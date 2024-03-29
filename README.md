@@ -16,5 +16,9 @@ The package provides a simple example to demonstrate the usage of the package. T
 
 As a proof of principle, in the example we reconstruct the figure from the paper Neyens, S. F. et al., Measurements of capacitive coupling within a quadruple-quantum-dot array. Physical Review Applied, 12(6), 064049
 
+<<<<<<< HEAD
 
 ![alt text](../Figures/neyens.png)
+=======
+![Test](qatpack/Figures/neyens.png)
+>>>>>>> 40acca1ac49c594c2d33ddedcaef64c7b271ddc7
