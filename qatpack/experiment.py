@@ -203,19 +203,24 @@ class Experiment(): #TODO: change name to the simulator name
         plane_axes: 2xN array, the axes spanning the cut through volage plane
         transition_sim: CapacitanceSimulator object, the transition simulator
         '''
-
+        transition = np.array(target_transition).T
         if compensate_sensors:
             # fix the sensor gate if we compensate
             csimulator = fix_gates(csimulator,self.sensor_config["sensor_dot_indices"], np.zeros(len(self.sensor_config["sensor_dot_indices"])))
             # reduce dimension of the voltag space
             plane_axes = plane_axes[:,self.inner_dots]
-        #find boundaries of the selected polytope
-        poly = csimulator.boundaries(target_state)
-        #get_labels of the transitions
-        inner_labels = poly.labels[:,self.inner_dots]
+            #get_labels of the transitions
+            poly = csimulator.boundaries(target_state)
+            inner_labels = poly.labels[:,self.inner_dots]
+            #Find the index of the transition point
+            transition = np.array(target_transition)[self.inner_dots].T
+        else:
+            poly = csimulator.boundaries(target_state)
+            transition = np.array(target_transition).T
+            inner_labels = poly.labels
 
-        #Find the index of the transition point
-        transition = np.array(target_transition)[self.inner_dots].T
+        #find boundaries of the selected polytope
+        
         try:
             idx_multidot_transition = [find_label(inner_labels, transition)[0]] 
         except ValueError:
@@ -230,7 +235,7 @@ class Experiment(): #TODO: change name to the simulator name
             # Compute the normals
             pair_transitions=np.array(
                 [np.array(transition).T for transition in plane_axes],dtype=int)  
-            
+
             idxs = [find_label(inner_labels,t)[0] for t in pair_transitions]  
             normals = -poly.A[idxs]
             normals /= np.linalg.norm(normals,axis=1)[:,None]
@@ -258,6 +263,7 @@ class Experiment(): #TODO: change name to the simulator name
         csimulator: CapacitanceSimulator object, the virtualised simulator
         '''
         gate_transitions = np.eye(self.N,dtype=int)[self.inner_dots]
+        print(gate_transitions)
         #TODO: Default target state is lower left corner state (initial guess). In future user could specify!
         self.target_state = target_state
         csimulator = axis_align_transitions(csimulator,  self.target_state, gate_transitions, self.inner_dots)
@@ -350,6 +356,8 @@ class Experiment(): #TODO: change name to the simulator name
         sensor_values: 3D array, the sensor signal [size(xout),size(yout),num_sensors]. None if use_sensor_signal is False
         V)offset: Nx1 array, the offset voltage of all of the gates
         '''
+        sensor_values = None
+
         # check required parameters
         if target_state is None:
             #if not target state use [0,0,0,0,0,0]
