@@ -220,7 +220,7 @@ class Experiment(): #TODO: change name to the simulator name
             inner_labels = poly.labels
 
         #find boundaries of the selected polytope
-        
+ 
         try:
             idx_multidot_transition = [find_label(inner_labels, transition)[0]] 
         except ValueError:
@@ -263,7 +263,6 @@ class Experiment(): #TODO: change name to the simulator name
         csimulator: CapacitanceSimulator object, the virtualised simulator
         '''
         gate_transitions = np.eye(self.N,dtype=int)[self.inner_dots]
-        print(gate_transitions)
         #TODO: Default target state is lower left corner state (initial guess). In future user could specify!
         self.target_state = target_state
         csimulator = axis_align_transitions(csimulator,  self.target_state, gate_transitions, self.inner_dots)
