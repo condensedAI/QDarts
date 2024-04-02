@@ -1,5 +1,5 @@
 [project]
-name = "QDATS"
+name = "QDarts"
 version = "1.0.1"
 authors = [
   { name="Jan Krzywda", email="j.a.krzywda@liacs.leidenuniv.nl" },
@@ -16,8 +16,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/condensedAI/QDATS"
-Issues = "https://github.com/condensedAI/QDATS"
+Homepage = "https://github.com/condensedAI/QDarts"
+Issues = "https://github.com/condensedAI/QDarts"
 
 [build-system]
 requires = ["setuptools>=61.0"]
