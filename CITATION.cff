@@ -1,0 +1,19 @@
+cff-version: 0.0.1
+message: "If you use this software, please cite it as below."
+title: "QDarts"
+authors:
+  - family-names: Krzywda
+    given-names: Jan
+    orcid: https://orcid.org/0000-0001-6449-1396
+  - family-names: Liu
+    given-names: Weikun
+  - family-names: van Nieuwenburg
+    given-names:  Evert
+    orcid: https://orcid.org/0000-0003-0323-0031
+  - family-names: Krause
+    given-names: Oswin
+    orcid: https://orcid.org/0000-0002-0990-559X
+version: 1.0.1
+date-released: 2024-04-02
+license: MIT License
+repository-code: "https://github.com/condensedAI/QDarts"
