@@ -1,0 +1,24 @@
+[project]
+name = "QDATS"
+version = "1.0.1"
+authors = [
+  { name="Jan Krzywda", email="j.a.krzywda@liacs.leidenuniv.nl" },
+  { name="Evert van Nieuwenburg", email="e.p.l.van.nieuwenburg@liacs.leidenuniv.nl" },
+  { name="Oswin Krause", email="oswin.krause@di.ku.dk" },
+]
+description = "A package for simulating realistic quantum dot arrays and their charge transitions."
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/condensedAI/QDATS"
+Issues = "https://github.com/condensedAI/QDATS"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
