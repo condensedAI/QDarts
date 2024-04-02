@@ -228,7 +228,7 @@ class Experiment(): #TODO: change name to the simulator name
         
         #Find the offset of V
         v_transition = find_point_on_transitions(poly,idx_multidot_transition)  
-        print("V_offset found:",v_transition) 
+        print("v_offset found:",v_transition) 
         
         
         if use_virtual_gates:
@@ -292,7 +292,7 @@ class Experiment(): #TODO: change name to the simulator name
                                         sensor_detunings = self.sensor_config["sensor_detunings"])
         return csimulator
     
-    def get_plot_args(self, x_voltages, y_voltages, plane_axes, V_offset = None):
+    def get_plot_args(self, x_voltages, y_voltages, plane_axes, v_offset = None):
         '''
         Function that returns the arguments for plotting the CSD.
         ----------------
@@ -300,22 +300,22 @@ class Experiment(): #TODO: change name to the simulator name
         x_voltages: list of floats, the x-axis voltages
         y_voltages: list of floats, the y-axis voltages
         plane_axes: 2xN array, the axes of the plane in which the CSD is to be rendered
-        V_offset: Nx1 array, the offset voltage of all of the gates, which defines the origin of the plot
+        v_offset: Nx1 array, the offset voltage of all of the gates, which defines the origin of the plot
         ----------------
         Returns:
-        V_offset: Nx1 array, the offset voltage of all of the gates
+        v_offset: Nx1 array, the offset voltage of all of the gates
         minV: 2x1 array, the minimum voltage of selected axes
         maxV: 2x1 array, the maximum voltage of selected axes
         resolution: list of integers, the resolution of the plot
         '''
 
-        if V_offset is None:
-            V_offset = np.zeros(self.N, dtype=float)
+        if v_offset is None:
+            v_offset = np.zeros(self.N, dtype=float)
         else:
-            V_offset = np.array(V_offset,dtype=float)
+            v_offset = np.array(v_offset,dtype=float)
 
-        xout = x_voltages + np.dot(V_offset,plane_axes[0])
-        yout = y_voltages + np.dot(V_offset,plane_axes[1])
+        xout = x_voltages + np.dot(v_offset,plane_axes[0])
+        yout = y_voltages + np.dot(v_offset,plane_axes[1])
 
 
         minV = np.array([x_voltages[0], y_voltages[0]])
@@ -323,7 +323,7 @@ class Experiment(): #TODO: change name to the simulator name
         
         resolution = [len(x_voltages), len(y_voltages)]
 
-        return V_offset, minV, maxV, resolution, xout, yout
+        return v_offset, minV, maxV, resolution, xout, yout
 
 
 # RENDER FUNCTIONS
@@ -332,7 +332,7 @@ class Experiment(): #TODO: change name to the simulator name
     def generate_CSD(self, x_voltages, y_voltages, plane_axes, target_state = None, 
                                target_transition = None, use_virtual_gates = False, 
                                compensate_sensors = False, compute_polytopes = False,
-                               use_sensor_signal = False, V_offset = None):
+                               use_sensor_signal = False, v_offset = None):
         '''
         Function that renders the capacitance CSD for a given set of voltages and axes.
         ----------------
@@ -346,14 +346,14 @@ class Experiment(): #TODO: change name to the simulator name
         compensate_sensors: bool, whether to compensate the sensors
         compute_polytopes: bool, whether to compute the polytopes
         use_sensor_signal: bool, whether to use the sensor signal
-        V_offset: Nx1 array, the offset voltage of all of the gates, which defines the origin of the plot
+        v_offset: Nx1 array, the offset voltage of all of the gates, which defines the origin of the plot
         ----------------
         Returns:
         xout, yout: list of floats, the x and y voltages
         CSD_data: 2D array, the CSD data
         polytopes: dictionary, the polytopes of the CSD. None if compute_polytopes is False
         sensor_values: 3D array, the sensor signal [size(xout),size(yout),num_sensors]. None if use_sensor_signal is False
-        V)offset: Nx1 array, the offset voltage of all of the gates
+        v_offset: Nx1 array, the offset voltage of all of the gates
         '''
         sensor_values = None
 
@@ -364,7 +364,7 @@ class Experiment(): #TODO: change name to the simulator name
         
         plane_axes = np.array(plane_axes)
         # prepare plot
-        V_offset, minV, maxV, resolution, xout, yout = self.get_plot_args(x_voltages, y_voltages, plane_axes, V_offset) 
+        v_offset, minV, maxV, resolution, xout, yout = self.get_plot_args(x_voltages, y_voltages, plane_axes, V_offset) 
         
         # prepare the simulator
         csimulator = self.capacitance_sim
@@ -375,7 +375,7 @@ class Experiment(): #TODO: change name to the simulator name
         if target_transition is not None:
             plane_axes, csimulator = self.center_transition(csimulator, target_state, target_transition, 
                                                             plane_axes, use_virtual_gates, compensate_sensors)
-            V_offset = np.zeros(2)  #TODO: how to do it nicer?
+            v_offset = np.zeros(2)  #TODO: how to do it nicer?
         
 
         elif use_virtual_gates:
@@ -384,24 +384,24 @@ class Experiment(): #TODO: change name to the simulator name
         
         # Part for the electrostatic CSD:
         if not use_sensor_signal or compute_polytopes:
-            backend, CSD_data, states =  get_CSD_data(csimulator, V_offset, np.array(plane_axes).T, minV, maxV, resolution, target_state)
+            backend, CSD_data, states =  get_CSD_data(csimulator, v_offset, np.array(plane_axes).T, minV, maxV, resolution, target_state)
             if compute_polytopes:
-                V_offset_polytopes = [np.dot(V_offset,plane_axes[0]), np.dot(V_offset,plane_axes[1])]
-                polytopes = get_polytopes(states, backend, minV, maxV,  V_offset_polytopes)
+                v_offset_polytopes = [np.dot(v_offset,plane_axes[0]), np.dot(v_offset,plane_axes[1])]
+                polytopes = get_polytopes(states, backend, minV, maxV,  v_offset_polytopes)
             
             if not use_sensor_signal:
-                return xout,yout, CSD_data.T, polytopes, sensor_values, V_offset
+                return xout,yout, CSD_data.T, polytopes, sensor_values, v_offset
         
         # Part for the sensor signal:
         self.print_logs = False
         simulator = self.deploy_tunneling_sim(csimulator, self.tunneling_config)
-        sensor_values = simulator.sensor_scan_2D(V_offset, plane_axes.T, minV, maxV, resolution, target_state)
+        sensor_values = simulator.sensor_scan_2D(v_offset, plane_axes.T, minV, maxV, resolution, target_state)
 
         if compute_polytopes:
-            backend, CSD_data, states =  get_CSD_data(csimulator, V_offset, np.array(plane_axes).T, minV, maxV, resolution,
+            backend, CSD_data, states =  get_CSD_data(csimulator, v_offset, np.array(plane_axes).T, minV, maxV, resolution,
                                                        target_state)
-            V_offset_polytopes = [np.dot(V_offset,plane_axes[0]), np.dot(V_offset,plane_axes[1])]
+            V_offset_polytopes = [np.dot(v_offset,plane_axes[0]), np.dot(v_offset,plane_axes[1])]
             polytopes = get_polytopes(states, backend, minV, maxV,   V_offset_polytopes)
-        return xout, yout, CSD_data.T, polytopes, sensor_values, V_offset
+        return xout, yout, CSD_data.T, polytopes, sensor_values, v_offset
         
         
