@@ -1,6 +1,6 @@
 [project]
 name = "QDarts"
-version = "1.0.1"
+version = "1.0.3"
 authors = [
   { name="Jan Krzywda", email="j.a.krzywda@liacs.leidenuniv.nl" },
   { name="Evert van Nieuwenburg", email="e.p.l.van.nieuwenburg@liacs.leidenuniv.nl" },

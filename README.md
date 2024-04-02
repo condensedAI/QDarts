@@ -25,7 +25,7 @@ The package provides a simple example to demonstrate the usage of the package. T
 As a proof of principle, in the example we reconstruct the figure from the paper [Neyens et al.](https://journals.aps.org/prapplied/abstract/10.1103/PhysRevApplied.12.064049z), which shows the measured charge conductance signal from two sensor dots, which detect simultanous four-dot transition in the quantum dot array. The figure, visible below, has been computed in about a minute on a standard laptop.
 
 <p align="center">
-  <img src="examples/figures/neyens.png" />
+  <img src="https://api.github.com/repos/condensedAI/QDarts/examples/figures/neyens.png" />
 <p/>
     
 ## Files in this repository
