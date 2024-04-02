@@ -13,9 +13,8 @@ We provide an efficient simulation package, QDarts, generating realistic charge 
 
 ## Installation
 The package supports Python 3.6 and later. To install the package, run the following command:
- 
 
-    pip install qdats
+    pip install qdarts
 
 ## Manuscript
 The package is based on the manuscript by [Krause et al., QDarts: Efficient Quantum Dot array transition simulator; The transition finding in presence of finite tunnel couplings, non-constant charging energies and sensor dots](). The manuscript has been submitted to the SciPost Physics Codebases.
