@@ -364,7 +364,7 @@ class Experiment(): #TODO: change name to the simulator name
         
         plane_axes = np.array(plane_axes)
         # prepare plot
-        v_offset, minV, maxV, resolution, xout, yout = self.get_plot_args(x_voltages, y_voltages, plane_axes, V_offset) 
+        v_offset, minV, maxV, resolution, xout, yout = self.get_plot_args(x_voltages, y_voltages, plane_axes, v_offset) 
         
         # prepare the simulator
         csimulator = self.capacitance_sim
