@@ -17,20 +17,17 @@ The package supports Python 3.6 and later. To install the package, run the follo
     pip install qdarts
 
 ## Manuscript
-The package is based on the manuscript by [Krause et al., QDarts: Efficient Quantum Dot array transition simulator; The transition finding in presence of finite tunnel couplings, non-constant charging energies and sensor dots](). The manuscript has been submitted to the SciPost Physics Codebases.
+The package is based on the manuscript by [Krzywda et al., QDarts: A Quantum Dot Array Transition Simulator for finding charge transitions in the presence of finite tunnel couplings, non-constant charging energies and sensor dots](). The manuscript has been submitted to the SciPost Physics Codebases.
 
 ## Examples
 The package provides a simple example to demonstrate the usage of the package. The example is available in the examples qatpack/examples folder. The example demonstrates the simulation of a quantum dot array with sensor dots, tunnel couplings, and non-constant charging energy. 
 
-As a proof of principle, in the example we reconstruct the figure from the paper [Neyens et al.](https://journals.aps.org/prapplied/abstract/10.1103/PhysRevApplied.12.064049z), which shows the measured charge conductance signal from two sensor dots, which detect simultanous four-dot transition in the quantum dot array. The figure, visible below, has been computed in about a minute on tabletop computer.
+As a proof of principle, in the example we reconstruct the figure from the paper [Neyens et al.](https://journals.aps.org/prapplied/abstract/10.1103/PhysRevApplied.12.064049z), which shows the measured charge conductance signal from two sensor dots, which detect simultanous four-dot transition in the quantum dot array. The figure, visible below, has been computed in about a minute on a standard laptop.
 
 <p align="center">
-  <img src="qdarts/figures/neyens.png" />
+  <img src="examples/figures/neyens.png" />
 <p/>
-using several line prompt:
     
-    
-
 ## Files in this repository
     qdarts
         |-- qdarts
@@ -46,3 +43,4 @@ using several line prompt:
             |-- examples_scipost.ipynb # notebook to reproduce figures from paper
         |-- README.md
         |-- LICENCE.md
+        |-- CITATION.cff
