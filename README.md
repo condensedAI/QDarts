@@ -2,7 +2,7 @@
 Efficient **Q**uantum **D**ot **ar**ray **t**ransition **s**imulator. 
 
 ## Description
-We provide an efficient simulation package, QDarts, generating realistic charge conductance signals from medium, more than 10 quantum dot arrays. By levering the polytope finding algorithm from ()[], the QDarts allows for:
+We provide an efficient simulation package, QDarts, generating realistic charge conductance signals from medium, more than 10 quantum dot arrays. By levering the polytope finding algorithm from ()[O. Krause, A. Chatterjee, F. Kuemmeth and E. van Nieuwenburg, Learning coulomb dia- monds in large quantum dot arrays, SciPost Physics 13(4), 084 (2022)](https://scipost.org/SciPostPhys.13.4.084), the QDarts allows for:
 - Transition finding in high-dimensional voltage space, 
 - Selection of arbitrary cuts in the voltage space,
 - Simulating effects of finite tunnel couplings,
