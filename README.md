@@ -52,6 +52,7 @@ The package is under active development. The future plans include:
 - [ ]   Including realistic noise processes, including 1/f noise,
 - [ ]   Adding more examples,
 - [ ]   Adding a method for generating capacitance matrices from:
-    - [ ] QD array layout
-    - [ ] Experimental data
+    - [ ] QD array layout,
+    - [ ] Experimental data,
+    - [ ] Finite element method simulations,
 - [ ]   Scaling up to larger quantum dot arrays N>10,
