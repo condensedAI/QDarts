@@ -44,3 +44,14 @@ As a proof of principle, in the example we reconstruct the figure from the paper
         |-- README.md
         |-- LICENCE.md
         |-- CITATION.cff
+
+
+## Roadmap
+The package is under active development. The future plans include:
+- [ ]   Adding barrier gates,
+- [ ]   Including realistic noise processes, including 1/f noise,
+- [ ]   Adding more examples,
+- [ ]   Adding a method for generating capacitance matrices from:
+    - [ ] QD array layout
+    - [ ] Experimental data
+- [ ]   Scaling up to larger quantum dot arrays N>10,
