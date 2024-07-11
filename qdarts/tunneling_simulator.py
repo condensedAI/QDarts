@@ -226,7 +226,7 @@ class ApproximateTunnelingSimulator:
     def _create_hamiltonian(self, v, A, b, tunnel_matrix, TOp):
         N = A.shape[0]
         energy_diff = -(A@v+b)
-        diags = np.sort(energy_diff)
+        diags = np.sort(energy_diff) #Q: Why sorted is not used?
         if tunnel_matrix is None:
             return np.diag(energy_diff)
         else:
@@ -257,7 +257,9 @@ class ApproximateTunnelingSimulator:
             
             #compute mixed state of the current voltage configuration
             extended_polytope = polytope.additional_info['extended_polytope']
-            H = sim_slice._create_hamiltonian(v, extended_polytope.A, extended_polytope.b, self.tunnel_matrix, extended_polytope.TOp)
+            H = sim_slice._create_hamiltonian(v, extended_polytope.A, extended_polytope.b, self.
+            tunnel_matrix, extended_polytope.TOp)
+
             mixed_state = sim_slice._compute_mixed_state(H)
             
             #compute sensor response for the mixed state
@@ -265,6 +267,18 @@ class ApproximateTunnelingSimulator:
             values[i] = sim_slice.sensor_sim.eval_sensor(H, mixed_state, sensor_state, self.beta)
         return values
         
+
+    def get_Hamiltonian(self, v, state_hint):
+          #prepare start state
+        state = self.poly_sim.find_state_of_voltage(v, state_hint = state_hint)
+        polytope = self._get_polytope(state)
+        extended_polytope = polytope.additional_info['extended_polytope']
+        H = self._create_hamiltonian(v, extended_polytope.A, extended_polytope.b, self.
+        tunnel_matrix, extended_polytope.TOp)
+    
+        return H
+
+
     def sensor_scan_2D(self, v_offset, P, minV, maxV, resolution, state_hint_lower_left):
         if P.shape[1] != 2:
             raise ValueError("P must have two columns")
