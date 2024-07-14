@@ -1,0 +1,85 @@
+% !TeX spellcheck = en_US
+\documentclass[aps,twocolumn,pra,notitlepage,]{revtex4-2}
+%twocolumn, 
+\usepackage{amsmath,amssymb}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{physics}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{cancel}
+\usepackage{bbold}
+\usepackage{bm}
+\usepackage{color} 
+\usepackage[dvipsnames]{xcolor}
+\usepackage[T1]{fontenc}
+
+\usepackage{tcolorbox}
+
+\usepackage{soul}
+
+
+\begin{document}
+\newcounter{theo}
+\affiliation{$\langle aQa^L
+\rangle$ Applied Quantum Algorithms, Lorentz Institute and Leiden Institute of Advanced Computer Science,
+Leiden University, P.O. Box 9506, 2300 RA Leiden, The Netherlands}
+
+\title{Relaxation between the two states} 
+
+
+\begin{abstract}
+  
+\end{abstract}
+\maketitle
+
+\section{Introduction}
+In this note we reveal the typical form of the coupling rate and compare against the phenomenological formula.
+
+\section{Model}
+We consider two state $\ket{n}$ and $\ket{m}$, which stands for the the two charge configurations. Addtionally there is a coupling between the electron states and the environment of the form $\hat V(x) = \hat V_s(x) \otimes \hat V_e(x)$, where $V_e$ acts on the environment and $V_s$ acts only on the system. The states are separated in energy by the Hamiltonian $H_0 = E(n,v) \ketbra{n} + E(m,v)\ketbra{m}$, and the environment has Hamiltonian $H_e = \sum_\alpha E_\alpha \ketbra{\alpha}$. We compute now probablity of transition from state $\ket{n}$ to $\ket{m}$, which is given by:
+\begin{equation}
+    p_{mn}(t) = \sum_{\alpha \beta} \abs{\bra{\alpha, m} \hat U_I(t) \ket{\beta,n}}^2
+\end{equation}
+where the environment is in state $\varrho = \sum_\alpha \ketbra{\alpha} p_\alpha$, where $\ket{\alpha}$ is some basis, and the unitary operator in interaction picture is given by
+\begin{equation}
+\hat U_I(t) = \hat T \exp\left( -i \int_0^t e^{i \hat H_0 t'}\hat V_e(x) e^{-i \hat H_0 t'} dt' \right).
+\end{equation}
+We now look at the leading order correction, i.e. $\hat U_I(t) = 1 - \frac{i}{\hbar} \int_0^t dt' e^{i (\hat H_0 + \hat H_e) t'}\hat V(x)e^{-i (\hat H_0+\hat H_1) t'}$ and split the interaction $\hat V_e(x) = \hat V_s(x) \otimes \hat V_e(x)$, where $V_s$ acts on the system only, and $V_e(x)$ only on the environment. This substituted gives:
+\begin{align}
+    p_{mn}(t) &=\int_0^t \text{d}t_1 \text{d}t_2  \sum_{\alpha\beta} p_\alpha \nonumber\\ &\bra{m}e^{i\hat H_0 t_1}\hat V_s(x) e^{-i\hat H_0 t_1}\ket{n}\bra{\alpha}\hat V_e(x,t_1)\ket{\beta}\nonumber \\& 
+    \bra{n}e^{i\hat H_0 t_2}\hat V_s^\dagger(x) e^{-i\hat H_0 t_2}\ket{m} \bra{\beta} \hat V_e^\dagger(x,t_2)\ket{\alpha}
+    \nonumber \\&=\abs{\bra{m}\hat V_s(x)\ket{n}}^2 
+    \int_0^t \text{d}t_1 \text{d}t_2 e^{i(E_m-E_n)(t_1-t_2)}\nonumber \\ &\times \sum_\alpha p_\alpha \bra{\alpha}\hat V_e(x,t_1)\sum_\beta \ketbra{\beta}\hat V_e(x,t_2) \ket \alpha \nonumber \\&=\abs{\bra{m}\hat V_s(x)\ket{n}}^2
+    \int_0^t \text{d}t_1 \text{d}t_2 e^{i(E_m-E_n)(t_1-t_2)}
+\end{align}
+
+We now define spectral density of the environment as:
+\begin{equation}
+    S(\omega) = \int_{-\infty}^\infty \text{d}t e^{i\omega t} C(t)
+\end{equation}
+where $C(t) = 
+\Tr_e\{V_e(t)V_e(0)\varrho_e\}$. Which allows to write the double integral as:
+\begin{align}
+    p_{mn}(t) = \abs{\bra{m}\hat V_s(x)\ket{n}}^2 \int_{-\infty}^\infty \frac{\text{d}\omega}{2\pi} S(\omega) \abs{\int_0^t \text{d}t_1 e^{-i(\omega - E_{mn}) t_1}}^2 \nonumber \\
+\end{align} 
+where $E_{mn} = E_m - E_n$. We now compute the integral, which gives:
+\begin{equation}
+    p_{mn}(t) = t\abs{\bra{m}\hat V_s(x)\ket{n}}^2 \int_{-\infty}^\infty \frac{\text{d}\omega}{2\pi} S(\omega) t \text{sinc}^2\bigg(\frac{\omega - E_{mn}}{2}t\bigg)
+\end{equation}
+Finally we assume $t$ is sufficiently large such that the $t \text{sinc}^2(a t/2) \to 2\pi \delta(a)$, which gives: 
+\begin{equation}
+    \Gamma_{mn}(t) \equiv p_{mn}/t =  \abs{\bra{m}\hat V_s(x)\ket{n}}^2 S(E_{mn})
+\end{equation}
+
+
+
+
+
+
+
+%\end{appendix}
+%\bibliographystyle{plain}
+
+
+\end{document}
