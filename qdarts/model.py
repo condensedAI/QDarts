@@ -159,11 +159,11 @@ class Model(BaseCapacitanceModel):
         self.C_D_atto = np.asarray(C_D)
         self.transform_C_g = np.array(transform_C_g)
 
-        # Check that an offset is provided for every dot
-        self.offset = np.zeros(self.num_dots)
+        # Check that an offset is provided for every gate
+        self.offset = np.zeros(self.transform_C_g.shape[0])
         if offset is not None:
-            if len(offset) != self.num_dots:
-                raise ValueError("The offset you provided does not have an offset for every dot.")
+            if len(offset) != self.transform_C_g.shape[0]:
+                raise ValueError("The offset you provided does not have an offset for every gate of the device (prior to slicing).")
             self.offset = np.array(offset)
 
         # Convert units from attoFarrad to Farrad per eV
