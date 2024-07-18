@@ -24,9 +24,11 @@ def solve_linear_problem(prob):
 def compute_polytope_slacks(A, b, maximum_slack):
     """Computes the slacks of each candidate transition of a ground state polytope.
     
-    The polytope is given given by all points x, such that Ax+b<0. There might be boundaries
+    The polytope is given by all points x, such that Ax+b<0. There might be boundaries
     such that for no x holds that A_ix+b_i = 0. In this case the definition of the polytope is
-    the same when it is removed. However, we can relax this by allowing a positive slack and 
+    the same when it is removed. However, sometimes we are interested in keeping transitions that
+    are near misses - i..e, there exists an x such that, the inequality is almost fulfilled.
+    In this case, we can relax this by allowing a positive slack and 
     accept transitions to still be relevant for the polytope when we find an x, such that
     
     A_ix+b_i <= slack
@@ -41,7 +43,7 @@ def compute_polytope_slacks(A, b, maximum_slack):
     Parameters
     ----------
     A: NxK np.array of floats
-        The linear coefficients of the N affine linear equations
+        The linear coefficients of the N affine linear equations in K dimensions
     b: N np.array of floats
         The constant offsets of the N affine linear equations
     maximum_slack: float
@@ -105,7 +107,7 @@ def compute_maximum_inscribed_circle(A, b, bounds_A, bounds_b):
     
     The maximum inscribed circle is a crude measure for position and size of a polytope.
     It computes the circle with maximum radius r and midpoint m, such that all its points 
-    lie inside the polytope. The function returns (m,r).
+    lie inside the polytope. The function returns the (m,r) maximizing this. This choice is very often not unique.
     
     Since the polytope given by linear equations A,b might be unbounded, the function takes another
     set of linear equations for establishing lower and upper bounds. In essence, this is the same as
@@ -116,7 +118,7 @@ def compute_maximum_inscribed_circle(A, b, bounds_A, bounds_b):
     Parameters
     ----------
     A: NxK np.array of floats
-        The linear coefficients of the N affine linear equations of the polytope
+        The linear coefficients of the N affine linear equations in the K-dimensional polytope
     b: N np.array of floats
         The constant offsets of the N affine linear equations of the polytope
     bounds_A: MxK np.array of floats
@@ -155,6 +157,8 @@ def find_point_on_transitions(polytope, indizes):
     by the maximum inscribed circle on the facet (or the subfacet
     created by the intersection of facets).
     
+    TODO: it is not quite clear what happens when the indizes are not touching.
+    
     Parameters
     ----------
     
@@ -190,7 +194,10 @@ def fix_gates(simulator, gate_ids, gate_values, proxy=False):
     operation can not be undone in the returned simulation.
     
     Please keep in mind that by doing this, all indices of gate voltages at entries
-    after the deleted entries change.
+    after the deleted entries change, i.e., in a device with 4 plungers, removing the
+    third plungers will lead to a simulator with 3 plungers where the last plunger has
+    index 3. It is therefore advisable to order parameters such that fix_gates is always
+    applied to the end.
     
     Parameters
     ----------
@@ -219,8 +226,11 @@ def axis_align_transitions(simulator, target_state, transitions, compensation_ga
     """Transform the simulators coordinate system such that transitions are aligned with coordinate axes
     
     Takes a set of transitions from a target state and a set of gate indices of same length. 
-    Computes a linear transformation such, that the ith transition is parallel to the ith gate axis supplied as
+    Computes a linear transformation such, that the normal of the ith transition is parallel to the ith gate axis supplied as
     argument.
+    
+    For example, to align the transition from state [1,1,1] to [1,1,2] with the first plunger gate, we set
+    target_state=[1,1,1], transitions=[[1,0,0]] and compensation_gates=[0]
     
     Parameters
     ----------
@@ -228,8 +238,8 @@ def axis_align_transitions(simulator, target_state, transitions, compensation_ga
         The simulator object which is to be transformed
     target_state: list of int
         The state from which the transitions are extracted
-    transitions: NxK np.array of int
-        The set of N transitions (given as difference vectors state-target_state) to align
+    transitions: NxD np.array of int
+        The set of N transitions (given as D-dimensional difference vectors state-target_state) to align
     compensation_gates: list of int
         The indices of the plunger gates that should be transformed to align with the transition normals
     proxy: bool
@@ -280,7 +290,7 @@ def compensate_simulator_sensors(simulator, target_state, compensation_gates, se
     target_state: list of int
         The state from which the transitions are extracted
     compensation_gates: list of int
-        The gates to be used for compensation of the sensor. Typiclaly the sensor plunger gates in the device
+        The gates to be used for compensation of the sensor. Typically the sensor plunger gates in the device
     sensor_ids: list of int
         The indices of the sensor ids.
     sensor_detunings: np.array of float
