@@ -1,7 +1,7 @@
 from simulator import *
 from tunneling_simulator import *
-from util_functions import compensated_simulator
-from noise_processes import OU_process
+from util_functions import compensate_simulator_sensors
+from noise_processes import OU_process,Cosine_Mean_Function
 
 #for the algorithm
 import numpy as np
@@ -45,12 +45,13 @@ class Experiment(): #TODO: change name to the simulator name
         # Check requirements for sensor and tunneling configurations
         if tunneling_config != None and sensor_config == None:
             raise ValueError("Specifying a tunneling configuration also requires a sensor configuration.")
-        elif (tunneling_config == None and sensor_config != None):
-            raise ValueError("Specifying a sensor configuration also requires a tunneling configuration.")        
-        elif (tunneling_config != None and sensor_config != None):
+        if (tunneling_config == None and sensor_config != None):
+            raise ValueError("Specifying a sensor configuration also requires a tunneling configuration.")
+        if tunneling_config != None:
             self.sensor_model = self.deploy_sensor_model(sensor_config)
             self.tunneling_sim = self.deploy_tunneling_sim(self.capacitance_sim, tunneling_config)
             self.has_sensors = True
+        
 
 
 # DEPLOYMENT FUNCTIONS
@@ -73,7 +74,7 @@ class Experiment(): #TODO: change name to the simulator name
         self.inner_dots = list(np.arange(self.N))  #indces of the dots. NOTE: no sensor at this point   
         
         if self.print_logs:
-            if config["ks"] == None:
+            if not config["ks"] is None:
                 # Print log of capacitance parameters
                 log = """
                 Capacitance model deployed with the following parameters:
@@ -112,10 +113,11 @@ class Experiment(): #TODO: change name to the simulator name
         tunneling_sim: ApproximateTunnelingSimulator object
         '''
         tunneling_matrix = tunneling_config["tunnel_couplings"]
-        if np.max(tunneling_matrix)==0:
-            tunneling_matrix = tunneling_matrix + 1e-20
+        tunnel_barrier_offsets = np.log(tunneling_matrix + 1e-20)
+        barrier_levers = tunneling_config["barrier_levers"] if "barrier_levers" in tunneling_config.keys() else None
+        barrier_sim = TunnelBarrierModel(tunnel_barrier_offsets, barrier_levers)
         tunneling_sim = ApproximateTunnelingSimulator(capacitance_sim, 
-                                             tunneling_matrix,   
+                                             barrier_sim,   
                                              tunneling_config["temperature"],
                                              self.sensor_model)
         
@@ -157,7 +159,14 @@ class Experiment(): #TODO: change name to the simulator name
         slow_noise_gen = OU_process(sig = sensor_config["noise_amplitude"]["slow_noise"], 
                                 tc = SLOW_NOISE["tc"], 
                                 dt = 1,  # the unit of time is the single measurment
-                                num_points=SLOW_NOISE["samples"], )  #TODO: LATER: implement 1/f noise
+                                num_points=SLOW_NOISE["samples"], 
+                                num_sensors = len(sensor_config["sensor_dot_indices"]))  #TODO: LATER: implement 1/f noise
+                                
+        if "mean_field" in sensor_config.keys():
+            mean_field_config = sensor_config["mean_field"]
+            if mean_field_config["type"] == "Cosine_Mean_Function":
+                b = mean_field_config["b"] if "b" in mean_field_config.keys() else None
+                slow_noise_gen = Cosine_Mean_Function(slow_noise_gen, mean_field_config["a"], mean_field_config["W"], b)
        
         # Deploy sensor model
         sensor_sim = NoisySensorDot(sensor_config["sensor_dot_indices"])
@@ -187,12 +196,12 @@ class Experiment(): #TODO: change name to the simulator name
         return sensor_sim
         
     
-    def center_transition(self, csimulator, target_state, target_transition, plane_axes, use_virtual_gates = False, compensate_sensors = False):
+    def center_transition(self, simulator, target_state, target_transition, plane_axes, use_virtual_gates = False, compensate_sensors = False):
         '''
         Function that center the CSD at a given facet (transition) of the polytope (occupation state).
         ----------------
         Arguments:
-        csimulator: CapacitanceSimulator object
+        simulator: any simulator object
         target_state: int, the state at which the transition happens, e.g. [2,2] 
         target_transition: list of integers, the transition point e.g. [1,-1] would be the transition from [2,2] to [1,1]
         plane_axes: 2xN array, the axes of the transition which span the plane
@@ -203,24 +212,20 @@ class Experiment(): #TODO: change name to the simulator name
         plane_axes: 2xN array, the axes spanning the cut through volage plane
         transition_sim: CapacitanceSimulator object, the transition simulator
         '''
-        transition = np.array(target_transition).T
+
         if compensate_sensors:
             # fix the sensor gate if we compensate
-            csimulator = fix_gates(csimulator,self.sensor_config["sensor_dot_indices"], np.zeros(len(self.sensor_config["sensor_dot_indices"])))
+            simulator = fix_gates(simulator,self.sensor_config["sensor_dot_indices"], np.zeros(len(self.sensor_config["sensor_dot_indices"])))
             # reduce dimension of the voltag space
-            plane_axes = plane_axes[:,self.inner_dots]
-            #get_labels of the transitions
-            poly = csimulator.boundaries(target_state)
-            inner_labels = poly.labels[:,self.inner_dots]
-            #Find the index of the transition point
-            transition = np.array(target_transition)[self.inner_dots].T
-        else:
-            poly = csimulator.boundaries(target_state)
-            transition = np.array(target_transition).T
-            inner_labels = poly.labels
-
+            complement_gates = [i for i in range(plane_axes.shape[1]) if i not in self.sensor_config["sensor_dot_indices"]]
+            plane_axes = plane_axes[:,complement_gates]
         #find boundaries of the selected polytope
- 
+        poly = simulator.boundaries(target_state)
+        #get_labels of the transitions
+        inner_labels = poly.labels[:,self.inner_dots]
+
+        #Find the index of the transition point
+        transition = np.array(target_transition)[self.inner_dots].T
         try:
             idx_multidot_transition = [find_label(inner_labels, transition)[0]] 
         except ValueError:
@@ -235,17 +240,18 @@ class Experiment(): #TODO: change name to the simulator name
             # Compute the normals
             pair_transitions=np.array(
                 [np.array(transition).T for transition in plane_axes],dtype=int)  
-
-            idxs = [find_label(inner_labels,t)[0] for t in pair_transitions]  
+            
+            idxs = [find_label(inner_labels,t[self.inner_dots])[0] for t in pair_transitions]  
             normals = -poly.A[idxs]
             normals /= np.linalg.norm(normals,axis=1)[:,None]
             P_transition = normals.T
             transition_sim = axis_align_transitions(
-                            csimulator.slice(P_transition, v_transition),
+                            simulator.slice(P_transition, v_transition),
                             target_state,poly.labels[idxs],[0,1])
         else:
-            transition_sim = csimulator.slice(plane_axes.T, v_transition)
-
+            transition_sim = simulator.slice(plane_axes.T, v_transition)
+        
+        
         return np.eye(2), transition_sim     
 
 # GETTERS
@@ -269,12 +275,12 @@ class Experiment(): #TODO: change name to the simulator name
         return csimulator
     
 
-    def get_compensated_csim(self,csimulator, target_state):
+    def get_compensated_sim(self,simulator, target_state):
         '''
-        Function that takes a capacitance simulator and compensates the sensors.
+        Function that takes a simulator and compensates the sensors.
         ----------------
         Arguments:
-        csimulator: CapacitanceSimulator object
+        simulator: any object
         target_stater: int, the state at which sensor compensation happens
         ----------------
         Returns:
@@ -285,12 +291,35 @@ class Experiment(): #TODO: change name to the simulator name
             
             # TODO: Do we need to specify compensation gates *and* sensor ids? Only if we want to compensate a subset of sensors.
         else:
-            csimulator = compensated_simulator(csimulator,
+            simulator = compensated_simulator(simulator,
                                         target_state=target_state,
                                         compensation_gates=self.sensor_config["sensor_dot_indices"],
                                         sensor_ids = self.sensor_config["sensor_dot_indices"], 
                                         sensor_detunings = self.sensor_config["sensor_detunings"])
         return csimulator
+    
+    def get_compensated_sim(self,simulator, target_state):
+        '''
+        Function that takes a capacitance simulator and compensates the sensors.
+        ----------------
+        Arguments:
+        csimulator: Tunnelingsimulator object
+        target_stater: int, the state at which sensor compensation happens
+        ----------------
+        Returns:
+        csimulator: CapacitanceSimulator object, the compensated simulator
+        '''
+        if not self.has_sensors:
+                raise ValueError("Compensating sensors requires a sensor model.")
+            
+            # TODO: Do we need to specify compensation gates *and* sensor ids? Only if we want to compensate a subset of sensors.
+        else:
+            simulator = compensate_simulator_sensors(simulator.poly_sim,
+                                        target_state=target_state,
+                                        compensation_gates=self.sensor_config["sensor_dot_indices"],
+                                        sensor_ids = self.sensor_config["sensor_dot_indices"], 
+                                        sensor_detunings = self.sensor_config["sensor_detunings"])
+        return simulator.slice(P,v_zero)
     
     def get_plot_args(self, x_voltages, y_voltages, plane_axes, v_offset = None):
         '''
@@ -310,7 +339,7 @@ class Experiment(): #TODO: change name to the simulator name
         '''
 
         if v_offset is None:
-            v_offset = np.zeros(self.N, dtype=float)
+            v_offset = np.zeros(plane_axes.shape[1], dtype=float)
         else:
             v_offset = np.array(v_offset,dtype=float)
 
@@ -355,8 +384,6 @@ class Experiment(): #TODO: change name to the simulator name
         sensor_values: 3D array, the sensor signal [size(xout),size(yout),num_sensors]. None if use_sensor_signal is False
         v_offset: Nx1 array, the offset voltage of all of the gates
         '''
-        sensor_values = None
-
         # check required parameters
         if target_state is None:
             #if not target state use [0,0,0,0,0,0]
@@ -366,42 +393,45 @@ class Experiment(): #TODO: change name to the simulator name
         # prepare plot
         v_offset, minV, maxV, resolution, xout, yout = self.get_plot_args(x_voltages, y_voltages, plane_axes, v_offset) 
         
-        # prepare the simulator
-        csimulator = self.capacitance_sim
+        # pick the simulator
+        if use_sensor_signal:
+            simulator = self.tunneling_sim
+        else:
+            simulator = self.capacitance_sim
         
         if compensate_sensors:
-            csimulator = self.get_compensated_csim(csimulator,target_state= target_state)
+            simulator = self.get_compensated_sim(simulator,target_state= target_state)
      
         if target_transition is not None:
-            plane_axes, csimulator = self.center_transition(csimulator, target_state, target_transition, 
+            plane_axes, simulator = self.center_transition(simulator, target_state, target_transition, 
                                                             plane_axes, use_virtual_gates, compensate_sensors)
             v_offset = np.zeros(2)  #TODO: how to do it nicer?
-        
+            
 
         elif use_virtual_gates:
-            csimulator = self.get_virtualised_csim(csimulator, target_state)
-       
+            simulator = self.get_virtualised_csim(simulator, target_state)
         
+        if use_sensor_signal:
+            csimulator = simulator.poly_sim
+        else:
+            csimulator = simulator
+       
         # Part for the electrostatic CSD:
+        CSD_data = None
+        polytopes = None
         if not use_sensor_signal or compute_polytopes:
             backend, CSD_data, states =  get_CSD_data(csimulator, v_offset, np.array(plane_axes).T, minV, maxV, resolution, target_state)
-            if compute_polytopes:
-                v_offset_polytopes = [np.dot(v_offset,plane_axes[0]), np.dot(v_offset,plane_axes[1])]
-                polytopes = get_polytopes(states, backend, minV, maxV,  v_offset_polytopes)
-            
-            if not use_sensor_signal:
-                return xout,yout, CSD_data.T, polytopes, sensor_values, v_offset
+            CSD_data = CSD_data.T
+        if compute_polytopes:
+            v_offset_polytopes = [np.dot(v_offset,plane_axes[0]), np.dot(v_offset,plane_axes[1])]
+            polytopes = get_polytopes(states, backend, minV, maxV,  v_offset_polytopes)
+                
         
         # Part for the sensor signal:
-        self.print_logs = False
-        simulator = self.deploy_tunneling_sim(csimulator, self.tunneling_config)
-        sensor_values = simulator.sensor_scan_2D(v_offset, plane_axes.T, minV, maxV, resolution, target_state)
+        sensor_values = None
+        if use_sensor_signal:
+            sensor_values = simulator.sensor_scan_2D(v_offset, plane_axes, minV, maxV, resolution, target_state)
 
-        if compute_polytopes:
-            backend, CSD_data, states =  get_CSD_data(csimulator, v_offset, np.array(plane_axes).T, minV, maxV, resolution,
-                                                       target_state)
-            V_offset_polytopes = [np.dot(v_offset,plane_axes[0]), np.dot(v_offset,plane_axes[1])]
-            polytopes = get_polytopes(states, backend, minV, maxV,   V_offset_polytopes)
-        return xout, yout, CSD_data.T, polytopes, sensor_values, v_offset
+        return xout, yout, CSD_data, polytopes, sensor_values, v_offset
         
         

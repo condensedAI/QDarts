@@ -1,6 +1,7 @@
 import numpy as np
 from functools import partial
 from scipy  import sparse as sp
+from util_functions import find_label
 import scipy.stats as stats
 
 def softmax(v,axis=None):
@@ -8,23 +9,106 @@ def softmax(v,axis=None):
     y = np.exp(v-max_v)
     return y/np.sum(y,axis)
 
-# def sigmoid(x):
-#     return 1.0/(1.0+np.exp(np.minimum(-x,200)))
-    
-# def logsumexp(v,axis=None):
-#     max_v = np.max(v,axis)
-#     y = np.exp(v-max_v)
-#     return np.log(np.sum(y,axis)) + max_v
-    
 class BaseSensorSim:
+    """ Base class defining the interface for all sensor simulations"""
     def __init__(self, num_sensors):
+        """Initialized a sensor configuration with num_sensors sensor dots"""
         self.num_sensors = num_sensors
-    def precompute_sensor_state(self, state, A, b, labels):
+    def slice(self, P, m):
+        """Takes an affine subspace of the simulated model."""
+        raise NotImplementedError('slice is not implemented')
+    def precompute_sensor_state(self, state, A, b, basis_labels):
+        """ Allows the sensor to precompute internal information that is valid for a whole ground state polytope.
+            
+            This allows the sensor to precompute and cache information that is valid for all voltages v that are inside a
+            ground state polytope P. The returned values are cached in the polytope objects of the simulator and
+            supplied as sensor_state argument during a call of sample_sensor_equilibrium and sample_sensor_configuration.
+            The supplied information provides all information of the basis labels considered by the simulation for P(n),
+            and the linear functions defining the facets of P(n) Av+b. Note that as everywhere else, these linear functions define
+            energy differences for each considered basis label to the ground state. 
+            
+            Parameters
+            ----------
+            
+            state: np.array of ints
+                the state of N dots, identifying the ground state polytope for which to generate the sensor state information
+            A: LxK np.array of floats
+                LxK linear parameters of the energy difference function for the K sensor gates
+            b: np.array of floats
+                The affine offsets of the energy difference function for the L basis states
+            basis_labels: LxN np.array of ints
+                The labels of the L basis states
+        """
         return None
-    def eval_sensor(self, H, rho, sensor_state):
-        raise NotImplementedError('eval_sensor is not implemented')
-    
+    def sample_sensor_equilibrium(self, v, H, mixed_state, sensor_state, beta):
+        """ Computes a noisy average of the sensor response for a given mixed state.
+        
+            This is intended to simulate a long (>1mus) time integration of the sensor signal, thus
+            we can assume that states are thermalized but the signal is still affected by noise.
+            
+            Parameters
+            ----------
+            
+            v: np.array of floats:
+                vector of K gate voltages defining the current system
+            H: LxL np.array of floats
+                Hamiltonian of the system defined by v. Labels and basis are the same as in precompute_sensor_state
+            mixed_state: LxL np.array of floats
+                Mixed state matrix computed via the Hamiltonian using expm(-beta*H)
+            sensor_state: 
+                Cached information returned by precompute_sensor_state. All information therein are internal to the
+                sensor simulator
+            beta: scaled inverse temperature parameter
+        """
+        raise NotImplementedError('sample_sensor_equilibrium is not implemented')  
+    def sample_sensor_configuration(self, sampled_configuration, v, H, mixed_state, sensor_state, beta):
+        """ samples a sensor response for a given sampled elecron configuration
+        
+            This is intended to simulate a short (<<1mus) time integration of the sensor signal,
+            where we can not assume that electrons transitions during the measurement. In this case,
+            the user supplied the relevant configuration and the sensor returns a sampled signal for this configuration.
+            Care should be taken that the configuration sampled has all information needed in the base to compute the sensor
+            signal, e.g., there should be a state with one more or less electrons on each sensor dot.
+
+            
+            Parameters
+            ----------
+            
+            sampled_configuration: np.array of ints
+                vector of N elements describing the sampled electron configuration.
+            v: np.array of floats:
+                vector of K gate voltages defining the current system
+            H: LxL np.array of floats
+                Hamiltonian of the system defined by v. Labels and basis are the same as in precompute_sensor_state
+            mixed_state: LxL np.array of floats
+                Mixed state matrix computed via the Hamiltonian using expm(-beta*H)
+            sensor_state: 
+                Cached information returned by precompute_sensor_state. All information therein are internal to the
+                sensor simulator
+            beta: scaled inverse temperature parameter
+        """
+        raise NotImplementedError('sample_sensor_configuration is not implemented')  
+
 class NoisySensorDot(BaseSensorSim):
+    """ Simulates a sensor signal by computing the conductance of the sensor dots.
+    
+        This class implements the interface of BaseSensorSim and for most points, the
+        documentation there should be referred to. This simulation combines a simple
+        estimation of the conductance g with two noise sources. A fast noise source
+        that simulates gaussian white noise that is drawn for each query of the sensor response
+        and a slow noise source that models time dependent noise between different invocations
+        of the sensor. 
+        
+        The shape of the simulated sensor peak can be configured ´via config_peak, in which
+        height and with of the peak can be adapted. Currently, all sensor dots share these 
+        parameters.
+        
+        The noise can be configured via config_noise. The noise is modeled as an additive 
+        noise on the sensor peak position in voltage space. Thus, at peaks or valleys, the noise
+        is small while on the sides of the peak, where the derivatives are largest, the noise will
+        affect measurements the most. No additional sensor noise is modeled and the user can for example
+        add white noise on top to model the noise added by the measurements.
+    """
     def __init__(self, sensor_dot_ids):
         super().__init__(len(sensor_dot_ids))
         self.sensor_dot_ids = sensor_dot_ids
@@ -42,6 +126,19 @@ class NoisySensorDot(BaseSensorSim):
     def config_peak(self, g_max, peak_width_multiplier):
         self.g_max = g_max
         self.peak_width_multiplier = peak_width_multiplier
+        
+    def slice(self, P, m):
+        #if there is no slow noise, there is nothing to slice
+        if self.slow_noise_gen is None: return self
+        
+        #otherwise create a copy of this with a sliced slow noise model
+        sliced_sensor_dot = NoisySensorDot(self.sensor_dot_ids)
+        sliced_sensor_dot.g_max = self.g_max
+        sliced_sensor_dot.fast_noise_var = self.fast_noise_var
+        sliced_sensor_dot.n_virtual_samples = self.n_virtual_samples
+        sliced_sensor_dot.peak_width_multiplier = self.peak_width_multiplier
+        sliced_sensor_dot.slow_noise_gen = self.slow_noise_gen.slice(P,m)
+        return sliced_sensor_dot
     
     def precompute_sensor_state(self, state, A, b, labels):
         sensor_state ={}
@@ -74,52 +171,322 @@ class NoisySensorDot(BaseSensorSim):
             terms = np.array(relevant_label_indices,dtype=int)
             prev = np.array(prev,dtype=int)
             next = np.array(next,dtype=int)
-            sensor_state[sensor_id] = (terms,prev,next)
+            terms_labels = labels[terms,:]
+            sensor_state[sensor_id] = (terms,prev,next,terms_labels)
         return sensor_state
-    
-    def eval_sensor(self, H, mixed_state, sensor_state, beta):
+        
+    def _precompute_g(self, v, H, sensor_state, beta):
         results = np.zeros(len(self.sensor_dot_ids))
+        gs={}
+        slow_noise = np.zeros((results.shape[0],1))
+        if not self.slow_noise_gen is None:
+            slow_noise = self.slow_noise_gen(v)
         for i, sensor_id in enumerate(self.sensor_dot_ids):
-            terms,neighbour_prev, neighbour_next = sensor_state[sensor_id]
+            terms,neighbour_prev, neighbour_next, _ = sensor_state[sensor_id]
             
-            #get probability of each state of the array
-            p = np.diag(mixed_state)[terms]
             #compute sensor detuning between every state and their neighbour
             eps_prev = np.abs(np.diag(H)[terms]-np.diag(H)[neighbour_prev])
             eps_next = np.abs(np.diag(H)[terms]-np.diag(H)[neighbour_next])
             eps = np.minimum(eps_prev,eps_next)
             #add noise
-            if self.slow_noise_gen is None:
-                eps = eps[:,None]
-            else:
-                eps = (eps[:,None]+self.slow_noise_gen()[None,:])
+            eps = eps[:,None]+slow_noise[i:i+1,:]
             if self.fast_noise_var > 0:
                 fast_noise = np.random.randn(*eps.shape)*np.sqrt(self.fast_noise_var)
                 eps += fast_noise
             eps *=beta 
-            #simulate the fast noise around the peak. for this we approximate the logistic shape of the peak by a normal
-            #peak and compute the exact noise and variance assuming that the fast noise is uncorrelated normal distributed
-            var_peak = 0
-            #var_peak = self.fast_noise_var*beta**2   #NOTE: We give fast noise in ueV
             var_logistic = (1/0.631*self.peak_width_multiplier)**2
             # compute first and second moment of the noise. by law of large numbers, as n_virtual_samples->large
             # the avg will become normally distributed.
+            #TODO: revert this to old logistic distribution, this is wrong.
             norm_pdf = lambda x, mu,var: 1/np.sqrt(2*np.pi*var)*np.exp(-(x-mu)**2/(2*var))
-            mean_g = 4*norm_pdf(0,eps, var_peak + var_logistic)
+            mean_g = 4*norm_pdf(0,eps, var_logistic)
             second_moment_g =  16*norm_pdf(0,eps, (self.fast_noise_var + var_logistic/2))* 0.5/np.sqrt(np.pi*var_logistic)
             std_g = np.sqrt(np.abs(second_moment_g - mean_g**2)/self.n_virtual_samples)
             
 
             #now sample from the approximation
             g = beta*self.g_max*(mean_g + std_g*np.random.randn(*eps.shape))
-            #average over the probability of each sample
-            results[i] = np.sum(p*np.mean(g,axis=1))/np.sum(p)
+            #average over noise samples (just now 1)
+            g = np.mean(g,axis=1)
+            #save for the sensor
+            gs[sensor_id] = g
+        return gs
+    def sample_sensor_equilibrium(self, v, H, mixed_state, sensor_state, beta):
+        results = np.zeros(len(self.sensor_dot_ids))
+        gs = self._precompute_g(v, H, sensor_state, beta)
+        
+        for i, sensor_id in enumerate(self.sensor_dot_ids):
+            terms,neighbour_prev, neighbour_next, _ = sensor_state[sensor_id]
+            g = gs[sensor_id]
+            p = np.diag(mixed_state)[terms]
+            results[i] = np.sum(p*g)/np.sum(p)
         return results
         
-class ApproximateTunnelingSimulator:
-    def __init__ (self, polytope_sim, tunnel_matrix, T, sensor_sim):
+    def sample_sensor_configuration(self, sampled_configuration, v, H, mixed_state, sensor_state, beta):
+        results = np.zeros(len(self.sensor_dot_ids))
+        gs = self._precompute_g(v, H, sensor_state, beta)
+        
+        
+        for i, sensor_id in enumerate(self.sensor_dot_ids):
+            terms,neighbour_prev, neighbour_next,terms_labels = sensor_state[sensor_id]
+            label_pos = find_label(terms_labels, sampled_configuration)
+            results[i] = gs[sensor_id][label_pos]
+        return results
+        
+class TunnelBarrierModel:
+    """ Model of the tunnel barriers of a device
+    
+    This class defines a mapping between gate voltages of the device and
+    the tunnel coupling between the dots. To be more exact, the tunnel
+    coupling between dots i, and j and the gate voltages v is given by
+    
+    T_ij = exp(W_ij^Tv+b_ij)
+    
+    where W_ij is a vector of couplings and b_ij is an offset.
+    """
+    def __init__(self, gate_offsets, gate_levers = None):
+        """Creates a tunnel barrier model.
+        
+        Parameters
+        ----------
+        gate_offsets : NxN np.array of floats
+            the offsets b_ij provided as matrix.
+        gate_levers : NxNxK np.array of floats or None
+            Here, K is the number of plunger gates. The first two indices describe the index of the tunnel coupling matrix ij.
+            If None, it is assumed to be 0.
+        """
+        self.gate_offsets = gate_offsets
+        self.gate_levers = gate_levers
+        
+    def slice(self, P, m):
+        """Takes an affine subspace of the simulated model.
+        
+        Let v=Pv'+m. Computes a new parameterization such, that
+        T_ij = exp(W'_ij^Tv'+b'_ij)
+        
+        Parameters
+        ----------
+        P : KxM np.array of floats
+            The linear transformation matrix
+        m : np.array of floats or None
+            Array of size K storing the affine offset.
+        """
+        if self.gate_levers is None:
+            return self
+        sliced_levers = self.gate_levers.reshape(-1,self.gate_levers.shape[-1])@P
+        
+        sliced_levers = sliced_levers.reshape(self.gate_levers.shape[0],self.gate_levers.shape[1],P.shape[1])
+        m_applied = self.gate_levers.reshape(-1,self.gate_levers.shape[-1])@m
+        sliced_offsets = self.gate_offsets + m_applied.reshape(self.gate_levers.shape[0],self.gate_levers.shape[1])
+        return TunnelBarrierModel(sliced_offsets, sliced_levers)
+        
+    def get_tunnel_matrix(self, v):
+        """Returns the tunnel matrix for a given gate voltage
+        
+        Parameters
+        ----------
+        v : np.array of floats or None
+            Array of size K storing the gate voltages
+        
+        """
+        if self.gate_levers is None:
+            return np.exp(self.gate_offsets)
+        else:
+            barrier_potentials = self.gate_levers@v
+            return np.exp(barrier_potentials+self.gate_offsets)
+
+
+
+class LocalSystem:
+    """ Class describing a quantum system defined by the gate voltages of a simulated device.
+    
+    For a given set of gate voltages, the simulator first computes a set of core states that are most
+    likely relevant for the computation of the hamiltonian and then extends it by adding additional 
+    states. These are then used to define a basis of the vector space for the Hamiltonian, which
+    is then used to compute the mixed state. Finally, the mixed state is then used to simulate a sensor signal.
+    
+    This class stores all this information and includes some minimal tools to query information on 
+    different sub-bases. This class is tightly coupled to tunneling_simulator.
+    
+    Attributes
+    ----------
+    
+    v: np.array of floats
+        gate voltages that define the parameters of this system
+    state: np.array of ints
+        the ground state configuration of v
+    beta: float
+        the scaled inverse temperature 1/k_bT
+    H: LxL np.array of floats
+        Hamiltonian over the subspace spanned by the L basis state of the extended basis.
+        See methods basis_labels and core_basis_indices
+    mixed_state: LxL np.array of floats
+        the mixed state matrix, defined as expm(-beta*H)
+    basis_labels: LxN np.array of ints
+        The labels of the L basis elements, indentified by their ground state electron configuration
+    core_basis_indices: np.array of ints
+        Indices into basis_labels that define the subset of core basis elements.
+    """
+    def __init__(self, v, H, state, sim):
+        """ Creates the LocalSystem.
+        
+        This is an internal function used by the tunneling simulator.
+        """
+        self.v = v
+        self.H = H
+        self.state = state.copy()
+        self._sim = sim
+        self.beta = self._sim.beta
+    def _compute_mixed_state(self, H):
+        diffs = np.diag(H)-np.min(np.diag(H))
+        sel = np.where(diffs<2*self._sim.poly_sim.get_maximum_polytope_slack())[0]
+        H_sel = H[:,sel][sel,:]
+        
+        eigs, U = np.linalg.eigh(H_sel)
+        ps = softmax(-eigs * self.beta)
+        rho_sel = U @ np.diag(ps) @ U.T
+        
+        rho = np.zeros(H.shape)
+        indizes = H.shape[0]*sel[:,None]+sel[None,:]
+        np.put(rho,indizes.flatten(), rho_sel.flatten())
+        return rho
+    @property
+    def mixed_state(self):
+        """ Computes an approximate mixed state matrix over the full basis.
+        
+        Note that this function approximated the true mixed state matrix by inly taking basis eleemnts into account
+        that have a small energy difference to the ground state. This is a multiple of the polytope slack used by the
+        capacitive simulation.
+        """
+        return self._compute_mixed_state(self.H)
+    
+    
+    def compute_mixed_state_of_subset(self, subset_indices):
+        """Computes the mixed state for a subset, ignoring the existance of any other state entirely.
+        
+        The result is a KxK matrix where K is the length of subset_indices.
+        This function is not equivalent to selecting a subset of mixed_state, since this assumes that
+        the states not referenced by subset_indices are ruled out for some other reason, i.e., they are
+        assigned probability 0 and probabilities are renormalized to sum to 1 over the elements in the subset.
+        
+        
+        Parameters
+        ----------
+        subset_indices : np.array of ints
+            The L' indices into the basis element matrix as returned by basis_labels
+        m : np.array of floats or None
+        """
+            
+        return self._compute_mixed_state(self.H[subset_indices,:][:, subset_indices])
+    @property
+    def basis_labels(self):
+        return self._sim.boundaries(self.state).additional_info["extended_polytope"].labels
+    
+    @property
+    def core_basis_indices(self):
+        return self._sim.boundaries(self.state).additional_info["extended_polytope"].core_basis_indices
+        
+    def sample_sensor_equilibrium(self):
+        """ Samples a boisy averaged sensor response from the current system over all basis elements.
+        
+        This returns the average signal with added sensor noise. This is an approximation to long 
+        average measurements at a single point.
+        """
+        sensor_state = self._sim.boundaries(self.state).additional_info["sensor_state"]
+        return self._sim.sensor_sim.sample_sensor_equilibrium(self.v, self.H, self.mixed_state, sensor_state, self.beta)
+    def sample_sensor_configuration(self, sampled_configuration):
+        """ Samples the sensor signal for a given sampled electron configuration.
+        
+        For a short time simulation it is more prudent to externally sample a state from the basis and then generate a sensor signal
+        from it. This function allows this. Note that only selecting states from the set of core_basis_indices is safe as otherwise 
+        the sensor might miss information required to correctly compute the response.
+        
+        Parameters
+        ----------
+            sampled_configuration: list of ints
+                the sampled state for which to generate the sensor response.
+        """
+        sensor_state = self._sim.boundaries(self.state).additional_info["sensor_state"]
+        return self._sim.sensor_sim.sample_sensor_configuration(sampled_configuration, self.v, self.H, self.mixed_state, sensor_state, self.beta)
+        
+class ApproximateTunnelingSimulator(BasePolytopeSimulator):
+    """Simulator for approximate charge tunneling in a quantum dot device.
+    
+    The simulator extends the supplied capacitive simulation by creating a Hamiltionian H,
+    where on the diagonals are the capacitive energies of the simualation, while the off-diagonals
+    have added tunnel coupling parameters. Locally the hamiltonian is approximated via L basis states,
+    where each state is an electron configurtion on the dots. This mixed state is then used to create a sensor simulation.
+    
+    It is possible to query the state of single hamiltonian, their mixed state and their sensor simulation via the class
+    LocalSystem, returned by compute_local_system, but the primary use of tis class lies in its ability to compute
+    1D or 2D sensor scans via sensor_scan and sensor_scan_2D.
+    
+    For computing the tunnel coupling parameters, this class can make use of an additional Tunnel barrier simulation, but it
+    is also possible to just supply a NxN constant matrix of tunnel couplings between all D dots in the array. 
+    
+    Finally, the class follows the interface of BasePolytopeSimulator, which means it is possible to directly query the information
+    of the underlying polytopes of the simulation. This is there to unify slicing between simulators.
+    
+    Implementation details:
+    
+    The basis used for a gate voltage v is queried by finding its ground states n and then the facets of the
+    ground state polytope P(n) create the basis. Thus, this basis becomes extended as the slack variable in the underlying
+    capacitance simulation is increased. This is called the core state set.
+    Additionally, the simulation allows to add additional states. For example, for most sensor simulations to work, we also need
+    other higher energy states to compute correct conductance. These additional states can be added by modifying the vector
+    num_additional_neighbours. if the ith element in this vector is R>0, and s is a state in the core basis, then
+    the extended basis will also include the states s+k*e_i where |k|<=R and e_i is the ith basis vector.
+    
+    The tunnel couplings T are included into the Hamiltonian the following way: let s_i and s_j be two states in the basis of the Hamiltonian
+    that differ only in the value of the electron configuration at dots i and j. 
+    More exactly, we have that s_i and s_j are related by moving an electron from state s_i to s_j or vice versa. 
+    Let H_kl be the off-diagonal matrix element of those states. Then we have H_kl = T_ij. 
+    In all other cases, tunnel coupling is 0.
+    
+    The mixed state is then again computed approximately, for more info on that, see documentation of LocalSystem.
+    
+    The sensor signal of the computed mixed state is computed via the sensor_sim. 
+
+    Attributes
+    ----------
+    
+    beta: float
+        Scaled inverse temperature 1/k_BT
+    T: float
+        Temperature
+    poly_sim: 
+        the capacitive simulation object
+    barrier_sim:
+        the barrier simulation object. Note that even if the supplied object to init was a matrix, this will be a TunnelBarrierModel.
+    sensor_sim:
+        the sensor simulation object
+    num_additional_neighbours: np.array of ints
+        for each dot defines how many additional states should be added for each state in the core basis. This is done
+        by adding or subtracting electrons on the ith element where the maximum is given by the ith element of num_additional_neighbours.
+        We advise to set this to 2 for sensor dots. Note that computation time can quickly explode when increasing this parameter.
+        Outside of sensor dots, we advise therefore to increase the slack in the capacitive simulation.
+    """
+    def __init__ (self, polytope_sim, barrier_sim, T, sensor_sim):
+        """ Creates a tunneling simulation
+        
+        Parameters
+        ----------
+        polytope_sim: 
+            capacitance simulator object that computes ground state polytopes and capacitive energy differences
+        barrier_sim: Object or Matrix
+            Either a DxD basis that describes a constant tunnel coupling between all D dots. Note that the diagonal of this matrix is zero.
+            Alternatively an object with a method barrier_sim.get_tunnel_matrix(v) returning a DxD matrix, and which supports the slice operation.
+        T: float
+            Temperature in Kelvin. Good values are < 0.1
+        sensor_sim: Derived from BaseSensorSim
+            A sensor simulation that follows the interface of BaseSensorSim and which computes the sensor signal.
+        """
         self.poly_sim = polytope_sim
-        self.tunnel_matrix = tunnel_matrix
+        #compatibility to earlier code that uses matrices
+        if isinstance(barrier_sim, np.ndarray):
+            self.barrier_sim = TunnelBarrierModel(np.log(barrier_sim+1.e-20))
+        else:
+            self.barrier_sim = barrier_sim
         eV = 1.602e-19
         kB = 1.380649e-23/eV
         self.beta=1.0/(kB*T)
@@ -131,18 +498,45 @@ class ApproximateTunnelingSimulator:
             poly.additional_info.pop("features_out_info",None)
             
         self.num_additional_neighbours=np.zeros(self.poly_sim.num_dots, dtype=int)
+        
+        super().__init__(self.poly_sim.num_dots, self.poly_sim.num_inputs)
             
     def slice(self, P, m, proxy=False):
+        """ Restricts the simulator to the affine subspace v=m+Pv'
+        
+        Computes the slice through the simulated device by setting v=m+Pv', where v is the plunger gate voltages of the 
+        original device and v' is the new coordinate system. This is implemented here by slicing all the different parts
+        of the simulation, capacitance model, barrier model and sensor model.
+        
+        Parameters
+        ----------
+        P : MxK np.array of floats
+            The linear coefficient matrix. Here M is the number of voltage elements in v in the full simulation 
+            and K the dimensionality of the subspace.
+        m: offset of the affine trnsformation.
+        proxy: bool
+            Whether a proxy is returned. A proxy shares the cache, if possible. This is the case when P is invertible,
+            especially this entails M=K. If cache sharing is possible, the simulation computes the original polytope and then
+            applies the affine transformation. This can reduce run time a lot if several slices need to be computed for the
+            same simulation.
+        
+        Returns
+        -------
+        A simulator object describing the simulation on the affine subspace. The current simulation object remains unchanged.
+        """
         sliced_poly_sim = self.poly_sim.slice(P,m, proxy)
-        sliced_features_out_sim = ApproximateTunnelingSimulator(sliced_poly_sim, self.tunnel_matrix, self.T, self.sensor_sim)
-        sliced_features_out_sim.num_additional_neighbours = self.num_additional_neighbours.copy()
-        return sliced_features_out_sim
+        sliced_barrier_sim = self.barrier_sim.slice(P, m)
+        sliced_sensor_sim = self.sensor_sim.slice(P,m)
+        sliced_tunneling_sim = ApproximateTunnelingSimulator(sliced_poly_sim, sliced_barrier_sim, self.T, sliced_sensor_sim)
+        sliced_tunneling_sim.num_additional_neighbours = self.num_additional_neighbours.copy()
+        return sliced_tunneling_sim
         
     def _compute_tunneling_op(self, state_list):
-        
+        """Computes the mapping between tunnel coupling and hamiltonian off diagonal elements.
+        """
         N = state_list.shape[0]
         n_dots = state_list.shape[1]
-        TOp = np.zeros((N,N),dtype=int)*n_dots**2 #by definition of self.tunnel_matrix the first element of the array is 0
+        TOp = np.zeros((N,N),dtype=int)
         
         sums = np.sum(state_list,axis=1)
         for i,s1 in enumerate(state_list):
@@ -156,8 +550,7 @@ class ApproximateTunnelingSimulator:
                 if np.sum(abs_diff) != 2:
                     continue
                 
-                #compute lookup indices in features_outing strength matrix
-                #if only one index is there this means we have a transition of a dot that is connected to a reservoir.
+                #compute lookup indices in tunneling strength matrix
                 idxs = np.where(abs_diff>0)[0]
                 if len(idxs) == 1:
                     ind = idxs[0]*n_dots + idxs[0]
@@ -168,6 +561,8 @@ class ApproximateTunnelingSimulator:
         return TOp
         
     def _create_state_list(self, state, direct_neighbours):
+        """ Creates the extended basis
+        """
         state_list = np.vstack([direct_neighbours, [np.zeros(len(state),dtype=int)]])
         
         additional_states = []
@@ -183,14 +578,34 @@ class ApproximateTunnelingSimulator:
             state_list = np.unique(state_list, axis=0)
         state_list += state[None,:]
         state_list = state_list[np.all(state_list>=0,axis=1)]
-        return state_list
-    def _get_polytope(self, state):
+        
+        #mark the subset of original polytope transitions + the current state
+        
+        core_index_set = [int(find_label(state_list,state)[0])]
+        for core_transition in direct_neighbours:
+            core_index_set.append(int(find_label(state_list,core_transition+state)[0]))
+        return state_list, np.array(core_index_set,dtype=int)
+    def boundaries(self, state):
+        """
+        Returns the polytope P(n) of a given state n with all its boundaries, labels and meta information.
+        
+        If the polytope is not cached, it needs to be computed. This can take some time for large devices.
+        
+        Parameters
+        ----------
+        state: list of ints
+            The state n for which to compute the polytope P(n)
+            
+        Returns
+        -------
+        The polytope P(n)
+        """
         state = np.asarray(state)
         polytope = self.poly_sim.boundaries(state)
         #cache features_out info in polytope structure
         if not "extended_polytope" in polytope.additional_info.keys():
             #create a list of all neighbour states of interest for use in the Hamiltonian
-            state_list = self._create_state_list(state, polytope.labels)
+            state_list,polytope_base_indx = self._create_state_list(state, polytope.labels)
             
             
             #create full set of transition equations
@@ -202,28 +617,16 @@ class ApproximateTunnelingSimulator:
             extended_polytope.b = b
             extended_polytope.TOp = TOp
             extended_polytope.labels = state_list
+            extended_polytope.core_basis_indices = polytope_base_indx
             polytope.additional_info["extended_polytope"] = extended_polytope
             
             #also compute the sensor info
             polytope.additional_info['sensor_state'] = self.sensor_sim.precompute_sensor_state(state, A, b, state_list)
         return polytope
-        
-    
-    def _compute_mixed_state(self, H):
-        diffs = np.diag(H)-np.min(np.diag(H))
-        sel = np.where(diffs<2*self.poly_sim.get_maximum_polytope_slack())[0]
-        H_sel = H[:,sel][sel,:]
-        
-        eigs, U = np.linalg.eigh(H_sel)
-        ps = softmax(-eigs * self.beta)
-        rho_sel = U @ np.diag(ps) @ U.T
-        
-        rho = np.zeros(H.shape)
-        indizes = H.shape[0]*sel[:,None]+sel[None,:]
-        np.put(rho,indizes.flatten(), rho_sel.flatten())
-        return rho
-        
-    def _create_hamiltonian(self, v, A, b, tunnel_matrix, TOp):
+    def _create_hamiltonian(self, v, A, b, TOp):
+        """ Computes the hamiltonian at the given gate voltages
+        """
+        tunnel_matrix = self.barrier_sim.get_tunnel_matrix(v)
         N = A.shape[0]
         energy_diff = -(A@v+b)
         diags = np.sort(energy_diff)
@@ -233,49 +636,121 @@ class ApproximateTunnelingSimulator:
             t_term = ((tunnel_matrix.reshape(-1)[TOp.reshape(-1)]).reshape(N,N))
             return np.diag(energy_diff)-t_term
     
-    def sensor_scan(self, v_start, v_end, resolution, v_start_state_hint, use_proxy=True):
+    def compute_local_system(self, v, state, search_ground_state = True):
+        """ Computes a full description of the local quantum system and returns the LocalSystem object.
+        
+        This is a full locla simulation of the device and can be used to query sensor values but also the mixed state matrix.
+        See LocalSystem for more info.
+        
+        Note that unlike in most other places, v does not need to belong to the ground state polytope of state. 
+        This might be useful for the computation of signals in which the device is far out of equilibrium.
+        
+        Parameters
+        ----------
+        v: np.array of floats
+            The vector of gate voltages of the device
+        state: np.array of ints
+            The ground state polytope relative to which the local system is computed. This is in most cases the ground state.
+        search_ground_state: bool
+            If True, verifies that state is the ground state of v and searches it otherwise. If you know that this is the case,
+            you can safely set it to False for a speed-up. In the general case, setting this to false will compute the 
+            LocalSystem relative to a different basis state. 
+        """
+        if search_ground_state:
+            state = self.poly_sim.find_state_of_voltage(v, state_hint = state_hint)
+        polytope = self.boundaries(state)
+        extended_polytope = polytope.additional_info['extended_polytope']
+        H = self._create_hamiltonian(v, extended_polytope.A, extended_polytope.b, extended_polytope.TOp)
+        system = LocalSystem(v, H, state, self)
+        return system
+    def sensor_scan(self, v_start, v_end, resolution, v_start_state_hint, cache=True):
+        """ Computes a 1D sensor ramp scan.
+        
+        Computes a linear set of points between v_start and v_end and for each point computes the sensor signal.
+        To be more exact, for each point, the ground state polytope is computed which is then used to define the local_system.
+        Returns the sensor signal for each sensor and dot
+        
+        Parameters
+        ----------
+        v_start: np.array of floats
+             Vector of gate voltages of the device describing the first measurement point
+        v_end: np.array of floats
+             Vector of gate voltages of the device describing the last measurement point
+        resolution: int
+            number of measured points on the linear scan between v_start and v_end, including both end points.
+        v_start_state_hint: np.array of int
+            Guess for the state n for which holds that v_start is element of P(n). The simulator will use this
+            guess as a starting point for the search of the correct state if this guess is wrong. Note that P(n)
+            must intersect with the affine slice, if slicing was used.
+        cache: bool
+            Whether the simulation should try to cache the computed polytopes. This might lead to a slower computation time
+            for a scan compared to not using caching, but consecutive scans with similar ranges tend to be quicker.
+        """
         #prepare start state
         state = self.poly_sim.find_state_of_voltage(v_start, state_hint = v_start_state_hint)
         
         P=(v_end - v_start).reshape(-1,1)
-        if use_proxy:
-            sim_slice = self.slice(P, v_start, proxy=use_proxy)
+        if cache:
+            sim_slice = self.slice(P, v_start, proxy=cache)
         else:
             sim_slice = self
         
         
-        polytope = sim_slice._get_polytope(state)
         values = np.zeros((resolution, self.sensor_sim.num_sensors))
         for i,v0 in enumerate(np.linspace([0.0],[1.0], resolution)):
-            if use_proxy:
+            if cache:
                 v = v0
             else:
                 v = v_start + P@v0
             if not sim_slice.poly_sim.inside_state(v, state):
                 state = sim_slice.poly_sim.find_state_of_voltage(v,state_hint=state)
-                polytope = sim_slice._get_polytope(state)
             
-            #compute mixed state of the current voltage configuration
-            extended_polytope = polytope.additional_info['extended_polytope']
-            H = sim_slice._create_hamiltonian(v, extended_polytope.A, extended_polytope.b, self.tunnel_matrix, extended_polytope.TOp)
-            mixed_state = sim_slice._compute_mixed_state(H)
-            
-            #compute sensor response for the mixed state
-            sensor_state = polytope.additional_info['sensor_state']
-            values[i] = sim_slice.sensor_sim.eval_sensor(H, mixed_state, sensor_state, self.beta)
+            system = sim_slice.compute_local_system(v, state, search_ground_state = True)
+            values[i] = system.sample_sensor_equilibrium()
         return values
         
-    def sensor_scan_2D(self, v_offset, P, minV, maxV, resolution, state_hint_lower_left):
+    def sensor_scan_2D(self, m, P, minV, maxV, resolution, state_hint_lower_left):
+        """ Computes the sensor signal on a 2D grid of points.
+        
+        For the exact computation of points, see sensor_scan.
+        
+        The grid is defined the following way: Let w_ij be a 2D vector that is part of a regular
+        rectangular grid spanned by the lower left corner given by minV and the upper right corner given
+        by maxV and let (m,n) be the number of points in both grid directions. We have that w_00=minV and w_m-1,n-1=maxV.
+        
+        This grid is then affinely transformed into the K-dimensional space of gate vectors via
+        v_ij = m+ P w_ij
+        
+        and thus P must be a Kx2 matrix and m a K-vector.
+        
+        Parameters
+        ----------
+        m: np.array of floats:
+            affine offset of the grid
+        P: Kx2 np.array of floats
+            linear transformation of grid-points into the K-dimensional voltage space
+        minV: np.array of floats
+            2D vector describing the minimum value of the grid points
+        maxV: np.array of floats
+            2D vector describing the maximum value of the grid points
+        resolution: int or list of ints
+            if integer, describes the same number of points in both grid directions. If a list of 2 elements,
+            describes the number of points along each axes of the grid.
+        state_hint_lower_left: np.array of int
+            Guess for the state n for point described by the grid position minV. The simulator will use this
+            guess as a starting point for the search of the correct state if this guess is wrong. Note that P(n)
+            must intersect with the affine slice, if slicing was used.
+        """
         if P.shape[1] != 2:
             raise ValueError("P must have two columns")
         if isinstance(resolution, int):
             resolution = [resolution, resolution]
         
         #obtain initial guess for state
-        line_start = self.poly_sim.find_state_of_voltage(v_offset+P@minV, state_hint = state_hint_lower_left)
+        line_start = self.poly_sim.find_state_of_voltage(m+P@minV, state_hint = state_hint_lower_left)
         
         #now slice down to 2D for efficiency
-        sim_slice = self.slice(P, v_offset, proxy=True)
+        sim_slice = self.slice(P, m, proxy=True)
             
         values=np.zeros((resolution[0],resolution[1], self.sensor_sim.num_sensors))
         for i,v2 in enumerate(np.linspace(minV[1],maxV[1],resolution[1])):
