@@ -707,7 +707,7 @@ class ApproximateTunnelingSimulator(BasePolytopeSimulator):
             values[i] = system.sample_sensor_equilibrium()
         return values
         
-    def sensor_scan_2D(self, m, P, minV, maxV, resolution, state_hint_lower_left):
+    def sensor_scan_2D(self, P, m, minV, maxV, resolution, state_hint_lower_left):
         """ Computes the sensor signal on a 2D grid of points.
         
         For the exact computation of points, see sensor_scan.
@@ -723,10 +723,10 @@ class ApproximateTunnelingSimulator(BasePolytopeSimulator):
         
         Parameters
         ----------
-        m: np.array of floats:
-            affine offset of the grid
         P: Kx2 np.array of floats
             linear transformation of grid-points into the K-dimensional voltage space
+        m: np.array of floats:
+            affine offset of the grid
         minV: np.array of floats
             2D vector describing the minimum value of the grid points
         maxV: np.array of floats

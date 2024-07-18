@@ -400,7 +400,7 @@ class Experiment(): #TODO: change name to the simulator name
         # Part for the sensor signal:
         sensor_values = None
         if use_sensor_signal:
-            sensor_values = simulator.sensor_scan_2D(v_offset, plane_axes, minV, maxV, resolution, target_state)
+            sensor_values = simulator.sensor_scan_2D(plane_axes, v_offset, minV, maxV, resolution, target_state)
 
         return xout, yout, CSD_data, polytopes, sensor_values, v_offset
         
