@@ -24,20 +24,20 @@ def solve_linear_problem(prob):
 def compute_polytope_slacks(A, b, maximum_slack):
     """Computes the slacks of each candidate transition of a ground state polytope.
     
-    The polytope is given by all points x, such that Ax+b<0. There might be boundaries
-    such that for no x holds that A_ix+b_i = 0. In this case the definition of the polytope is
+    The polytope is given by all points x, such that :math:`Ax+b<0`. There might be boundaries
+    such that for no x holds that :math:`A_ix+b_i = 0`. In this case the definition of the polytope is
     the same when it is removed. However, sometimes we are interested in keeping transitions that
-    are near misses - i..e, there exists an x such that, the inequality is almost fulfilled.
+    are near misses - i.e., there exists an x such that, the inequality is almost fulfilled.
     In this case, we can relax this by allowing a positive slack and 
     accept transitions to still be relevant for the polytope when we find an x, such that
     
-    A_ix+b_i <= slack
+    :math:`A_ix+b_i <= s`
     
-    if this inequality holds exactly with slack=0, we say that the ith transition touches
+    if this inequality holds exactly with slack :math:`s=0`, we say that the ith transition touches
     the polytope and the larger slack is, the more distant is the polytope
     
-    The function computes the slack for all transitions in A_i and b_i. default slack
-    is needed if for some reason it is not possible to compute the slack due to numerical
+    The function computes the minimum slack for all transitions in :math:`A_i` and :math:`b_i`. 
+    The default slack is needed if for some reason it is not possible to compute the slack due to numerical
     difficulties.
     
     Parameters
