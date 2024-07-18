@@ -258,21 +258,19 @@ class Experiment(): #TODO: change name to the simulator name
             
     def get_virtualised_sim(self, simulator, target_state):
         '''
-        Function that takes a capacitance simulator and virtualises the gates specified by inner_dots.
+        Function that takes a simulator and virtualises the gates specified by inner_dots.
         ----------------
         Arguments:
-        simulator: CapacitanceSimulator object
+        simulator: BasePolytopeSimulator object
         target_state: int, the initial corner state guess
         ----------------
         Returns:
-        csimulator: CapacitanceSimulator object, the virtualised simulator
+        simulator: BasePolytopeSimulator object, the virtualised simulator
         '''
         gate_transitions = np.eye(self.N,dtype=int)[self.inner_dots]
         #TODO: Default target state is lower left corner state (initial guess). In future user could specify!
         self.target_state = target_state
-        print(simulator)
         simulator = axis_align_transitions(simulator,  self.target_state, gate_transitions, self.inner_dots)
-        print(simulator)
         return simulator
     
     def get_compensated_sim(self,simulator, target_state):
@@ -280,11 +278,11 @@ class Experiment(): #TODO: change name to the simulator name
         Function that takes a capacitance simulator and compensates the sensors.
         ----------------
         Arguments:
-        csimulator: BasePolytopeSimulator object
+        simulator: BasePolytopeSimulator object
         target_stater: int, the state at which sensor compensation happens
         ----------------
         Returns:
-        csimulator: CapacitanceSimulator object, the compensated simulator
+        simulator: BasePolytopeSimulator object, the compensated simulator
         '''
         if not self.has_sensors:
                 raise ValueError("Compensating sensors requires a sensor model.")
