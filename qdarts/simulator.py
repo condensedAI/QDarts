@@ -1,6 +1,7 @@
 import numpy as np
-from util_functions import is_invertible_matrix
-
+from qdarts.util_functions import is_invertible_matrix
+from qdarts.model import Model as Model
+from qdarts.util_functions import compensate_simulator_sensors, fix_gates, find_point_on_transitions, axis_align_transitions
 
 class BasePolytopeSimulator:
     """ Base class for all simulation objects that can compute and return polytopes.

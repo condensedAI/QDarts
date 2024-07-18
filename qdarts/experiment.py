@@ -1,14 +1,13 @@
-from simulator import *
-from tunneling_simulator import *
-from util_functions import compensate_simulator_sensors
-from noise_processes import OU_process,Cosine_Mean_Function
+from qdarts.simulator import *
+from qdarts.tunneling_simulator import *
+from qdarts.noise_processes import OU_process,Cosine_Mean_Function 
 
 #for the algorithm
 import numpy as np
 
 #for plotting
 from matplotlib import pyplot as plt
-from plotting import get_CSD_data, get_polytopes
+from qdarts.plotting import get_CSD_data, get_polytopes
 
 #for measuring runtime
 import time
@@ -257,12 +256,12 @@ class Experiment(): #TODO: change name to the simulator name
 # GETTERS
 #--------------------------
             
-    def get_virtualised_csim(self, csimulator, target_state):
+    def get_virtualised_sim(self, simulator, target_state):
         '''
         Function that takes a capacitance simulator and virtualises the gates specified by inner_dots.
         ----------------
         Arguments:
-        csimulator: CapacitanceSimulator object
+        simulator: CapacitanceSimulator object
         target_state: int, the initial corner state guess
         ----------------
         Returns:
@@ -271,39 +270,17 @@ class Experiment(): #TODO: change name to the simulator name
         gate_transitions = np.eye(self.N,dtype=int)[self.inner_dots]
         #TODO: Default target state is lower left corner state (initial guess). In future user could specify!
         self.target_state = target_state
-        csimulator = axis_align_transitions(csimulator,  self.target_state, gate_transitions, self.inner_dots)
-        return csimulator
-    
-
-    def get_compensated_sim(self,simulator, target_state):
-        '''
-        Function that takes a simulator and compensates the sensors.
-        ----------------
-        Arguments:
-        simulator: any object
-        target_stater: int, the state at which sensor compensation happens
-        ----------------
-        Returns:
-        csimulator: CapacitanceSimulator object, the compensated simulator
-        '''
-        if not self.has_sensors:
-                raise ValueError("Compensating sensors requires a sensor model.")
-            
-            # TODO: Do we need to specify compensation gates *and* sensor ids? Only if we want to compensate a subset of sensors.
-        else:
-            simulator = compensated_simulator(simulator,
-                                        target_state=target_state,
-                                        compensation_gates=self.sensor_config["sensor_dot_indices"],
-                                        sensor_ids = self.sensor_config["sensor_dot_indices"], 
-                                        sensor_detunings = self.sensor_config["sensor_detunings"])
-        return csimulator
+        print(simulator)
+        simulator = axis_align_transitions(simulator,  self.target_state, gate_transitions, self.inner_dots)
+        print(simulator)
+        return simulator
     
     def get_compensated_sim(self,simulator, target_state):
         '''
         Function that takes a capacitance simulator and compensates the sensors.
         ----------------
         Arguments:
-        csimulator: Tunnelingsimulator object
+        csimulator: BasePolytopeSimulator object
         target_stater: int, the state at which sensor compensation happens
         ----------------
         Returns:
@@ -311,15 +288,12 @@ class Experiment(): #TODO: change name to the simulator name
         '''
         if not self.has_sensors:
                 raise ValueError("Compensating sensors requires a sensor model.")
-            
-            # TODO: Do we need to specify compensation gates *and* sensor ids? Only if we want to compensate a subset of sensors.
-        else:
-            simulator = compensate_simulator_sensors(simulator.poly_sim,
-                                        target_state=target_state,
-                                        compensation_gates=self.sensor_config["sensor_dot_indices"],
-                                        sensor_ids = self.sensor_config["sensor_dot_indices"], 
-                                        sensor_detunings = self.sensor_config["sensor_detunings"])
-        return simulator.slice(P,v_zero)
+
+        return compensate_simulator_sensors(simulator,
+                                    target_state=target_state,
+                                    compensation_gates=self.sensor_config["sensor_dot_indices"],
+                                    sensor_ids = self.sensor_config["sensor_dot_indices"], 
+                                    sensor_detunings = self.sensor_config["sensor_detunings"])
     
     def get_plot_args(self, x_voltages, y_voltages, plane_axes, v_offset = None):
         '''
@@ -398,10 +372,8 @@ class Experiment(): #TODO: change name to the simulator name
             simulator = self.tunneling_sim
         else:
             simulator = self.capacitance_sim
-        
         if compensate_sensors:
             simulator = self.get_compensated_sim(simulator,target_state= target_state)
-     
         if target_transition is not None:
             plane_axes, simulator = self.center_transition(simulator, target_state, target_transition, 
                                                             plane_axes, use_virtual_gates, compensate_sensors)
@@ -409,8 +381,8 @@ class Experiment(): #TODO: change name to the simulator name
             
 
         elif use_virtual_gates:
-            simulator = self.get_virtualised_csim(simulator, target_state)
-        
+            simulator = self.get_virtualised_sim(simulator, target_state)
+
         if use_sensor_signal:
             csimulator = simulator.poly_sim
         else:

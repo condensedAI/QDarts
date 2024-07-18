@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.distutils.misc_util import is_sequence
-from util_functions import compute_maximum_inscribed_circle, compute_polytope_slacks
-from polytope import Polytope
+from qdarts.util_functions import compute_maximum_inscribed_circle, compute_polytope_slacks
+from qdarts.polytope import Polytope
 
 #internal unit conversion of capacitances from attoFarrad to Farrad/eV
 eV = 1.602e-19

@@ -1,5 +1,4 @@
 import numpy as np
-from util_functions import is_invertible_matrix, solve_linear_problem, compute_polytope_slacks, compute_maximum_inscribed_circle, find_label, find_point_on_transitions
 
 class Polytope:
     """ Represents an arbitrary polytope in the form of a set of linear inequalities, 

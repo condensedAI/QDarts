@@ -1,8 +1,6 @@
 import numpy as np
-from functools import partial
-from scipy  import sparse as sp
-from util_functions import find_label
-import scipy.stats as stats
+from qdarts.util_functions import find_label
+from qdarts.simulator import BasePolytopeSimulator
 
 def softmax(v,axis=None):
     max_v = np.max(v)
@@ -657,7 +655,7 @@ class ApproximateTunnelingSimulator(BasePolytopeSimulator):
             LocalSystem relative to a different basis state. 
         """
         if search_ground_state:
-            state = self.poly_sim.find_state_of_voltage(v, state_hint = state_hint)
+            state = self.poly_sim.find_state_of_voltage(v, state_hint = state)
         polytope = self.boundaries(state)
         extended_polytope = polytope.additional_info['extended_polytope']
         H = self._create_hamiltonian(v, extended_polytope.A, extended_polytope.b, extended_polytope.TOp)
@@ -705,7 +703,7 @@ class ApproximateTunnelingSimulator(BasePolytopeSimulator):
             if not sim_slice.poly_sim.inside_state(v, state):
                 state = sim_slice.poly_sim.find_state_of_voltage(v,state_hint=state)
             
-            system = sim_slice.compute_local_system(v, state, search_ground_state = True)
+            system = sim_slice.compute_local_system(v, state, search_ground_state = False)
             values[i] = system.sample_sensor_equilibrium()
         return values
         
@@ -757,5 +755,5 @@ class ApproximateTunnelingSimulator(BasePolytopeSimulator):
             v_start = np.array([minV[0],v2])
             v_end = np.array([maxV[0],v2])
             line_start = sim_slice.poly_sim.find_state_of_voltage(v_start, state_hint = line_start)
-            values[i] = sim_slice.sensor_scan(v_start, v_end, resolution[0], line_start, use_proxy=False)
+            values[i] = sim_slice.sensor_scan(v_start, v_end, resolution[0], line_start, cache=False)
         return values

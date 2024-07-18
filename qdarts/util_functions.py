@@ -1,6 +1,5 @@
 import cvxpy as cp
 import numpy as np
-from scipy.linalg import sqrtm
 
 def is_invertible_matrix(A,max_cond=1.e8):
     """ Returns true if A is an invertible matrix.
