@@ -1,6 +1,7 @@
 from qdarts.simulator import *
 from qdarts.tunneling_simulator import *
 from qdarts.noise_processes import OU_process,Cosine_Mean_Function 
+from qdarts.latching_simulator import LatchingSimulator
 
 #for the algorithm
 import numpy as np
@@ -21,7 +22,7 @@ SLOW_NOISE = {"tc": 250,
 
 
 class Experiment(): #TODO: change name to the simulator name
-    def __init__(self, capacitance_config, tunneling_config = None, sensor_config = None, print_logs = True):
+    def __init__(self, capacitance_config, tunneling_config = None, sensor_config = None, latching_config= None, print_logs = True):
         '''
         capacitance_config: dictionary containing the capacitance model parameters
         tunneling_config: dictionary containing the tunneling model parameters
@@ -46,10 +47,17 @@ class Experiment(): #TODO: change name to the simulator name
             raise ValueError("Specifying a tunneling configuration also requires a sensor configuration.")
         if (tunneling_config == None and sensor_config != None):
             raise ValueError("Specifying a sensor configuration also requires a tunneling configuration.")
+        if latching_config is not None and tunneling_config is None:
+            raise ValueError("Specifying a latching configuration also requires a tunneling configuration.")
         if tunneling_config != None:
             self.sensor_model = self.deploy_sensor_model(sensor_config)
             self.tunneling_sim = self.deploy_tunneling_sim(self.capacitance_sim, tunneling_config)
             self.has_sensors = True
+        
+        if latching_config is not None:
+            self.latching_sim = self.deploy_latching_sim(self.tunneling_sim, latching_config)
+        else:
+            self.latching_sim = None
         
 
 
@@ -193,6 +201,15 @@ class Experiment(): #TODO: change name to the simulator name
                     np.round(sensor_config["noise_amplitude"]["slow_noise"]*1e6,4),np.round(sensor_config["noise_amplitude"]["fast_noise"]*1e6,4))
             print(log)
         return sensor_sim
+    def deploy_latching_sim(self, tunneling_sim, latching_config):
+       
+        reservoir_coupling = latching_config["reservoir_coupling"]
+        scan_dt = latching_config["measurement_time"]
+        transition_quantile = None
+        if "transition_prob_thresh" in latching_config.keys():
+            transition_quantile = latching_config["transition_prob_thresh"]
+        latching_sim =LatchingSimulator(tunneling_sim, reservoir_coupling,scan_dt, transition_quantile)
+        return latching_sim
         
     
     def center_transition(self, simulator, target_state, target_transition, plane_axes, use_virtual_gates = False, compensate_sensors = False):
@@ -369,7 +386,7 @@ class Experiment(): #TODO: change name to the simulator name
         
         # pick the simulator
         if use_sensor_signal:
-            simulator = self.tunneling_sim
+            simulator = self.latching_sim if self.latching_sim is not None else self.tunneling_sim
         else:
             simulator = self.capacitance_sim
         if compensate_sensors:
