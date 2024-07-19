@@ -1,0 +1,27 @@
+﻿qdarts.capacitance\_model.AbstractCapacitanceModel
+==================================================
+
+.. currentmodule:: qdarts.capacitance_model
+
+.. autoclass:: AbstractCapacitanceModel
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AbstractCapacitanceModel.__init__
+      ~AbstractCapacitanceModel.compute_polytope_for_state
+      ~AbstractCapacitanceModel.compute_transition_equations
+      ~AbstractCapacitanceModel.enumerate_neighbours
+      ~AbstractCapacitanceModel.slice
+      ~AbstractCapacitanceModel.verify_polytope
+   
+   
+
+   
+   
+   

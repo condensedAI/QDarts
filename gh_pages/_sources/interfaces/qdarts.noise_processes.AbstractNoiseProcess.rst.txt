@@ -1,0 +1,24 @@
+﻿qdarts.noise\_processes.AbstractNoiseProcess
+============================================
+
+.. currentmodule:: qdarts.noise_processes
+
+.. autoclass:: AbstractNoiseProcess
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AbstractNoiseProcess.__init__
+      ~AbstractNoiseProcess.slice
+      ~AbstractNoiseProcess.start_sequence
+   
+   
+
+   
+   
+   

@@ -1,0 +1,33 @@
+﻿qdarts.tunneling\_simulator.LocalSystem
+=======================================
+
+.. currentmodule:: qdarts.tunneling_simulator
+
+.. autoclass:: LocalSystem
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LocalSystem.__init__
+      ~LocalSystem.compute_mixed_state_of_subset
+      ~LocalSystem.sample_sensor_configuration
+      ~LocalSystem.sample_sensor_equilibrium
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~LocalSystem.basis_labels
+      ~LocalSystem.core_basis_indices
+      ~LocalSystem.mixed_state
+   
+   

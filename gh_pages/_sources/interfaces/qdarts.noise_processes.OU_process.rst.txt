@@ -1,0 +1,25 @@
+﻿qdarts.noise\_processes.OU\_process
+===================================
+
+.. currentmodule:: qdarts.noise_processes
+
+.. autoclass:: OU_process
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~OU_process.__init__
+      ~OU_process.next_val
+      ~OU_process.slice
+      ~OU_process.start_sequence
+   
+   
+
+   
+   
+   

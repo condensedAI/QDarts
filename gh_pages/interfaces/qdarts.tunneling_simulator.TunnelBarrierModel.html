@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>qdarts.tunneling_simulator.TunnelBarrierModel &#8212; QDarts  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=61cd365c" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qdarts.tunneling_simulator.NoisySensorDot" href="qdarts.tunneling_simulator.NoisySensorDot.html" />
+    <link rel="prev" title="qdarts.tunneling_simulator.ApproximateTunnelingSimulator" href="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="qdarts-tunneling-simulator-tunnelbarriermodel">
+<h1>qdarts.tunneling_simulator.TunnelBarrierModel<a class="headerlink" href="#qdarts-tunneling-simulator-tunnelbarriermodel" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.TunnelBarrierModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qdarts.tunneling_simulator.</span></span><span class="sig-name descname"><span class="pre">TunnelBarrierModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gate_offsets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gate_levers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.TunnelBarrierModel" title="Link to this definition">¶</a></dt>
+<dd><p>Model of the tunnel barriers of a device</p>
+<p>This class defines a mapping between gate voltages of the device and
+the tunnel coupling between the dots. To be more exact, the tunnel
+coupling between dots i, and j and the gate voltages v is given by</p>
+<p>T_ij = exp(W_ij^Tv+b_ij)</p>
+<p>where W_ij is a vector of couplings and b_ij is an offset.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.TunnelBarrierModel.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gate_offsets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gate_levers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.TunnelBarrierModel.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a tunnel barrier model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gate_offsets</strong> (<em>NxN np.array</em><em> of </em><em>floats</em>) – the offsets b_ij provided as matrix.</p></li>
+<li><p><strong>gate_levers</strong> (<em>NxNxK np.array</em><em> of </em><em>floats</em><em> or </em><em>None</em>) – Here, K is the number of plunger gates. The first two indices describe the index of the tunnel coupling matrix ij.
+If None, it is assumed to be 0.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.TunnelBarrierModel.__init__" title="qdarts.tunneling_simulator.TunnelBarrierModel.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(gate_offsets[, gate_levers])</p></td>
+<td><p>Creates a tunnel barrier model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.TunnelBarrierModel.get_tunnel_matrix" title="qdarts.tunneling_simulator.TunnelBarrierModel.get_tunnel_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tunnel_matrix</span></code></a>(v)</p></td>
+<td><p>Returns the tunnel matrix for a given gate voltage</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.TunnelBarrierModel.slice" title="qdarts.tunneling_simulator.TunnelBarrierModel.slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slice</span></code></a>(P, m)</p></td>
+<td><p>Takes an affine subspace of the simulated model.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.TunnelBarrierModel.get_tunnel_matrix">
+<span class="sig-name descname"><span class="pre">get_tunnel_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.TunnelBarrierModel.get_tunnel_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the tunnel matrix for a given gate voltage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>v</strong> (<em>np.array</em><em> of </em><em>floats</em><em> or </em><em>None</em>) – Array of size K storing the gate voltages</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.TunnelBarrierModel.slice">
+<span class="sig-name descname"><span class="pre">slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.TunnelBarrierModel.slice" title="Link to this definition">¶</a></dt>
+<dd><p>Takes an affine subspace of the simulated model.</p>
+<p>Let v=Pv’+m. Computes a new parameterization such, that
+T_ij = exp(W’_ij^Tv’+b’_ij)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>P</strong> (<em>KxM np.array</em><em> of </em><em>floats</em>) – The linear transformation matrix</p></li>
+<li><p><strong>m</strong> (<em>np.array</em><em> of </em><em>floats</em><em> or </em><em>None</em>) – Array of size K storing the affine offset.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">QDarts</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../simulator.html">Simulator</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#simulation-components">Simulation Components</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qdarts.capacitance_model.CapacitanceModel.html">qdarts.capacitance_model.CapacitanceModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.simulator.CapacitiveDeviceSimulator.html">qdarts.simulator.CapacitiveDeviceSimulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html">qdarts.tunneling_simulator.ApproximateTunnelingSimulator</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">qdarts.tunneling_simulator.TunnelBarrierModel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qdarts.tunneling_simulator.TunnelBarrierModel"><code class="docutils literal notranslate"><span class="pre">TunnelBarrierModel</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.TunnelBarrierModel.__init__"><code class="docutils literal notranslate"><span class="pre">TunnelBarrierModel.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.TunnelBarrierModel.get_tunnel_matrix"><code class="docutils literal notranslate"><span class="pre">TunnelBarrierModel.get_tunnel_matrix()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.TunnelBarrierModel.slice"><code class="docutils literal notranslate"><span class="pre">TunnelBarrierModel.slice()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.tunneling_simulator.NoisySensorDot.html">qdarts.tunneling_simulator.NoisySensorDot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.noise_processes.OU_process.html">qdarts.noise_processes.OU_process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.noise_processes.Cosine_Mean_Function.html">qdarts.noise_processes.Cosine_Mean_Function</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#other-classes">Other Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#interfaces">Interfaces</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+      <li>Previous: <a href="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html" title="previous chapter">qdarts.tunneling_simulator.ApproximateTunnelingSimulator</a></li>
+      <li>Next: <a href="qdarts.tunneling_simulator.NoisySensorDot.html" title="next chapter">qdarts.tunneling_simulator.NoisySensorDot</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Oswin Krause, Jan Krzywda, Weikun Liu, Evert van Nieuwenburg.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/interfaces/qdarts.tunneling_simulator.TunnelBarrierModel.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

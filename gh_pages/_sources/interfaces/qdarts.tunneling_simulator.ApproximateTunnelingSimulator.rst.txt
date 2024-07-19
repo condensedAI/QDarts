@@ -1,0 +1,27 @@
+﻿qdarts.tunneling\_simulator.ApproximateTunnelingSimulator
+=========================================================
+
+.. currentmodule:: qdarts.tunneling_simulator
+
+.. autoclass:: ApproximateTunnelingSimulator
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ApproximateTunnelingSimulator.__init__
+      ~ApproximateTunnelingSimulator.boundaries
+      ~ApproximateTunnelingSimulator.compute_local_system
+      ~ApproximateTunnelingSimulator.sensor_scan
+      ~ApproximateTunnelingSimulator.sensor_scan_2D
+      ~ApproximateTunnelingSimulator.slice
+   
+   
+
+   
+   
+   

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>qdarts.simulator.CapacitiveDeviceSimulator &#8212; QDarts  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=61cd365c" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qdarts.tunneling_simulator.ApproximateTunnelingSimulator" href="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html" />
+    <link rel="prev" title="qdarts.capacitance_model.CapacitanceModel" href="qdarts.capacitance_model.CapacitanceModel.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="qdarts-simulator-capacitivedevicesimulator">
+<h1>qdarts.simulator.CapacitiveDeviceSimulator<a class="headerlink" href="#qdarts-simulator-capacitivedevicesimulator" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qdarts.simulator.CapacitiveDeviceSimulator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qdarts.simulator.</span></span><span class="sig-name descname"><span class="pre">CapacitiveDeviceSimulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacitance_model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.CapacitiveDeviceSimulator" title="Link to this definition">¶</a></dt>
+<dd><p>This class simulates a quantum dot device based on a capacitance model.</p>
+<p>The simulator interally keeps track of the Coulomb diamonds (polytopes) and their transitions (facets),
+and takes care of keeping track of which transitions are feasible, with what precision, etc.
+This allows one to ask questions such as: “which transition does this facet correspond to?” and
+“what is the orthogonal axis in voltage space (i.e. virtual gate) that tunes across it?”.
+The simulator will return, for each transition, a point on the transition line and the virtual gate.</p>
+<p>It also has the ability to take 2D slices through high dimensional voltage spaces to construct 2D
+projections of charge stability diagrams. See documentation of AbstractCapacitiveDeviceSimulator for more details.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.CapacitiveDeviceSimulator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacitance_model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.CapacitiveDeviceSimulator.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.simulator.CapacitiveDeviceSimulator.__init__" title="qdarts.simulator.CapacitiveDeviceSimulator.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(capacitance_model)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">boundaries</span></code>(state)</p></td>
+<td><p>Returns the polytope P(n) of a given state n with all its boundaries, labels and meta information.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cached_polytopes</span></code>()</p></td>
+<td><p>Returns a sequence including all computed and cached polytopes for inspection and modification.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.simulator.CapacitiveDeviceSimulator.compute_polytope" title="qdarts.simulator.CapacitiveDeviceSimulator.compute_polytope"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_polytope</span></code></a>(state)</p></td>
+<td><p>Computes the polytope for a given state.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_transition_equations</span></code>(state_list, ...)</p></td>
+<td><p>Computes the energy difference equations from target states to all states in the list.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_boundary_intersection</span></code>(old_v, new_v, state)</p></td>
+<td><p>Computes an intersection of a ray with the boundary of a polytope and computes the new state</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_state_of_voltage</span></code>(v, state_hint[, ...])</p></td>
+<td><p>Searches the ground state for a given voltage, given an initial guess.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.simulator.CapacitiveDeviceSimulator.get_maximum_polytope_slack" title="qdarts.simulator.CapacitiveDeviceSimulator.get_maximum_polytope_slack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_maximum_polytope_slack</span></code></a>()</p></td>
+<td><p>Returns the maximum slack value for inclusing of a facet into the polytope.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">inside_state</span></code>(v, state)</p></td>
+<td><p>Returns true if a point v is fully within the polytope of a given state.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.simulator.CapacitiveDeviceSimulator.set_maximum_polytope_slack" title="qdarts.simulator.CapacitiveDeviceSimulator.set_maximum_polytope_slack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_maximum_polytope_slack</span></code></a>(maximum_slack)</p></td>
+<td><p>Sets the maximum slack value for inclusing of a facet into the polytope.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.simulator.CapacitiveDeviceSimulator.slice" title="qdarts.simulator.CapacitiveDeviceSimulator.slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slice</span></code></a>(P, m[, proxy])</p></td>
+<td><p>Restricts the simulator to the affine subspace v=m+Pv'</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.CapacitiveDeviceSimulator.compute_polytope">
+<span class="sig-name descname"><span class="pre">compute_polytope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.CapacitiveDeviceSimulator.compute_polytope" title="Link to this definition">¶</a></dt>
+<dd><p>Computes the polytope for a given state.</p>
+<p>Is implemented by the derived class and called when the polytope for a state is not found in cache.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>list</em><em> of </em><em>ints</em>) – the state identifying the polytope</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Polytope object containing the full computed polytope.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.CapacitiveDeviceSimulator.get_maximum_polytope_slack">
+<span class="sig-name descname"><span class="pre">get_maximum_polytope_slack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.CapacitiveDeviceSimulator.get_maximum_polytope_slack" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the maximum slack value for inclusing of a facet into the polytope.</p>
+<p>Returns the maximum energy distance the closest point of a transition can have to the polytope
+before it is discarded. Setting to 0 means that only transitions that actually touch the polytope
+are kept.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.CapacitiveDeviceSimulator.set_maximum_polytope_slack">
+<span class="sig-name descname"><span class="pre">set_maximum_polytope_slack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maximum_slack</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.CapacitiveDeviceSimulator.set_maximum_polytope_slack" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the maximum slack value for inclusing of a facet into the polytope.</p>
+<p>Sets the maximum distance the closest point of a transition can have to the polytope
+before it is discarded. Setting to 0 means that only transitions that actually touch the polytope
+are kept.</p>
+<p>Note that changing this value clears the cache.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.CapacitiveDeviceSimulator.slice">
+<span class="sig-name descname"><span class="pre">slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.CapacitiveDeviceSimulator.slice" title="Link to this definition">¶</a></dt>
+<dd><p>Restricts the simulator to the affine subspace v=m+Pv’</p>
+<p>Computes the slice through the device by setting v=m+Pv’, where v is the plunger gate voltages of the
+original device and v’ is the new coordinate system. Must be implemented by derived classes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>P</strong> (<em>MxK np.array</em><em> of </em><em>floats</em>) – The linear coefficient matrix. Here M is the number of voltage elements in v in the full simulation
+and K the dimensionality of the subspace.</p></li>
+<li><p><strong>m</strong> (<em>offset</em><em> of </em><em>the affine trnsformation.</em>)</p></li>
+<li><p><strong>proxy</strong> (<em>bool</em>) – Whether a proxy is returned. A proxy shares the cache, if possible. This is the case when P is invertible,
+especially this entails M=K. If cache sharing is possible, the simulation computes the original polytope and then
+applies the affine transformation. This can reduce run time a lot if several slices need to be computed for the
+same simulation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A simulator object describing the simulation on the affine subspace. The current simulation object remains unchanged.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">QDarts</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../simulator.html">Simulator</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#simulation-components">Simulation Components</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qdarts.capacitance_model.CapacitanceModel.html">qdarts.capacitance_model.CapacitanceModel</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">qdarts.simulator.CapacitiveDeviceSimulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qdarts.simulator.CapacitiveDeviceSimulator"><code class="docutils literal notranslate"><span class="pre">CapacitiveDeviceSimulator</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.CapacitiveDeviceSimulator.__init__"><code class="docutils literal notranslate"><span class="pre">CapacitiveDeviceSimulator.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.CapacitiveDeviceSimulator.compute_polytope"><code class="docutils literal notranslate"><span class="pre">CapacitiveDeviceSimulator.compute_polytope()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.CapacitiveDeviceSimulator.get_maximum_polytope_slack"><code class="docutils literal notranslate"><span class="pre">CapacitiveDeviceSimulator.get_maximum_polytope_slack()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.CapacitiveDeviceSimulator.set_maximum_polytope_slack"><code class="docutils literal notranslate"><span class="pre">CapacitiveDeviceSimulator.set_maximum_polytope_slack()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.CapacitiveDeviceSimulator.slice"><code class="docutils literal notranslate"><span class="pre">CapacitiveDeviceSimulator.slice()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html">qdarts.tunneling_simulator.ApproximateTunnelingSimulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.tunneling_simulator.TunnelBarrierModel.html">qdarts.tunneling_simulator.TunnelBarrierModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.tunneling_simulator.NoisySensorDot.html">qdarts.tunneling_simulator.NoisySensorDot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.noise_processes.OU_process.html">qdarts.noise_processes.OU_process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.noise_processes.Cosine_Mean_Function.html">qdarts.noise_processes.Cosine_Mean_Function</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#interfaces">Interfaces</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+      <li>Previous: <a href="qdarts.capacitance_model.CapacitanceModel.html" title="previous chapter">qdarts.capacitance_model.CapacitanceModel</a></li>
+      <li>Next: <a href="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html" title="next chapter">qdarts.tunneling_simulator.ApproximateTunnelingSimulator</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Oswin Krause, Jan Krzywda, Weikun Liu, Evert van Nieuwenburg.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/interfaces/qdarts.simulator.CapacitiveDeviceSimulator.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

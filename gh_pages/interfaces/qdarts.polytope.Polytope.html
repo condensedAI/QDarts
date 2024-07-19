@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>qdarts.polytope.Polytope &#8212; QDarts  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=61cd365c" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qdarts.capacitance_model.AbstractCapacitanceModel" href="qdarts.capacitance_model.AbstractCapacitanceModel.html" />
+    <link rel="prev" title="qdarts.tunneling_simulator.LocalSystem" href="qdarts.tunneling_simulator.LocalSystem.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="qdarts-polytope-polytope">
+<h1>qdarts.polytope.Polytope<a class="headerlink" href="#qdarts-polytope-polytope" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qdarts.polytope.Polytope">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qdarts.polytope.</span></span><span class="sig-name descname"><span class="pre">Polytope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.polytope.Polytope" title="Link to this definition">¶</a></dt>
+<dd><p>Represents the polytope P(n) defined by all gate voltages v in a device that have
+capacitive ground state n. They are stored as a set of linear inequalities (A,b), and
+A point v in P(n) fulfills</p>
+<p><span class="math notranslate nohighlight">\(Av+b &lt;0\)</span></p>
+<p>Each inequality represents a facet of the polytope and each facet marks a transition from P(n) to
+some other ground state polytope P(n’). The state difference t=n’-n is stored as label for each
+inequality.</p>
+<p>Not each inequality stored must touch the polytope. There might be others that could be removed without changing P(n).
+The distance from the polytope is given by the slack variable s that for each inequality either is 0 if the side is touching
+(or some number numerically close to 0, e..g, 1.e-8) and otherwise we have</p>
+<p><span class="math notranslate nohighlight">\(s_i = min_v A_i^Tv +b_i, v \in P(n)\)</span></p>
+<p>If the inequalities measure difference in capacitive energy from the ground state (which is default in the simulator) the slack
+therefore indicates the minimum energy gap between the transition state indicated by the inequality and the ground state.</p>
+<p>Finally, for optimization reason, not every polytope might be fully computed and must be verified. This should never happen to a user
+and is mostly an internal detail of the simulator. This holds as well for additional information that can be stored inside a dict in the
+polytope. The simulators can store additional info in the polytope via this way.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.polytope.Polytope.state">
+<span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#qdarts.polytope.Polytope.state" title="Link to this definition">¶</a></dt>
+<dd><p>The D dimensional array that stores the electron configuration n of the current ground state polytope. All points inside
+the polytope have this state as ground state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>D np.array of int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.polytope.Polytope.labels">
+<span class="sig-name descname"><span class="pre">labels</span></span><a class="headerlink" href="#qdarts.polytope.Polytope.labels" title="Link to this definition">¶</a></dt>
+<dd><p>Matrix of transitions. Each of the N inequalities is labeled by the state difference t=n’-n.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>NxD np.array of int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.polytope.Polytope.A">
+<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#qdarts.polytope.Polytope.A" title="Link to this definition">¶</a></dt>
+<dd><p>Linear factors of the N inequalities for a K-dimensional gate space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>NxK np.array of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.polytope.Polytope.b">
+<span class="sig-name descname"><span class="pre">b</span></span><a class="headerlink" href="#qdarts.polytope.Polytope.b" title="Link to this definition">¶</a></dt>
+<dd><p>constant offsets of the N linear inequalities</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>N np.array of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.polytope.Polytope.slacks">
+<span class="sig-name descname"><span class="pre">slacks</span></span><a class="headerlink" href="#qdarts.polytope.Polytope.slacks" title="Link to this definition">¶</a></dt>
+<dd><p>Measures the distance of the inequality from the boundary of the polytope. ~0 if touching.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>N np.array of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.polytope.Polytope.point_inside">
+<span class="sig-name descname"><span class="pre">point_inside</span></span><a class="headerlink" href="#qdarts.polytope.Polytope.point_inside" title="Link to this definition">¶</a></dt>
+<dd><p>A point inside the polytope.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>K np.array of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.polytope.Polytope.must_verify">
+<span class="sig-name descname"><span class="pre">must_verify</span></span><a class="headerlink" href="#qdarts.polytope.Polytope.must_verify" title="Link to this definition">¶</a></dt>
+<dd><p>Internal variable for bookkeeping whether the polytope needs recomputing (mostly after slice). Should ALWAYS be False for polytopes
+queried from the simulator. TODO: can we remove this?</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.polytope.Polytope.additional_info">
+<span class="sig-name descname"><span class="pre">additional_info</span></span><a class="headerlink" href="#qdarts.polytope.Polytope.additional_info" title="Link to this definition">¶</a></dt>
+<dd><p>Internal additional information that later steps of the simulation can store inside a polytope for bookkeeping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.polytope.Polytope.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.polytope.Polytope.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.polytope.Polytope.__init__" title="qdarts.polytope.Polytope.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(state)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.polytope.Polytope.invertible_transform" title="qdarts.polytope.Polytope.invertible_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">invertible_transform</span></code></a>(P, m)</p></td>
+<td><p>Apply an invertible affine transformation to the polytope.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.polytope.Polytope.lazy_slice" title="qdarts.polytope.Polytope.lazy_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lazy_slice</span></code></a>(P, m)</p></td>
+<td><p>Slices a polytope lazyily, i.e., without recomputing the slacks and boundaries.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.polytope.Polytope.set_polytope" title="qdarts.polytope.Polytope.set_polytope"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_polytope</span></code></a>(labels, A, b, slacks, point_inside)</p></td>
+<td><p>Sets the internal variables of the polytope.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.polytope.Polytope.invertible_transform">
+<span class="sig-name descname"><span class="pre">invertible_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.polytope.Polytope.invertible_transform" title="Link to this definition">¶</a></dt>
+<dd><p>Apply an invertible affine transformation to the polytope. This can be done without changing slacks and thus no verification is needed.</p>
+<p>Changes the space of the polytope via the transformation <span class="math notranslate nohighlight">\(v=Av'+b\)</span>. Returns the polytope in the coordinate system of v’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>P</strong> (<em>KxK np.array</em><em> of </em><em>float</em>) – Invertible linear transformation matrix</p></li>
+<li><p><strong>m</strong> (<em>K np.array</em><em> of </em><em>float</em>) – Affine offset of the transformation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.polytope.Polytope.lazy_slice">
+<span class="sig-name descname"><span class="pre">lazy_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.polytope.Polytope.lazy_slice" title="Link to this definition">¶</a></dt>
+<dd><p>Slices a polytope lazyily, i.e., without recomputing the slacks and boundaries.</p>
+<p>As a result, after this must_verify is True. P is not required to be invertible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>P</strong> (<em>KxK np.array</em><em> of </em><em>float</em>) – Invertible linear transformation matrix</p></li>
+<li><p><strong>m</strong> (<em>K np.array</em><em> of </em><em>float</em>) – Affine offset of the transformation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.polytope.Polytope.set_polytope">
+<span class="sig-name descname"><span class="pre">set_polytope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slacks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_inside</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">must_verify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.polytope.Polytope.set_polytope" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the internal variables of the polytope.</p>
+<p>Helper function to ensure thateverything is set as it should be.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">QDarts</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../simulator.html">Simulator</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api.html#simulation-components">Simulation Components</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#other-classes">Other Classes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qdarts.tunneling_simulator.LocalSystem.html">qdarts.tunneling_simulator.LocalSystem</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">qdarts.polytope.Polytope</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qdarts.polytope.Polytope"><code class="docutils literal notranslate"><span class="pre">Polytope</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.polytope.Polytope.state"><code class="docutils literal notranslate"><span class="pre">Polytope.state</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.polytope.Polytope.labels"><code class="docutils literal notranslate"><span class="pre">Polytope.labels</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.polytope.Polytope.A"><code class="docutils literal notranslate"><span class="pre">Polytope.A</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.polytope.Polytope.b"><code class="docutils literal notranslate"><span class="pre">Polytope.b</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.polytope.Polytope.slacks"><code class="docutils literal notranslate"><span class="pre">Polytope.slacks</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.polytope.Polytope.point_inside"><code class="docutils literal notranslate"><span class="pre">Polytope.point_inside</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.polytope.Polytope.must_verify"><code class="docutils literal notranslate"><span class="pre">Polytope.must_verify</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.polytope.Polytope.additional_info"><code class="docutils literal notranslate"><span class="pre">Polytope.additional_info</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.polytope.Polytope.__init__"><code class="docutils literal notranslate"><span class="pre">Polytope.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.polytope.Polytope.invertible_transform"><code class="docutils literal notranslate"><span class="pre">Polytope.invertible_transform()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.polytope.Polytope.lazy_slice"><code class="docutils literal notranslate"><span class="pre">Polytope.lazy_slice()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.polytope.Polytope.set_polytope"><code class="docutils literal notranslate"><span class="pre">Polytope.set_polytope()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#interfaces">Interfaces</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+      <li>Previous: <a href="qdarts.tunneling_simulator.LocalSystem.html" title="previous chapter">qdarts.tunneling_simulator.LocalSystem</a></li>
+      <li>Next: <a href="qdarts.capacitance_model.AbstractCapacitanceModel.html" title="next chapter">qdarts.capacitance_model.AbstractCapacitanceModel</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Oswin Krause, Jan Krzywda, Weikun Liu, Evert van Nieuwenburg.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/interfaces/qdarts.polytope.Polytope.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,32 @@
+﻿qdarts.simulator.CapacitiveDeviceSimulator
+==========================================
+
+.. currentmodule:: qdarts.simulator
+
+.. autoclass:: CapacitiveDeviceSimulator
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CapacitiveDeviceSimulator.__init__
+      ~CapacitiveDeviceSimulator.boundaries
+      ~CapacitiveDeviceSimulator.cached_polytopes
+      ~CapacitiveDeviceSimulator.compute_polytope
+      ~CapacitiveDeviceSimulator.compute_transition_equations
+      ~CapacitiveDeviceSimulator.find_boundary_intersection
+      ~CapacitiveDeviceSimulator.find_state_of_voltage
+      ~CapacitiveDeviceSimulator.get_maximum_polytope_slack
+      ~CapacitiveDeviceSimulator.inside_state
+      ~CapacitiveDeviceSimulator.set_maximum_polytope_slack
+      ~CapacitiveDeviceSimulator.slice
+   
+   
+
+   
+   
+   

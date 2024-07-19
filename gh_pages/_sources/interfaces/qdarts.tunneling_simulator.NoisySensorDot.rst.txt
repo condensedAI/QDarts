@@ -1,0 +1,29 @@
+﻿qdarts.tunneling\_simulator.NoisySensorDot
+==========================================
+
+.. currentmodule:: qdarts.tunneling_simulator
+
+.. autoclass:: NoisySensorDot
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~NoisySensorDot.__init__
+      ~NoisySensorDot.config_noise
+      ~NoisySensorDot.config_peak
+      ~NoisySensorDot.precompute_sensor_state
+      ~NoisySensorDot.sample_sensor_configuration
+      ~NoisySensorDot.sample_sensor_equilibrium
+      ~NoisySensorDot.slice
+      ~NoisySensorDot.start_measurement
+   
+   
+
+   
+   
+   

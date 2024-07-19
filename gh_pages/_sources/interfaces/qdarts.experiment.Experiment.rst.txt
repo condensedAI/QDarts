@@ -1,0 +1,30 @@
+﻿qdarts.experiment.Experiment
+============================
+
+.. currentmodule:: qdarts.experiment
+
+.. autoclass:: Experiment
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Experiment.__init__
+      ~Experiment.center_transition
+      ~Experiment.deploy_capacitance_sim
+      ~Experiment.deploy_sensor_model
+      ~Experiment.deploy_tunneling_sim
+      ~Experiment.generate_CSD
+      ~Experiment.get_compensated_sim
+      ~Experiment.get_plot_args
+      ~Experiment.get_virtualised_sim
+   
+   
+
+   
+   
+   

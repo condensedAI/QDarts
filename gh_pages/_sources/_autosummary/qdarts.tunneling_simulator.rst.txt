@@ -1,0 +1,39 @@
+qdarts.tunneling\_simulator
+===========================
+
+.. automodule:: qdarts.tunneling_simulator
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      softmax
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AbstractSensorSim
+      ApproximateTunnelingSimulator
+      LocalSystem
+      NoisySensorDot
+      TunnelBarrierModel
+   
+   
+
+   
+   
+   
+
+
+

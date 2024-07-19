@@ -1,0 +1,32 @@
+qdarts.simulator
+================
+
+.. automodule:: qdarts.simulator
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AbstractPolytopeSimulator
+      BaseCapacitiveDeviceSimulator
+      CapacitiveDeviceSimulator
+      CapacitiveDeviceSimulatorProxy
+   
+   
+
+   
+   
+   
+
+
+

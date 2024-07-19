@@ -1,0 +1,30 @@
+qdarts.capacitance\_model
+=========================
+
+.. automodule:: qdarts.capacitance_model
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      BaseCapacitanceModel
+      CapacitanceModel
+   
+   
+
+   
+   
+   
+
+
+

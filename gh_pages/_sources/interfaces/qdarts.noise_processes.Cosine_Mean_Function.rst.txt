@@ -1,0 +1,24 @@
+﻿qdarts.noise\_processes.Cosine\_Mean\_Function
+==============================================
+
+.. currentmodule:: qdarts.noise_processes
+
+.. autoclass:: Cosine_Mean_Function
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Cosine_Mean_Function.__init__
+      ~Cosine_Mean_Function.slice
+      ~Cosine_Mean_Function.start_sequence
+   
+   
+
+   
+   
+   

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>qdarts.noise_processes.AbstractNoiseProcess &#8212; QDarts  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=61cd365c" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qdarts.tunneling_simulator.AbstractSensorSim" href="qdarts.tunneling_simulator.AbstractSensorSim.html" />
+    <link rel="prev" title="qdarts.simulator.AbstractPolytopeSimulator" href="qdarts.simulator.AbstractPolytopeSimulator.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="qdarts-noise-processes-abstractnoiseprocess">
+<h1>qdarts.noise_processes.AbstractNoiseProcess<a class="headerlink" href="#qdarts-noise-processes-abstractnoiseprocess" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qdarts.noise_processes.AbstractNoiseProcess">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qdarts.noise_processes.</span></span><span class="sig-name descname"><span class="pre">AbstractNoiseProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_elements</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.noise_processes.AbstractNoiseProcess" title="Link to this definition">¶</a></dt>
+<dd><p>Models a noise process that produces possibly dependent samples <span class="math notranslate nohighlight">\(\epsilon(v)_t\)</span>. The noise process
+can depend on the device voltages v and the noise can depend on all previous samples in the sequence. We assume
+that <span class="math notranslate nohighlight">\(\epsilon(v)_t\)</span> is vector valued and the number of elements is stored in the <code class="docutils literal notranslate"><span class="pre">num_elements</span></code> attribute</p>
+<p>A sequence is started by calling <code class="docutils literal notranslate"><span class="pre">start_sequence</span></code>, at which point the newly sampled points are independent from
+all previous samples.</p>
+<p>Note that currently, the elements in the noise process are assumed to be drawn with equal time difference between samples.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.noise_processes.AbstractNoiseProcess.num_elements">
+<span class="sig-name descname"><span class="pre">num_elements</span></span><a class="headerlink" href="#qdarts.noise_processes.AbstractNoiseProcess.num_elements" title="Link to this definition">¶</a></dt>
+<dd><p>the dimensionality of the noise variable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.noise_processes.AbstractNoiseProcess.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_elements</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.noise_processes.AbstractNoiseProcess.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.noise_processes.AbstractNoiseProcess.__init__" title="qdarts.noise_processes.AbstractNoiseProcess.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(num_elements)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.noise_processes.AbstractNoiseProcess.slice" title="qdarts.noise_processes.AbstractNoiseProcess.slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slice</span></code></a>(P, m)</p></td>
+<td><p>Restricts the noise to the affine subspace <span class="math notranslate nohighlight">\(v=m+Pv\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.noise_processes.AbstractNoiseProcess.start_sequence" title="qdarts.noise_processes.AbstractNoiseProcess.start_sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_sequence</span></code></a>()</p></td>
+<td><p>Restart the sequence so that the next sample drawn is independent from all previous samples.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.noise_processes.AbstractNoiseProcess.slice">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.noise_processes.AbstractNoiseProcess.slice" title="Link to this definition">¶</a></dt>
+<dd><p>Restricts the noise to the affine subspace <span class="math notranslate nohighlight">\(v=m+Pv\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>P</strong> (<em>MxK np.array</em><em> of </em><em>floats</em>) – The linear coefficient matrix.</p></li>
+<li><p><strong>m</strong> (<em>M np.array</em><em> of </em><em>floats</em>) – offset of the affine transformation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A noise process object describing the noise on the affine subspace. The current noise object remains unchanged.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.noise_processes.AbstractNoiseProcess.start_sequence">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_sequence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.noise_processes.AbstractNoiseProcess.start_sequence" title="Link to this definition">¶</a></dt>
+<dd><p>Restart the sequence so that the next sample drawn is independent from all previous samples.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">QDarts</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../simulator.html">Simulator</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api.html#simulation-components">Simulation Components</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#interfaces">Interfaces</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qdarts.capacitance_model.AbstractCapacitanceModel.html">qdarts.capacitance_model.AbstractCapacitanceModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.simulator.AbstractPolytopeSimulator.html">qdarts.simulator.AbstractPolytopeSimulator</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">qdarts.noise_processes.AbstractNoiseProcess</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qdarts.noise_processes.AbstractNoiseProcess"><code class="docutils literal notranslate"><span class="pre">AbstractNoiseProcess</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.noise_processes.AbstractNoiseProcess.num_elements"><code class="docutils literal notranslate"><span class="pre">AbstractNoiseProcess.num_elements</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.noise_processes.AbstractNoiseProcess.__init__"><code class="docutils literal notranslate"><span class="pre">AbstractNoiseProcess.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.noise_processes.AbstractNoiseProcess.slice"><code class="docutils literal notranslate"><span class="pre">AbstractNoiseProcess.slice()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.noise_processes.AbstractNoiseProcess.start_sequence"><code class="docutils literal notranslate"><span class="pre">AbstractNoiseProcess.start_sequence()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.tunneling_simulator.AbstractSensorSim.html">qdarts.tunneling_simulator.AbstractSensorSim</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+      <li>Previous: <a href="qdarts.simulator.AbstractPolytopeSimulator.html" title="previous chapter">qdarts.simulator.AbstractPolytopeSimulator</a></li>
+      <li>Next: <a href="qdarts.tunneling_simulator.AbstractSensorSim.html" title="next chapter">qdarts.tunneling_simulator.AbstractSensorSim</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Oswin Krause, Jan Krzywda, Weikun Liu, Evert van Nieuwenburg.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/interfaces/qdarts.noise_processes.AbstractNoiseProcess.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

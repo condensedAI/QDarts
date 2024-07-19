@@ -1,0 +1,37 @@
+qdarts.util\_functions
+======================
+
+.. automodule:: qdarts.util_functions
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      axis_align_transitions
+      compensate_simulator_sensors
+      compute_maximum_inscribed_circle
+      compute_polytope_slacks
+      find_label
+      find_point_on_transitions
+      fix_gates
+      is_invertible_matrix
+      solve_linear_problem
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

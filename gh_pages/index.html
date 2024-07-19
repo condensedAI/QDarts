@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Welcome to QDarts’s documentation! &#8212; QDarts  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=61cd365c" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Simulator" href="simulator.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="welcome-to-qdarts-s-documentation">
+<h1>Welcome to QDarts’s documentation!<a class="headerlink" href="#welcome-to-qdarts-s-documentation" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="simulator.html">Simulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#experiment-class">Experiment Class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.experiment.Experiment.html">qdarts.experiment.Experiment</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.experiment.Experiment.html#qdarts.experiment.Experiment"><code class="docutils literal notranslate"><span class="pre">Experiment</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.experiment.Experiment.html#qdarts.experiment.Experiment.__init__"><code class="docutils literal notranslate"><span class="pre">Experiment.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.experiment.Experiment.html#qdarts.experiment.Experiment.center_transition"><code class="docutils literal notranslate"><span class="pre">Experiment.center_transition()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.experiment.Experiment.html#qdarts.experiment.Experiment.deploy_capacitance_sim"><code class="docutils literal notranslate"><span class="pre">Experiment.deploy_capacitance_sim()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.experiment.Experiment.html#qdarts.experiment.Experiment.deploy_sensor_model"><code class="docutils literal notranslate"><span class="pre">Experiment.deploy_sensor_model()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.experiment.Experiment.html#qdarts.experiment.Experiment.deploy_tunneling_sim"><code class="docutils literal notranslate"><span class="pre">Experiment.deploy_tunneling_sim()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.experiment.Experiment.html#qdarts.experiment.Experiment.generate_CSD"><code class="docutils literal notranslate"><span class="pre">Experiment.generate_CSD()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.experiment.Experiment.html#qdarts.experiment.Experiment.get_compensated_sim"><code class="docutils literal notranslate"><span class="pre">Experiment.get_compensated_sim()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.experiment.Experiment.html#qdarts.experiment.Experiment.get_plot_args"><code class="docutils literal notranslate"><span class="pre">Experiment.get_plot_args()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.experiment.Experiment.html#qdarts.experiment.Experiment.get_virtualised_sim"><code class="docutils literal notranslate"><span class="pre">Experiment.get_virtualised_sim()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#simulation-components">Simulation Components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.capacitance_model.CapacitanceModel.html">qdarts.capacitance_model.CapacitanceModel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.capacitance_model.CapacitanceModel.html#qdarts.capacitance_model.CapacitanceModel"><code class="docutils literal notranslate"><span class="pre">CapacitanceModel</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.capacitance_model.CapacitanceModel.html#qdarts.capacitance_model.CapacitanceModel.__init__"><code class="docutils literal notranslate"><span class="pre">CapacitanceModel.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.capacitance_model.CapacitanceModel.html#qdarts.capacitance_model.CapacitanceModel.compute_transition_equations"><code class="docutils literal notranslate"><span class="pre">CapacitanceModel.compute_transition_equations()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.capacitance_model.CapacitanceModel.html#qdarts.capacitance_model.CapacitanceModel.slice"><code class="docutils literal notranslate"><span class="pre">CapacitanceModel.slice()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.simulator.CapacitiveDeviceSimulator.html">qdarts.simulator.CapacitiveDeviceSimulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.simulator.CapacitiveDeviceSimulator.html#qdarts.simulator.CapacitiveDeviceSimulator"><code class="docutils literal notranslate"><span class="pre">CapacitiveDeviceSimulator</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.CapacitiveDeviceSimulator.html#qdarts.simulator.CapacitiveDeviceSimulator.__init__"><code class="docutils literal notranslate"><span class="pre">CapacitiveDeviceSimulator.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.CapacitiveDeviceSimulator.html#qdarts.simulator.CapacitiveDeviceSimulator.compute_polytope"><code class="docutils literal notranslate"><span class="pre">CapacitiveDeviceSimulator.compute_polytope()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.CapacitiveDeviceSimulator.html#qdarts.simulator.CapacitiveDeviceSimulator.get_maximum_polytope_slack"><code class="docutils literal notranslate"><span class="pre">CapacitiveDeviceSimulator.get_maximum_polytope_slack()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.CapacitiveDeviceSimulator.html#qdarts.simulator.CapacitiveDeviceSimulator.set_maximum_polytope_slack"><code class="docutils literal notranslate"><span class="pre">CapacitiveDeviceSimulator.set_maximum_polytope_slack()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.CapacitiveDeviceSimulator.html#qdarts.simulator.CapacitiveDeviceSimulator.slice"><code class="docutils literal notranslate"><span class="pre">CapacitiveDeviceSimulator.slice()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html">qdarts.tunneling_simulator.ApproximateTunnelingSimulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.beta"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.beta</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.T"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.T</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.poly_sim"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.poly_sim</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.barrier_sim"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.barrier_sim</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_sim"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.sensor_sim</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.num_additional_neighbours"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.num_additional_neighbours</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.__init__"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.boundaries"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.boundaries()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.compute_local_system"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.compute_local_system()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.sensor_scan()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan_2D"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.sensor_scan_2D()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.slice"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.slice()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.TunnelBarrierModel.html">qdarts.tunneling_simulator.TunnelBarrierModel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.TunnelBarrierModel.html#qdarts.tunneling_simulator.TunnelBarrierModel"><code class="docutils literal notranslate"><span class="pre">TunnelBarrierModel</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.TunnelBarrierModel.html#qdarts.tunneling_simulator.TunnelBarrierModel.__init__"><code class="docutils literal notranslate"><span class="pre">TunnelBarrierModel.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.TunnelBarrierModel.html#qdarts.tunneling_simulator.TunnelBarrierModel.get_tunnel_matrix"><code class="docutils literal notranslate"><span class="pre">TunnelBarrierModel.get_tunnel_matrix()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.TunnelBarrierModel.html#qdarts.tunneling_simulator.TunnelBarrierModel.slice"><code class="docutils literal notranslate"><span class="pre">TunnelBarrierModel.slice()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.NoisySensorDot.html">qdarts.tunneling_simulator.NoisySensorDot</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.NoisySensorDot.html#qdarts.tunneling_simulator.NoisySensorDot"><code class="docutils literal notranslate"><span class="pre">NoisySensorDot</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.NoisySensorDot.html#qdarts.tunneling_simulator.NoisySensorDot.__init__"><code class="docutils literal notranslate"><span class="pre">NoisySensorDot.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.NoisySensorDot.html#qdarts.tunneling_simulator.NoisySensorDot.config_noise"><code class="docutils literal notranslate"><span class="pre">NoisySensorDot.config_noise()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.NoisySensorDot.html#qdarts.tunneling_simulator.NoisySensorDot.config_peak"><code class="docutils literal notranslate"><span class="pre">NoisySensorDot.config_peak()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.NoisySensorDot.html#qdarts.tunneling_simulator.NoisySensorDot.precompute_sensor_state"><code class="docutils literal notranslate"><span class="pre">NoisySensorDot.precompute_sensor_state()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.NoisySensorDot.html#qdarts.tunneling_simulator.NoisySensorDot.sample_sensor_configuration"><code class="docutils literal notranslate"><span class="pre">NoisySensorDot.sample_sensor_configuration()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.NoisySensorDot.html#qdarts.tunneling_simulator.NoisySensorDot.sample_sensor_equilibrium"><code class="docutils literal notranslate"><span class="pre">NoisySensorDot.sample_sensor_equilibrium()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.NoisySensorDot.html#qdarts.tunneling_simulator.NoisySensorDot.slice"><code class="docutils literal notranslate"><span class="pre">NoisySensorDot.slice()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.NoisySensorDot.html#qdarts.tunneling_simulator.NoisySensorDot.start_measurement"><code class="docutils literal notranslate"><span class="pre">NoisySensorDot.start_measurement()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.noise_processes.OU_process.html">qdarts.noise_processes.OU_process</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.noise_processes.OU_process.html#qdarts.noise_processes.OU_process"><code class="docutils literal notranslate"><span class="pre">OU_process</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.noise_processes.OU_process.html#qdarts.noise_processes.OU_process.__init__"><code class="docutils literal notranslate"><span class="pre">OU_process.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.noise_processes.OU_process.html#qdarts.noise_processes.OU_process.next_val"><code class="docutils literal notranslate"><span class="pre">OU_process.next_val()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.noise_processes.OU_process.html#qdarts.noise_processes.OU_process.slice"><code class="docutils literal notranslate"><span class="pre">OU_process.slice()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.noise_processes.OU_process.html#qdarts.noise_processes.OU_process.start_sequence"><code class="docutils literal notranslate"><span class="pre">OU_process.start_sequence()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.noise_processes.Cosine_Mean_Function.html">qdarts.noise_processes.Cosine_Mean_Function</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.noise_processes.Cosine_Mean_Function.html#qdarts.noise_processes.Cosine_Mean_Function"><code class="docutils literal notranslate"><span class="pre">Cosine_Mean_Function</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.noise_processes.Cosine_Mean_Function.html#qdarts.noise_processes.Cosine_Mean_Function.__init__"><code class="docutils literal notranslate"><span class="pre">Cosine_Mean_Function.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.noise_processes.Cosine_Mean_Function.html#qdarts.noise_processes.Cosine_Mean_Function.slice"><code class="docutils literal notranslate"><span class="pre">Cosine_Mean_Function.slice()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.noise_processes.Cosine_Mean_Function.html#qdarts.noise_processes.Cosine_Mean_Function.start_sequence"><code class="docutils literal notranslate"><span class="pre">Cosine_Mean_Function.start_sequence()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#data-classes">Data Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html">qdarts.tunneling_simulator.LocalSystem</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html#qdarts.tunneling_simulator.LocalSystem"><code class="docutils literal notranslate"><span class="pre">LocalSystem</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html#qdarts.tunneling_simulator.LocalSystem.v"><code class="docutils literal notranslate"><span class="pre">LocalSystem.v</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html#qdarts.tunneling_simulator.LocalSystem.state"><code class="docutils literal notranslate"><span class="pre">LocalSystem.state</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html#qdarts.tunneling_simulator.LocalSystem.beta"><code class="docutils literal notranslate"><span class="pre">LocalSystem.beta</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html#qdarts.tunneling_simulator.LocalSystem.H"><code class="docutils literal notranslate"><span class="pre">LocalSystem.H</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html#qdarts.tunneling_simulator.LocalSystem.__init__"><code class="docutils literal notranslate"><span class="pre">LocalSystem.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html#qdarts.tunneling_simulator.LocalSystem.basis_labels"><code class="docutils literal notranslate"><span class="pre">LocalSystem.basis_labels</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html#qdarts.tunneling_simulator.LocalSystem.compute_mixed_state_of_subset"><code class="docutils literal notranslate"><span class="pre">LocalSystem.compute_mixed_state_of_subset()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html#qdarts.tunneling_simulator.LocalSystem.core_basis_indices"><code class="docutils literal notranslate"><span class="pre">LocalSystem.core_basis_indices</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html#qdarts.tunneling_simulator.LocalSystem.mixed_state"><code class="docutils literal notranslate"><span class="pre">LocalSystem.mixed_state</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html#qdarts.tunneling_simulator.LocalSystem.sample_sensor_configuration"><code class="docutils literal notranslate"><span class="pre">LocalSystem.sample_sensor_configuration()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html#qdarts.tunneling_simulator.LocalSystem.sample_sensor_equilibrium"><code class="docutils literal notranslate"><span class="pre">LocalSystem.sample_sensor_equilibrium()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html">qdarts.polytope.Polytope</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope"><code class="docutils literal notranslate"><span class="pre">Polytope</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope.state"><code class="docutils literal notranslate"><span class="pre">Polytope.state</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope.labels"><code class="docutils literal notranslate"><span class="pre">Polytope.labels</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope.A"><code class="docutils literal notranslate"><span class="pre">Polytope.A</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope.b"><code class="docutils literal notranslate"><span class="pre">Polytope.b</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope.slacks"><code class="docutils literal notranslate"><span class="pre">Polytope.slacks</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope.point_inside"><code class="docutils literal notranslate"><span class="pre">Polytope.point_inside</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope.must_verify"><code class="docutils literal notranslate"><span class="pre">Polytope.must_verify</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope.additional_info"><code class="docutils literal notranslate"><span class="pre">Polytope.additional_info</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope.__init__"><code class="docutils literal notranslate"><span class="pre">Polytope.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope.invertible_transform"><code class="docutils literal notranslate"><span class="pre">Polytope.invertible_transform()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope.lazy_slice"><code class="docutils literal notranslate"><span class="pre">Polytope.lazy_slice()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope.set_polytope"><code class="docutils literal notranslate"><span class="pre">Polytope.set_polytope()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#interfaces">Interfaces</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.capacitance_model.AbstractCapacitanceModel.html">qdarts.capacitance_model.AbstractCapacitanceModel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.capacitance_model.AbstractCapacitanceModel.html#qdarts.capacitance_model.AbstractCapacitanceModel"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.capacitance_model.AbstractCapacitanceModel.html#qdarts.capacitance_model.AbstractCapacitanceModel.num_dots"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.num_dots</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.capacitance_model.AbstractCapacitanceModel.html#qdarts.capacitance_model.AbstractCapacitanceModel.num_inputs"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.num_inputs</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.capacitance_model.AbstractCapacitanceModel.html#qdarts.capacitance_model.AbstractCapacitanceModel.bounds_limits"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.bounds_limits</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.capacitance_model.AbstractCapacitanceModel.html#qdarts.capacitance_model.AbstractCapacitanceModel.__init__"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.capacitance_model.AbstractCapacitanceModel.html#qdarts.capacitance_model.AbstractCapacitanceModel.compute_polytope_for_state"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.compute_polytope_for_state()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.capacitance_model.AbstractCapacitanceModel.html#qdarts.capacitance_model.AbstractCapacitanceModel.compute_transition_equations"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.compute_transition_equations()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.capacitance_model.AbstractCapacitanceModel.html#qdarts.capacitance_model.AbstractCapacitanceModel.enumerate_neighbours"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.enumerate_neighbours()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.capacitance_model.AbstractCapacitanceModel.html#qdarts.capacitance_model.AbstractCapacitanceModel.slice"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.slice()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.capacitance_model.AbstractCapacitanceModel.html#qdarts.capacitance_model.AbstractCapacitanceModel.verify_polytope"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.verify_polytope()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractPolytopeSimulator.html">qdarts.simulator.AbstractPolytopeSimulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractPolytopeSimulator.html#qdarts.simulator.AbstractPolytopeSimulator"><code class="docutils literal notranslate"><span class="pre">AbstractPolytopeSimulator</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractPolytopeSimulator.html#qdarts.simulator.AbstractPolytopeSimulator.num_dots"><code class="docutils literal notranslate"><span class="pre">AbstractPolytopeSimulator.num_dots</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractPolytopeSimulator.html#qdarts.simulator.AbstractPolytopeSimulator.num_inputs"><code class="docutils literal notranslate"><span class="pre">AbstractPolytopeSimulator.num_inputs</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractPolytopeSimulator.html#qdarts.simulator.AbstractPolytopeSimulator.__init__"><code class="docutils literal notranslate"><span class="pre">AbstractPolytopeSimulator.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractPolytopeSimulator.html#qdarts.simulator.AbstractPolytopeSimulator.boundaries"><code class="docutils literal notranslate"><span class="pre">AbstractPolytopeSimulator.boundaries()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractPolytopeSimulator.html#qdarts.simulator.AbstractPolytopeSimulator.slice"><code class="docutils literal notranslate"><span class="pre">AbstractPolytopeSimulator.slice()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html">qdarts.simulator.AbstractCapacitiveDeviceSimulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html#qdarts.simulator.AbstractCapacitiveDeviceSimulator"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html#qdarts.simulator.AbstractCapacitiveDeviceSimulator.__init__"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html#qdarts.simulator.AbstractCapacitiveDeviceSimulator.boundaries"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.boundaries()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html#qdarts.simulator.AbstractCapacitiveDeviceSimulator.cached_polytopes"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.cached_polytopes()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html#qdarts.simulator.AbstractCapacitiveDeviceSimulator.compute_polytope"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.compute_polytope()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html#qdarts.simulator.AbstractCapacitiveDeviceSimulator.compute_transition_equations"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.compute_transition_equations()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html#qdarts.simulator.AbstractCapacitiveDeviceSimulator.find_boundary_intersection"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.find_boundary_intersection()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html#qdarts.simulator.AbstractCapacitiveDeviceSimulator.find_state_of_voltage"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.find_state_of_voltage()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html#qdarts.simulator.AbstractCapacitiveDeviceSimulator.get_maximum_polytope_slack"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.get_maximum_polytope_slack()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html#qdarts.simulator.AbstractCapacitiveDeviceSimulator.inside_state"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.inside_state()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html#qdarts.simulator.AbstractCapacitiveDeviceSimulator.set_maximum_polytope_slack"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.set_maximum_polytope_slack()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html#qdarts.simulator.AbstractCapacitiveDeviceSimulator.slice"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.slice()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.noise_processes.AbstractNoiseProcess.html">qdarts.noise_processes.AbstractNoiseProcess</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.noise_processes.AbstractNoiseProcess.html#qdarts.noise_processes.AbstractNoiseProcess"><code class="docutils literal notranslate"><span class="pre">AbstractNoiseProcess</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.noise_processes.AbstractNoiseProcess.html#qdarts.noise_processes.AbstractNoiseProcess.num_elements"><code class="docutils literal notranslate"><span class="pre">AbstractNoiseProcess.num_elements</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.noise_processes.AbstractNoiseProcess.html#qdarts.noise_processes.AbstractNoiseProcess.__init__"><code class="docutils literal notranslate"><span class="pre">AbstractNoiseProcess.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.noise_processes.AbstractNoiseProcess.html#qdarts.noise_processes.AbstractNoiseProcess.slice"><code class="docutils literal notranslate"><span class="pre">AbstractNoiseProcess.slice()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.noise_processes.AbstractNoiseProcess.html#qdarts.noise_processes.AbstractNoiseProcess.start_sequence"><code class="docutils literal notranslate"><span class="pre">AbstractNoiseProcess.start_sequence()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.AbstractSensorSim.html">qdarts.tunneling_simulator.AbstractSensorSim</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.AbstractSensorSim.html#qdarts.tunneling_simulator.AbstractSensorSim"><code class="docutils literal notranslate"><span class="pre">AbstractSensorSim</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.AbstractSensorSim.html#qdarts.tunneling_simulator.AbstractSensorSim.__init__"><code class="docutils literal notranslate"><span class="pre">AbstractSensorSim.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.AbstractSensorSim.html#qdarts.tunneling_simulator.AbstractSensorSim.precompute_sensor_state"><code class="docutils literal notranslate"><span class="pre">AbstractSensorSim.precompute_sensor_state()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.AbstractSensorSim.html#qdarts.tunneling_simulator.AbstractSensorSim.sample_sensor_configuration"><code class="docutils literal notranslate"><span class="pre">AbstractSensorSim.sample_sensor_configuration()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.AbstractSensorSim.html#qdarts.tunneling_simulator.AbstractSensorSim.sample_sensor_equilibrium"><code class="docutils literal notranslate"><span class="pre">AbstractSensorSim.sample_sensor_equilibrium()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.AbstractSensorSim.html#qdarts.tunneling_simulator.AbstractSensorSim.slice"><code class="docutils literal notranslate"><span class="pre">AbstractSensorSim.slice()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.AbstractSensorSim.html#qdarts.tunneling_simulator.AbstractSensorSim.start_measurement"><code class="docutils literal notranslate"><span class="pre">AbstractSensorSim.start_measurement()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">QDarts</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="simulator.html">Simulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="simulator.html" title="next chapter">Simulator</a></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Oswin Krause, Jan Krzywda, Weikun Liu, Evert van Nieuwenburg.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

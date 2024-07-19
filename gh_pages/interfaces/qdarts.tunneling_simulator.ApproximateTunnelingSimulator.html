@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>qdarts.tunneling_simulator.ApproximateTunnelingSimulator &#8212; QDarts  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=61cd365c" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qdarts.tunneling_simulator.TunnelBarrierModel" href="qdarts.tunneling_simulator.TunnelBarrierModel.html" />
+    <link rel="prev" title="qdarts.simulator.CapacitiveDeviceSimulator" href="qdarts.simulator.CapacitiveDeviceSimulator.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="qdarts-tunneling-simulator-approximatetunnelingsimulator">
+<h1>qdarts.tunneling_simulator.ApproximateTunnelingSimulator<a class="headerlink" href="#qdarts-tunneling-simulator-approximatetunnelingsimulator" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qdarts.tunneling_simulator.</span></span><span class="sig-name descname"><span class="pre">ApproximateTunnelingSimulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polytope_sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barrier_sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensor_sim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator" title="Link to this definition">¶</a></dt>
+<dd><p>Simulator for approximate charge tunneling in a quantum dot device.</p>
+<p>The simulator extends the supplied capacitive simulation by creating a Hamiltionian H,
+where on the diagonals are the capacitive energies of the simualation, while the off-diagonals
+have added tunnel coupling parameters. Locally the hamiltonian is approximated via L basis states,
+where each state is an electron configurtion on the dots. This mixed state is then used to create a sensor simulation.</p>
+<p>It is possible to query the state of single hamiltonian, their mixed state and their sensor simulation via the class
+LocalSystem, returned by compute_local_system, but the primary use of tis class lies in its ability to compute
+1D or 2D sensor scans via sensor_scan and sensor_scan_2D.</p>
+<p>For computing the tunnel coupling parameters, this class can make use of an additional Tunnel barrier simulation, but it
+is also possible to just supply a NxN constant matrix of tunnel couplings between all D dots in the array.</p>
+<p>Finally, the class follows the interface of AbstractPolytopeSimulator, which means it is possible to directly query the information
+of the underlying polytopes of the simulation. This is there to unify slicing between simulators.</p>
+<p>Implementation details:</p>
+<p>The basis used for a gate voltage v is queried by finding its ground states n and then the facets of the
+ground state polytope P(n) create the basis. Thus, this basis becomes extended as the slack variable in the underlying
+capacitance simulation is increased. This is called the core state set.
+Additionally, the simulation allows to add additional states. For example, for most sensor simulations to work, we also need
+other higher energy states to compute correct conductance. These additional states can be added by modifying the vector
+num_additional_neighbours. if the ith element in this vector is R&gt;0, and s is a state in the core basis, then
+the extended basis will also include the states <span class="math notranslate nohighlight">\(s+ke_i\)</span> where <span class="math notranslate nohighlight">\(|k|&lt;=R\)</span> and <span class="math notranslate nohighlight">\(e_i\)</span> is the ith basis vector.</p>
+<p>The tunnel couplings T are included into the Hamiltonian the following way: let <span class="math notranslate nohighlight">\(s_i\)</span> and <span class="math notranslate nohighlight">\(s_j\)</span> be two states in the basis of the Hamiltonian
+that differ only in the value of the electron configuration at dots i and j.
+More exactly, we have that <span class="math notranslate nohighlight">\(s_i\)</span> and <span class="math notranslate nohighlight">\(s_j\)</span> are related by moving an electron from state <span class="math notranslate nohighlight">\(s_i\)</span> to <span class="math notranslate nohighlight">\(s_j\)</span> or vice versa.
+Let <span class="math notranslate nohighlight">\(H_{kl}\)</span> be the off-diagonal matrix element of those states. Then we have <span class="math notranslate nohighlight">\(H_{kl} = T_{ij}\)</span>.
+In all other cases, tunnel coupling is 0.</p>
+<p>The mixed state is then again computed approximately, for more info on that, see documentation of LocalSystem.</p>
+<p>The sensor signal of the computed mixed state is computed via the sensor_sim.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.beta">
+<span class="sig-name descname"><span class="pre">beta</span></span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.beta" title="Link to this definition">¶</a></dt>
+<dd><p>Scaled inverse temperature 1/k_BT</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.T">
+<span class="sig-name descname"><span class="pre">T</span></span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.T" title="Link to this definition">¶</a></dt>
+<dd><p>Temperature</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.poly_sim">
+<span class="sig-name descname"><span class="pre">poly_sim</span></span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.poly_sim" title="Link to this definition">¶</a></dt>
+<dd><p>the capacitive simulation object</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.barrier_sim">
+<span class="sig-name descname"><span class="pre">barrier_sim</span></span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.barrier_sim" title="Link to this definition">¶</a></dt>
+<dd><p>the barrier simulation object. Note that even if the supplied object to init was a matrix, this will be a TunnelBarrierModel.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_sim">
+<span class="sig-name descname"><span class="pre">sensor_sim</span></span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_sim" title="Link to this definition">¶</a></dt>
+<dd><p>the sensor simulation object</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.num_additional_neighbours">
+<span class="sig-name descname"><span class="pre">num_additional_neighbours</span></span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.num_additional_neighbours" title="Link to this definition">¶</a></dt>
+<dd><p>for each dot defines how many additional states should be added for each state in the core basis. This is done
+by adding or subtracting electrons on the ith element where the maximum is given by the ith element of num_additional_neighbours.
+We advise to set this to 2 for sensor dots. Note that computation time can quickly explode when increasing this parameter.
+Outside of sensor dots, we advise therefore to increase the slack in the capacitive simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.array of ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polytope_sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barrier_sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensor_sim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a tunneling simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>polytope_sim</strong> – capacitance simulator object that computes ground state polytopes and capacitive energy differences</p></li>
+<li><p><strong>barrier_sim</strong> (<em>Object</em><em> or </em><em>Matrix</em>) – Either a DxD basis that describes a constant tunnel coupling between all D dots. Note that the diagonal of this matrix is zero.
+Alternatively an object with a method barrier_sim.get_tunnel_matrix(v) returning a DxD matrix, and which supports the slice operation.</p></li>
+<li><p><strong>T</strong> (<em>float</em>) – Temperature in Kelvin. Good values are &lt; 0.1</p></li>
+<li><p><strong>sensor_sim</strong> (<em>Derived from AbstractSensorSim</em>) – A sensor simulation that follows the interface of AbstractSensorSim and which computes the sensor signal.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.__init__" title="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(polytope_sim, barrier_sim, T, ...)</p></td>
+<td><p>Creates a tunneling simulation</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.boundaries" title="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.boundaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">boundaries</span></code></a>(state)</p></td>
+<td><p>Returns the polytope P(n) of a given state n with all its boundaries, labels and meta information.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.compute_local_system" title="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.compute_local_system"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_local_system</span></code></a>(v, state[, ...])</p></td>
+<td><p>Computes a full description of the local quantum system and returns the LocalSystem object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan" title="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sensor_scan</span></code></a>(v_start, v_end, resolution, ...)</p></td>
+<td><p>Computes a 1D sensor ramp scan.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan_2D" title="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan_2D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sensor_scan_2D</span></code></a>(P, m, minV, maxV, resolution, ...)</p></td>
+<td><p>Computes the sensor signal on a 2D grid of points.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.slice" title="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slice</span></code></a>(P, m[, proxy])</p></td>
+<td><p>Restricts the simulator to the affine subspace v=m+Pv'</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.boundaries">
+<span class="sig-name descname"><span class="pre">boundaries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.boundaries" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the polytope P(n) of a given state n with all its boundaries, labels and meta information.</p>
+<p>If the polytope is not cached, it needs to be computed. This can take some time for large devices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>list</em><em> of </em><em>ints</em>) – The state n for which to compute the polytope P(n)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The polytope P(n)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.compute_local_system">
+<span class="sig-name descname"><span class="pre">compute_local_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_ground_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.compute_local_system" title="Link to this definition">¶</a></dt>
+<dd><p>Computes a full description of the local quantum system and returns the LocalSystem object.</p>
+<p>This is a full locla simulation of the device and can be used to query sensor values but also the mixed state matrix.
+See LocalSystem for more info.</p>
+<p>Note that unlike in most other places, v does not need to belong to the ground state polytope of state.
+This might be useful for the computation of signals in which the device is far out of equilibrium.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> (<em>np.array</em><em> of </em><em>floats</em>) – The vector of gate voltages of the device</p></li>
+<li><p><strong>state</strong> (<em>np.array</em><em> of </em><em>ints</em>) – The ground state polytope relative to which the local system is computed. This is in most cases the ground state.</p></li>
+<li><p><strong>search_ground_state</strong> (<em>bool</em>) – If True, verifies that state is the ground state of v and searches it otherwise. If you know that this is the case,
+you can safely set it to False for a speed-up. In the general case, setting this to false will compute the
+LocalSystem relative to a different basis state.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan">
+<span class="sig-name descname"><span class="pre">sensor_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_start_state_hint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_new_measurement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan" title="Link to this definition">¶</a></dt>
+<dd><p>Computes a 1D sensor ramp scan.</p>
+<p>Computes a linear set of points between v_start and v_end and for each point computes the sensor signal.
+To be more exact, for each point, the ground state polytope is computed which is then used to define the local_system.
+Returns the sensor signal for each sensor and dot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v_start</strong> (<em>np.array</em><em> of </em><em>floats</em>) – Vector of gate voltages of the device describing the first measurement point</p></li>
+<li><p><strong>v_end</strong> (<em>np.array</em><em> of </em><em>floats</em>) – Vector of gate voltages of the device describing the last measurement point</p></li>
+<li><p><strong>resolution</strong> (<em>int</em>) – number of measured points on the linear scan between v_start and v_end, including both end points.</p></li>
+<li><p><strong>v_start_state_hint</strong> (<em>np.array</em><em> of </em><em>int</em>) – Guess for the state n for which holds that v_start is element of P(n). The simulator will use this
+guess as a starting point for the search of the correct state if this guess is wrong. Note that P(n)
+must intersect with the affine slice, if slicing was used.</p></li>
+<li><p><strong>cache</strong> (<em>bool</em>) – Whether the simulation should try to cache the computed polytopes. This might lead to a slower computation time
+for a scan compared to not using caching, but consecutive scans with similar ranges tend to be quicker.</p></li>
+<li><p><strong>start_new_measurement</strong> (<em>bool</em>) – Whether the seimulated sensor measurement should be independent of any previous measurements.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan_2D">
+<span class="sig-name descname"><span class="pre">sensor_scan_2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minV</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxV</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_hint_lower_left</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan_2D" title="Link to this definition">¶</a></dt>
+<dd><p>Computes the sensor signal on a 2D grid of points.</p>
+<p>For the exact computation of points, see sensor_scan.</p>
+<p>The grid is defined the following way: Let w_ij be a 2D vector that is part of a regular
+rectangular grid spanned by the lower left corner given by minV and the upper right corner given
+by maxV and let (m,n) be the number of points in both grid directions. We have that w_00=minV and w_m-1,n-1=maxV.</p>
+<p>This grid is then affinely transformed into the K-dimensional space of gate vectors via
+v_ij = m+ P w_ij</p>
+<p>and thus P must be a Kx2 matrix and m a K-vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>P</strong> (<em>Kx2 np.array</em><em> of </em><em>floats</em>) – linear transformation of grid-points into the K-dimensional voltage space</p></li>
+<li><p><strong>m</strong> (<em>np.array</em><em> of </em><em>floats:</em>) – affine offset of the grid</p></li>
+<li><p><strong>minV</strong> (<em>np.array</em><em> of </em><em>floats</em>) – 2D vector describing the minimum value of the grid points</p></li>
+<li><p><strong>maxV</strong> (<em>np.array</em><em> of </em><em>floats</em>) – 2D vector describing the maximum value of the grid points</p></li>
+<li><p><strong>resolution</strong> (<em>int</em><em> or </em><em>list</em><em> of </em><em>ints</em>) – if integer, describes the same number of points in both grid directions. If a list of 2 elements,
+describes the number of points along each axes of the grid.</p></li>
+<li><p><strong>state_hint_lower_left</strong> (<em>np.array</em><em> of </em><em>int</em>) – Guess for the state n for point described by the grid position minV. The simulator will use this
+guess as a starting point for the search of the correct state if this guess is wrong. Note that P(n)
+must intersect with the affine slice, if slicing was used.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.slice">
+<span class="sig-name descname"><span class="pre">slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.slice" title="Link to this definition">¶</a></dt>
+<dd><p>Restricts the simulator to the affine subspace v=m+Pv’</p>
+<p>Computes the slice through the simulated device by setting v=m+Pv’, where v is the plunger gate voltages of the
+original device and v’ is the new coordinate system. This is implemented here by slicing all the different parts
+of the simulation, capacitance model, barrier model and sensor model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>P</strong> (<em>MxK np.array</em><em> of </em><em>floats</em>) – The linear coefficient matrix. Here M is the number of voltage elements in v in the full simulation
+and K the dimensionality of the subspace.</p></li>
+<li><p><strong>m</strong> (<em>offset</em><em> of </em><em>the affine trnsformation.</em>)</p></li>
+<li><p><strong>proxy</strong> (<em>bool</em>) – Whether a proxy is returned. A proxy shares the cache, if possible. This is the case when P is invertible,
+especially this entails M=K. If cache sharing is possible, the simulation computes the original polytope and then
+applies the affine transformation. This can reduce run time a lot if several slices need to be computed for the
+same simulation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A simulator object describing the simulation on the affine subspace. The current simulation object remains unchanged.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">QDarts</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../simulator.html">Simulator</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#simulation-components">Simulation Components</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qdarts.capacitance_model.CapacitanceModel.html">qdarts.capacitance_model.CapacitanceModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.simulator.CapacitiveDeviceSimulator.html">qdarts.simulator.CapacitiveDeviceSimulator</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">qdarts.tunneling_simulator.ApproximateTunnelingSimulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.beta"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.beta</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.T"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.T</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.poly_sim"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.poly_sim</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.barrier_sim"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.barrier_sim</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_sim"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.sensor_sim</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.num_additional_neighbours"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.num_additional_neighbours</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.__init__"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.boundaries"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.boundaries()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.compute_local_system"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.compute_local_system()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.sensor_scan()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan_2D"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.sensor_scan_2D()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.slice"><code class="docutils literal notranslate"><span class="pre">ApproximateTunnelingSimulator.slice()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.tunneling_simulator.TunnelBarrierModel.html">qdarts.tunneling_simulator.TunnelBarrierModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.tunneling_simulator.NoisySensorDot.html">qdarts.tunneling_simulator.NoisySensorDot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.noise_processes.OU_process.html">qdarts.noise_processes.OU_process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.noise_processes.Cosine_Mean_Function.html">qdarts.noise_processes.Cosine_Mean_Function</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#other-classes">Other Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#interfaces">Interfaces</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+      <li>Previous: <a href="qdarts.simulator.CapacitiveDeviceSimulator.html" title="previous chapter">qdarts.simulator.CapacitiveDeviceSimulator</a></li>
+      <li>Next: <a href="qdarts.tunneling_simulator.TunnelBarrierModel.html" title="next chapter">qdarts.tunneling_simulator.TunnelBarrierModel</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Oswin Krause, Jan Krzywda, Weikun Liu, Evert van Nieuwenburg.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>qdarts.experiment.Experiment &#8212; QDarts  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=61cd365c" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="qdarts-experiment-experiment">
+<h1>qdarts.experiment.Experiment<a class="headerlink" href="#qdarts-experiment-experiment" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qdarts.experiment.Experiment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qdarts.experiment.</span></span><span class="sig-name descname"><span class="pre">Experiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacitance_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tunneling_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensor_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_logs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.experiment.Experiment" title="Link to this definition">¶</a></dt>
+<dd><p>Experiment class that helps setup the different parts of the simulator into an easy to ue interface.
+The usage of this class is best described by the tutorials in the example folder.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.experiment.Experiment.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacitance_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tunneling_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensor_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_logs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.experiment.Experiment.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>capacitance_config: dictionary containing the capacitance model parameters
+tunneling_config: dictionary containing the tunneling model parameters
+sensor_config: dictionary containing the sensor model parameters
+print_logs: bool, whether to print logs</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.experiment.Experiment.__init__" title="qdarts.experiment.Experiment.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(capacitance_config[, ...])</p></td>
+<td><p>capacitance_config: dictionary containing the capacitance model parameters tunneling_config: dictionary containing the tunneling model parameters sensor_config: dictionary containing the sensor model parameters print_logs: bool, whether to print logs</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.experiment.Experiment.center_transition" title="qdarts.experiment.Experiment.center_transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">center_transition</span></code></a>(simulator, target_state, ...)</p></td>
+<td><p>Function that center the CSD at a given facet (transition) of the polytope (occupation state).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.experiment.Experiment.deploy_capacitance_sim" title="qdarts.experiment.Experiment.deploy_capacitance_sim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deploy_capacitance_sim</span></code></a>(config)</p></td>
+<td><p>Function that deploys a capacitance simulator.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.experiment.Experiment.deploy_sensor_model" title="qdarts.experiment.Experiment.deploy_sensor_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deploy_sensor_model</span></code></a>(sensor_config)</p></td>
+<td><p>Function that deploys a sensor model.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.experiment.Experiment.deploy_tunneling_sim" title="qdarts.experiment.Experiment.deploy_tunneling_sim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deploy_tunneling_sim</span></code></a>(capacitance_sim, ...)</p></td>
+<td><p>Function that deploys a tunneling simulator.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.experiment.Experiment.generate_CSD" title="qdarts.experiment.Experiment.generate_CSD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_CSD</span></code></a>(x_voltages, y_voltages, plane_axes)</p></td>
+<td><p>Function that renders the capacitance CSD for a given set of voltages and axes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.experiment.Experiment.get_compensated_sim" title="qdarts.experiment.Experiment.get_compensated_sim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_compensated_sim</span></code></a>(simulator, target_state)</p></td>
+<td><p>Function that takes a capacitance simulator and compensates the sensors.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.experiment.Experiment.get_plot_args" title="qdarts.experiment.Experiment.get_plot_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_plot_args</span></code></a>(x_voltages, y_voltages, plane_axes)</p></td>
+<td><p>Function that returns the arguments for plotting the CSD.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.experiment.Experiment.get_virtualised_sim" title="qdarts.experiment.Experiment.get_virtualised_sim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_virtualised_sim</span></code></a>(simulator, target_state)</p></td>
+<td><p>Function that takes a simulator and virtualises the gates specified by inner_dots.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.experiment.Experiment.center_transition">
+<span class="sig-name descname"><span class="pre">center_transition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane_axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_virtual_gates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compensate_sensors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.experiment.Experiment.center_transition" title="Link to this definition">¶</a></dt>
+<dd><p>Function that center the CSD at a given facet (transition) of the polytope (occupation state).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>simulator</strong> (<em>any simulator object</em>)</p></li>
+<li><p><strong>target_state</strong> (<em>int</em><em>, </em><em>the state at which the transition happens</em><em>, </em><em>e.g.</em><em> [</em><em>2</em><em>,</em><em>2</em><em>]</em>)</p></li>
+<li><p><strong>target_transition</strong> (<em>list</em><em> of </em><em>integers</em><em>, </em><em>the transition point e.g.</em><em> [</em><em>1</em><em>,</em><em>-1</em><em>] </em><em>would be the transition from</em><em> [</em><em>2</em><em>,</em><em>2</em><em>] </em><em>to</em><em> [</em><em>1</em><em>,</em><em>1</em><em>]</em>)</p></li>
+<li><p><strong>plane_axes</strong> (<em>2xN array</em><em>, </em><em>the axes</em><em> of </em><em>the transition which span the plane</em>)</p></li>
+<li><p><strong>use_virtual_gates</strong> (<em>bool</em><em>, </em><em>whether to use virtual gates</em>)</p></li>
+<li><p><strong>compensate_sensors</strong> (<em>bool</em><em>, </em><em>whether to compensate the sensors</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>plane_axes</strong> (<em>2xN array, the axes spanning the cut through volage plane</em>)</p></li>
+<li><p><strong>transition_sim</strong> (<em>CapacitanceSimulator object, the transition simulator</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.experiment.Experiment.deploy_capacitance_sim">
+<span class="sig-name descname"><span class="pre">deploy_capacitance_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.experiment.Experiment.deploy_capacitance_sim" title="Link to this definition">¶</a></dt>
+<dd><p>Function that deploys a capacitance simulator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dictionary containing the capacitance model parameters</em>)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sim</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>CapacitiveDeviceSimulator object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.experiment.Experiment.deploy_sensor_model">
+<span class="sig-name descname"><span class="pre">deploy_sensor_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sensor_config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.experiment.Experiment.deploy_sensor_model" title="Link to this definition">¶</a></dt>
+<dd><p>Function that deploys a sensor model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dictionary containing the sensor model parameters</em>)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sensor_sim</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>NoisySensorDot object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.experiment.Experiment.deploy_tunneling_sim">
+<span class="sig-name descname"><span class="pre">deploy_tunneling_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacitance_sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tunneling_config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.experiment.Experiment.deploy_tunneling_sim" title="Link to this definition">¶</a></dt>
+<dd><p>Function that deploys a tunneling simulator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>capacitance_sim</strong> (<em>CapacitiveDeviceSimulator object</em>)</p></li>
+<li><p><strong>tunneling_config</strong> (<em>dictionary containing the tunneling model parameters</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tunneling_sim</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ApproximateTunnelingSimulator object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.experiment.Experiment.generate_CSD">
+<span class="sig-name descname"><span class="pre">generate_CSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_voltages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_voltages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane_axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_virtual_gates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compensate_sensors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_polytopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_sensor_signal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.experiment.Experiment.generate_CSD" title="Link to this definition">¶</a></dt>
+<dd><p>Function that renders the capacitance CSD for a given set of voltages and axes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_voltages</strong> (<em>list</em><em> of </em><em>floats</em><em>, </em><em>the x-axis voltages</em>)</p></li>
+<li><p><strong>y_voltages</strong> (<em>list</em><em> of </em><em>floats</em><em>, </em><em>the y-axis voltages</em>)</p></li>
+<li><p><strong>plane_axes</strong> (<em>2xN array</em><em>, </em><em>the axes</em><em> of </em><em>the plane in which the CSD is to be rendered</em>)</p></li>
+<li><p><strong>target_state</strong> (<em>int</em><em>, </em><em>the guess state</em><em> or </em><em>the state at which the transition happens</em>)</p></li>
+<li><p><strong>target_transition</strong> (<em>list</em><em> of </em><em>integers</em><em>, </em><em>the transition point e.g.</em><em> [</em><em>1</em><em>,</em><em>-1</em><em>] </em><em>would be the transition from</em><em> [</em><em>2</em><em>,</em><em>2</em><em>] </em><em>to</em><em> [</em><em>1</em><em>,</em><em>1</em><em>]</em>)</p></li>
+<li><p><strong>use_virtual_gates</strong> (<em>bool</em><em>, </em><em>whether to use virtual gates</em>)</p></li>
+<li><p><strong>compensate_sensors</strong> (<em>bool</em><em>, </em><em>whether to compensate the sensors</em>)</p></li>
+<li><p><strong>compute_polytopes</strong> (<em>bool</em><em>, </em><em>whether to compute the polytopes</em>)</p></li>
+<li><p><strong>use_sensor_signal</strong> (<em>bool</em><em>, </em><em>whether to use the sensor signal</em>)</p></li>
+<li><p><strong>v_offset</strong> (<em>Nx1 array</em><em>, </em><em>the offset voltage</em><em> of </em><em>all</em><em> of </em><em>the gates</em><em>, </em><em>which defines the origin</em><em> of </em><em>the plot</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>xout, yout</strong> (<em>list of floats, the x and y voltages</em>)</p></li>
+<li><p><strong>CSD_data</strong> (<em>2D array, the CSD data</em>)</p></li>
+<li><p><strong>polytopes</strong> (<em>dictionary, the polytopes of the CSD. None if compute_polytopes is False</em>)</p></li>
+<li><p><strong>sensor_values</strong> (<em>3D array, the sensor signal [size(xout),size(yout),num_sensors]. None if use_sensor_signal is False</em>)</p></li>
+<li><p><strong>v_offset</strong> (<em>Nx1 array, the offset voltage of all of the gates</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.experiment.Experiment.get_compensated_sim">
+<span class="sig-name descname"><span class="pre">get_compensated_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.experiment.Experiment.get_compensated_sim" title="Link to this definition">¶</a></dt>
+<dd><p>Function that takes a capacitance simulator and compensates the sensors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>simulator</strong> (<em>AbstractPolytopeSimulator object</em>)</p></li>
+<li><p><strong>target_stater</strong> (<em>int</em><em>, </em><em>the state at which sensor compensation happens</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>simulator</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AbstractPolytopeSimulator object, the compensated simulator</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.experiment.Experiment.get_plot_args">
+<span class="sig-name descname"><span class="pre">get_plot_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_voltages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_voltages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane_axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.experiment.Experiment.get_plot_args" title="Link to this definition">¶</a></dt>
+<dd><p>Function that returns the arguments for plotting the CSD.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_voltages</strong> (<em>list</em><em> of </em><em>floats</em><em>, </em><em>the x-axis voltages</em>)</p></li>
+<li><p><strong>y_voltages</strong> (<em>list</em><em> of </em><em>floats</em><em>, </em><em>the y-axis voltages</em>)</p></li>
+<li><p><strong>plane_axes</strong> (<em>2xN array</em><em>, </em><em>the axes</em><em> of </em><em>the plane in which the CSD is to be rendered</em>)</p></li>
+<li><p><strong>v_offset</strong> (<em>Nx1 array</em><em>, </em><em>the offset voltage</em><em> of </em><em>all</em><em> of </em><em>the gates</em><em>, </em><em>which defines the origin</em><em> of </em><em>the plot</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>v_offset</strong> (<em>Nx1 array, the offset voltage of all of the gates</em>)</p></li>
+<li><p><strong>minV</strong> (<em>2x1 array, the minimum voltage of selected axes</em>)</p></li>
+<li><p><strong>maxV</strong> (<em>2x1 array, the maximum voltage of selected axes</em>)</p></li>
+<li><p><strong>resolution</strong> (<em>list of integers, the resolution of the plot</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.experiment.Experiment.get_virtualised_sim">
+<span class="sig-name descname"><span class="pre">get_virtualised_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.experiment.Experiment.get_virtualised_sim" title="Link to this definition">¶</a></dt>
+<dd><p>Function that takes a simulator and virtualises the gates specified by inner_dots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>simulator</strong> (<em>AbstractPolytopeSimulator object</em>)</p></li>
+<li><p><strong>target_state</strong> (<em>int</em><em>, </em><em>the initial corner state guess</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>simulator</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AbstractPolytopeSimulator object, the virtualised simulator</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">QDarts</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulator.html">Simulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Oswin Krause, Jan Krzywda, Weikun Liu, Evert van Nieuwenburg.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/interfaces/qdarts.experiment.Experiment.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

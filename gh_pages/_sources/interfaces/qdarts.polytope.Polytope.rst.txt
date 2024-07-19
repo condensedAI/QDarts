@@ -1,0 +1,25 @@
+﻿qdarts.polytope.Polytope
+========================
+
+.. currentmodule:: qdarts.polytope
+
+.. autoclass:: Polytope
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Polytope.__init__
+      ~Polytope.invertible_transform
+      ~Polytope.lazy_slice
+      ~Polytope.set_polytope
+   
+   
+
+   
+   
+   

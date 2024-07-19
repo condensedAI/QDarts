@@ -1,0 +1,27 @@
+﻿qdarts.tunneling\_simulator.AbstractSensorSim
+=============================================
+
+.. currentmodule:: qdarts.tunneling_simulator
+
+.. autoclass:: AbstractSensorSim
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AbstractSensorSim.__init__
+      ~AbstractSensorSim.precompute_sensor_state
+      ~AbstractSensorSim.sample_sensor_configuration
+      ~AbstractSensorSim.sample_sensor_equilibrium
+      ~AbstractSensorSim.slice
+      ~AbstractSensorSim.start_measurement
+   
+   
+
+   
+   
+   

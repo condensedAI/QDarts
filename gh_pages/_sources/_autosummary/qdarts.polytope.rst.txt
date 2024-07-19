@@ -1,0 +1,29 @@
+qdarts.polytope
+===============
+
+.. automodule:: qdarts.polytope
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Polytope
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,24 @@
+﻿qdarts.simulator.AbstractPolytopeSimulator
+==========================================
+
+.. currentmodule:: qdarts.simulator
+
+.. autoclass:: AbstractPolytopeSimulator
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AbstractPolytopeSimulator.__init__
+      ~AbstractPolytopeSimulator.boundaries
+      ~AbstractPolytopeSimulator.slice
+   
+   
+
+   
+   
+   

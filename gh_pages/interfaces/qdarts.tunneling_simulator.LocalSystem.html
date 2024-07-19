@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>qdarts.tunneling_simulator.LocalSystem &#8212; QDarts  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=61cd365c" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qdarts.polytope.Polytope" href="qdarts.polytope.Polytope.html" />
+    <link rel="prev" title="qdarts.noise_processes.Cosine_Mean_Function" href="qdarts.noise_processes.Cosine_Mean_Function.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="qdarts-tunneling-simulator-localsystem">
+<h1>qdarts.tunneling_simulator.LocalSystem<a class="headerlink" href="#qdarts-tunneling-simulator-localsystem" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.LocalSystem">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qdarts.tunneling_simulator.</span></span><span class="sig-name descname"><span class="pre">LocalSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.LocalSystem" title="Link to this definition">¶</a></dt>
+<dd><p>Class describing a quantum system defined by the gate voltages of a simulated device.</p>
+<p>For a given set of gate voltages, the simulator first computes a set of core states that are most
+likely relevant for the computation of the hamiltonian and then extends it by adding additional
+states. These are then used to define a basis of the vector space for the Hamiltonian, which
+is then used to compute the mixed state. Finally, the mixed state is then used to simulate a sensor signal.</p>
+<p>This class stores all this information and includes some minimal tools to query information on
+different sub-bases. This class is tightly coupled to tunneling_simulator.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.LocalSystem.v">
+<span class="sig-name descname"><span class="pre">v</span></span><a class="headerlink" href="#qdarts.tunneling_simulator.LocalSystem.v" title="Link to this definition">¶</a></dt>
+<dd><p>gate voltages that define the parameters of this system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.array of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.LocalSystem.state">
+<span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#qdarts.tunneling_simulator.LocalSystem.state" title="Link to this definition">¶</a></dt>
+<dd><p>the ground state configuration of v</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.array of ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.LocalSystem.beta">
+<span class="sig-name descname"><span class="pre">beta</span></span><a class="headerlink" href="#qdarts.tunneling_simulator.LocalSystem.beta" title="Link to this definition">¶</a></dt>
+<dd><p>the scaled inverse temperature 1/k_bT</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.LocalSystem.H">
+<span class="sig-name descname"><span class="pre">H</span></span><a class="headerlink" href="#qdarts.tunneling_simulator.LocalSystem.H" title="Link to this definition">¶</a></dt>
+<dd><p>Hamiltonian over the subspace spanned by the L basis state of the extended basis.
+See methods basis_labels and core_basis_indices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>LxL np.array of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.LocalSystem.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.LocalSystem.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Creates the LocalSystem.</p>
+<p>This is an internal function used by the tunneling simulator.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.__init__" title="qdarts.tunneling_simulator.LocalSystem.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(v, H, state, sim)</p></td>
+<td><p>Creates the LocalSystem.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.compute_mixed_state_of_subset" title="qdarts.tunneling_simulator.LocalSystem.compute_mixed_state_of_subset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_mixed_state_of_subset</span></code></a>(subset_indices)</p></td>
+<td><p>Computes the mixed state for a subset, ignoring the existance of any other state entirely.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.sample_sensor_configuration" title="qdarts.tunneling_simulator.LocalSystem.sample_sensor_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_sensor_configuration</span></code></a>(...)</p></td>
+<td><p>Samples the sensor signal for a given sampled electron configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.sample_sensor_equilibrium" title="qdarts.tunneling_simulator.LocalSystem.sample_sensor_equilibrium"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_sensor_equilibrium</span></code></a>()</p></td>
+<td><p>Samples a boisy averaged sensor response from the current system over all basis elements.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.basis_labels" title="qdarts.tunneling_simulator.LocalSystem.basis_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">basis_labels</span></code></a></p></td>
+<td><p>The labels of the basis elements, indentified by their ground state electron configuration</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.core_basis_indices" title="qdarts.tunneling_simulator.LocalSystem.core_basis_indices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">core_basis_indices</span></code></a></p></td>
+<td><p>Indices into basis_labels that define the subset of core basis elements.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.mixed_state" title="qdarts.tunneling_simulator.LocalSystem.mixed_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mixed_state</span></code></a></p></td>
+<td><p>Computes an approximate mixed state matrix over the full basis.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.LocalSystem.basis_labels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">basis_labels</span></span><a class="headerlink" href="#qdarts.tunneling_simulator.LocalSystem.basis_labels" title="Link to this definition">¶</a></dt>
+<dd><p>The labels of the basis elements, indentified by their ground state electron configuration</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.LocalSystem.compute_mixed_state_of_subset">
+<span class="sig-name descname"><span class="pre">compute_mixed_state_of_subset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subset_indices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.LocalSystem.compute_mixed_state_of_subset" title="Link to this definition">¶</a></dt>
+<dd><p>Computes the mixed state for a subset, ignoring the existance of any other state entirely.</p>
+<p>The result is a KxK matrix where K is the length of subset_indices.
+This function is not equivalent to selecting a subset of mixed_state, since this assumes that
+the states not referenced by subset_indices are ruled out for some other reason, i.e., they are
+assigned probability 0 and probabilities are renormalized to sum to 1 over the elements in the subset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subset_indices</strong> (<em>np.array</em><em> of </em><em>ints</em>) – The L’ indices into the basis element matrix as returned by basis_labels</p></li>
+<li><p><strong>m</strong> (<em>np.array</em><em> of </em><em>floats</em><em> or </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.LocalSystem.core_basis_indices">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">core_basis_indices</span></span><a class="headerlink" href="#qdarts.tunneling_simulator.LocalSystem.core_basis_indices" title="Link to this definition">¶</a></dt>
+<dd><p>Indices into basis_labels that define the subset of core basis elements.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.LocalSystem.mixed_state">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mixed_state</span></span><a class="headerlink" href="#qdarts.tunneling_simulator.LocalSystem.mixed_state" title="Link to this definition">¶</a></dt>
+<dd><p>Computes an approximate mixed state matrix over the full basis.</p>
+<p>the mixed state matrix, defined as expm(-beta*H)</p>
+<p>Note that this function approximated the true mixed state matrix by inly taking basis eleemnts into account
+that have a small energy difference to the ground state. This is a multiple of the polytope slack used by the
+capacitive simulation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.LocalSystem.sample_sensor_configuration">
+<span class="sig-name descname"><span class="pre">sample_sensor_configuration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampled_configuration</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.LocalSystem.sample_sensor_configuration" title="Link to this definition">¶</a></dt>
+<dd><p>Samples the sensor signal for a given sampled electron configuration.</p>
+<p>For a short time simulation it is more prudent to externally sample a state from the basis and then generate a sensor signal
+from it. This function allows this. Note that only selecting states from the set of core_basis_indices is safe as otherwise
+the sensor might miss information required to correctly compute the response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sampled_configuration</strong> (<em>list</em><em> of </em><em>ints</em>) – the sampled state for which to generate the sensor response.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.tunneling_simulator.LocalSystem.sample_sensor_equilibrium">
+<span class="sig-name descname"><span class="pre">sample_sensor_equilibrium</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.LocalSystem.sample_sensor_equilibrium" title="Link to this definition">¶</a></dt>
+<dd><p>Samples a boisy averaged sensor response from the current system over all basis elements.</p>
+<p>This returns the average signal with added sensor noise. This is an approximation to long
+average measurements at a single point.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">QDarts</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../simulator.html">Simulator</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api.html#simulation-components">Simulation Components</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#other-classes">Other Classes</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">qdarts.tunneling_simulator.LocalSystem</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem"><code class="docutils literal notranslate"><span class="pre">LocalSystem</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.v"><code class="docutils literal notranslate"><span class="pre">LocalSystem.v</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.state"><code class="docutils literal notranslate"><span class="pre">LocalSystem.state</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.beta"><code class="docutils literal notranslate"><span class="pre">LocalSystem.beta</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.H"><code class="docutils literal notranslate"><span class="pre">LocalSystem.H</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.__init__"><code class="docutils literal notranslate"><span class="pre">LocalSystem.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.basis_labels"><code class="docutils literal notranslate"><span class="pre">LocalSystem.basis_labels</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.compute_mixed_state_of_subset"><code class="docutils literal notranslate"><span class="pre">LocalSystem.compute_mixed_state_of_subset()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.core_basis_indices"><code class="docutils literal notranslate"><span class="pre">LocalSystem.core_basis_indices</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.mixed_state"><code class="docutils literal notranslate"><span class="pre">LocalSystem.mixed_state</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.sample_sensor_configuration"><code class="docutils literal notranslate"><span class="pre">LocalSystem.sample_sensor_configuration()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.tunneling_simulator.LocalSystem.sample_sensor_equilibrium"><code class="docutils literal notranslate"><span class="pre">LocalSystem.sample_sensor_equilibrium()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.polytope.Polytope.html">qdarts.polytope.Polytope</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#interfaces">Interfaces</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+      <li>Previous: <a href="qdarts.noise_processes.Cosine_Mean_Function.html" title="previous chapter">qdarts.noise_processes.Cosine_Mean_Function</a></li>
+      <li>Next: <a href="qdarts.polytope.Polytope.html" title="next chapter">qdarts.polytope.Polytope</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Oswin Krause, Jan Krzywda, Weikun Liu, Evert van Nieuwenburg.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/interfaces/qdarts.tunneling_simulator.LocalSystem.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

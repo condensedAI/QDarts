@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>qdarts.simulator.AbstractCapacitiveDeviceSimulator &#8212; QDarts  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=61cd365c" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qdarts.noise_processes.AbstractNoiseProcess" href="qdarts.noise_processes.AbstractNoiseProcess.html" />
+    <link rel="prev" title="qdarts.simulator.AbstractPolytopeSimulator" href="qdarts.simulator.AbstractPolytopeSimulator.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="qdarts-simulator-abstractcapacitivedevicesimulator">
+<h1>qdarts.simulator.AbstractCapacitiveDeviceSimulator<a class="headerlink" href="#qdarts-simulator-abstractcapacitivedevicesimulator" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="qdarts.simulator.AbstractCapacitiveDeviceSimulator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qdarts.simulator.</span></span><span class="sig-name descname"><span class="pre">AbstractCapacitiveDeviceSimulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacitance_model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator" title="Link to this definition">¶</a></dt>
+<dd><p>Base class for all objects that create device simulations from a Capacitive Model.</p>
+<p>This class includes all tools to compute and cache polytopes from the provided capacitive model.
+Polytopes are queried using a call to boundaries() which queries the internal cache and then
+computes the polytope on demand.</p>
+<p>The computed polytope P(n) is the set of voltages v for which n is the ground state of the capacitance
+energy function E(v,n), i.e., n=min_n’ E(v,n’). A facet of the polytope is given by the equality
+E(v,n’)-E(v,n) = 0 for a suitable choice of n’. As a result, when shooting a ray through
+a facet of the polytope created by state n’, there is a transition from state n-&gt;n’ in the ground state.</p>
+<p>The computation of the polytope discards by default all states and inequalitis that do not form a facet of P(n).
+However, this can be relaed by allowing a maximum slack, which also keeps facets for which
+min_v E(v,n’)-E(v,n) &lt; max_slack, where v is restricted to elements in the polytope P(n). i.e., max slack keeps facet
+in which the energy difference is small.</p>
+<p>This class supports slicing of the voltage space into affine subspaces.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.AbstractCapacitiveDeviceSimulator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacitance_model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.__init__" title="qdarts.simulator.AbstractCapacitiveDeviceSimulator.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(capacitance_model)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.boundaries" title="qdarts.simulator.AbstractCapacitiveDeviceSimulator.boundaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">boundaries</span></code></a>(state)</p></td>
+<td><p>Returns the polytope P(n) of a given state n with all its boundaries, labels and meta information.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.cached_polytopes" title="qdarts.simulator.AbstractCapacitiveDeviceSimulator.cached_polytopes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cached_polytopes</span></code></a>()</p></td>
+<td><p>Returns a sequence including all computed and cached polytopes for inspection and modification.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.compute_polytope" title="qdarts.simulator.AbstractCapacitiveDeviceSimulator.compute_polytope"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_polytope</span></code></a>(state)</p></td>
+<td><p>Computes the polytope for a given state.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.compute_transition_equations" title="qdarts.simulator.AbstractCapacitiveDeviceSimulator.compute_transition_equations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_transition_equations</span></code></a>(state_list, ...)</p></td>
+<td><p>Computes the energy difference equations from target states to all states in the list.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.find_boundary_intersection" title="qdarts.simulator.AbstractCapacitiveDeviceSimulator.find_boundary_intersection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_boundary_intersection</span></code></a>(old_v, new_v, state)</p></td>
+<td><p>Computes an intersection of a ray with the boundary of a polytope and computes the new state</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.find_state_of_voltage" title="qdarts.simulator.AbstractCapacitiveDeviceSimulator.find_state_of_voltage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_state_of_voltage</span></code></a>(v, state_hint[, ...])</p></td>
+<td><p>Searches the ground state for a given voltage, given an initial guess.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.get_maximum_polytope_slack" title="qdarts.simulator.AbstractCapacitiveDeviceSimulator.get_maximum_polytope_slack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_maximum_polytope_slack</span></code></a>()</p></td>
+<td><p>Returns the maximum slack value for inclusing of a facet into the polytope.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.inside_state" title="qdarts.simulator.AbstractCapacitiveDeviceSimulator.inside_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inside_state</span></code></a>(v, state)</p></td>
+<td><p>Returns true if a point v is fully within the polytope of a given state.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.set_maximum_polytope_slack" title="qdarts.simulator.AbstractCapacitiveDeviceSimulator.set_maximum_polytope_slack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_maximum_polytope_slack</span></code></a>(maximum_slack)</p></td>
+<td><p>Sets the maximum slack value for inclusing of a facet into the polytope.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.slice" title="qdarts.simulator.AbstractCapacitiveDeviceSimulator.slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slice</span></code></a>(P, m[, proxy])</p></td>
+<td><p>Restricts the simulator to the affine subspace v=m+Pv'</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.AbstractCapacitiveDeviceSimulator.boundaries">
+<span class="sig-name descname"><span class="pre">boundaries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.boundaries" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the polytope P(n) of a given state n with all its boundaries, labels and meta information.</p>
+<p>If the polytope is not cached, it needs to be computed. This can take some time for large devices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>list</em><em> of </em><em>ints</em>) – The state n for which to compute the polytope P(n)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The polytope P(n)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.AbstractCapacitiveDeviceSimulator.cached_polytopes">
+<span class="sig-name descname"><span class="pre">cached_polytopes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.cached_polytopes" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a sequence including all computed and cached polytopes for inspection and modification.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.AbstractCapacitiveDeviceSimulator.compute_polytope">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compute_polytope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.compute_polytope" title="Link to this definition">¶</a></dt>
+<dd><p>Computes the polytope for a given state.</p>
+<p>Is implemented by the derived class and called when the polytope for a state is not found in cache.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>list</em><em> of </em><em>ints</em>) – the state identifying the polytope</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Polytope object containing the full computed polytope.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.AbstractCapacitiveDeviceSimulator.compute_transition_equations">
+<span class="sig-name descname"><span class="pre">compute_transition_equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_from</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.compute_transition_equations" title="Link to this definition">¶</a></dt>
+<dd><p>Computes the energy difference equations from target states to all states in the list.</p>
+<p>For a given state and list of neighbour states, computes the linear equations Av+b that compute the energy differences
+Between the target state_from and the other states. That is, if state_list contains a list of states n’, this
+function constains linear equations E(v,n’)-E(v,state_from)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state_list</strong> (<em>numpy array</em><em> of </em><em>ints</em><em> of </em><em>size NxK</em>) – A list containing N states for which to compute the energy differences</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>A</strong> (<em>NxK np.array, containing the linear factors for each state in state_list</em>)</p></li>
+<li><p><strong>b</strong> (<em>np.array, containing the N offsets, one for each equation.</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.AbstractCapacitiveDeviceSimulator.find_boundary_intersection">
+<span class="sig-name descname"><span class="pre">find_boundary_intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deep_search</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.find_boundary_intersection" title="Link to this definition">¶</a></dt>
+<dd><p>Computes an intersection of a ray with the boundary of a polytope and computes the new state</p>
+<p>For a given state and a voltage old_v within the polytope of this state and a point new_v outside the polytope,
+computes the intersection of the ray old_v+t*(new_v-old_v) with the boundary of the polytope.
+the intersection point and new target state is computed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>old_v</strong> (<em>np.array</em><em> of </em><em>floats</em>) – A point within the current polytope</p></li>
+<li><p><strong>new_v</strong> (<em>np.array</em><em> of </em><em>floats</em>) – Another point on the ray</p></li>
+<li><p><strong>state</strong> (<em>list</em><em> of </em><em>ints</em>) – The ground state n of old_v. It is assumed that v is element of P(n)</p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>) – slack value added to the ray t to ensure that the point is numerically clearly outside the polytope.</p></li>
+<li><p><strong>deep_search</strong> (<em>bool</em>) – whether an iterative search is performed for the new point in case none of the direct neighbours of the polytope match.
+If false, will throw an exception in that case. An exception is also raised when the deep search failed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The first intersection point of the ray with the polytope, together with the new state</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.AbstractCapacitiveDeviceSimulator.find_state_of_voltage">
+<span class="sig-name descname"><span class="pre">find_state_of_voltage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_hint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deep_search</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.find_state_of_voltage" title="Link to this definition">¶</a></dt>
+<dd><p>Searches the ground state for a given voltage, given an initial guess.</p>
+<p>For a given state voltage, computes the state for which is within the polytope of the state.
+Note that the choice of the hint is not arbitrary, since the search starts from a point in state_hint
+in order to find iteratively intersections with the boundary that are closer to v. A specific requirement
+is that the polytope must not be empty, i.e., in case of a sliced simulator, the polytope must intersect
+with the affine space. This can sometimes be tricky and we recommend perform this type of computations
+only on spaces where all plungers are available and then perform the slicing through v.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> (<em>np.array</em><em> of </em><em>floats</em>) – Voltage vector for which to find the ground state</p></li>
+<li><p><strong>state_hint</strong> (<em>list</em><em> of </em><em>ints</em>) – a likely candidate for the state.</p></li>
+<li><p><strong>deep_search</strong> (<em>bool</em>) – whether an iterative search is performed in case none of the direct neighbours of a polytope match.
+If false, will throw an exception in that case. An exception is also raised when the deep search failed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.AbstractCapacitiveDeviceSimulator.get_maximum_polytope_slack">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_maximum_polytope_slack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.get_maximum_polytope_slack" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the maximum slack value for inclusing of a facet into the polytope.</p>
+<p>Returns the maximum energy distance the closest point of a transition can have to the polytope
+before it is discarded. Setting to 0 means that only transitions that actually touch the polytope
+are kept.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.AbstractCapacitiveDeviceSimulator.inside_state">
+<span class="sig-name descname"><span class="pre">inside_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.inside_state" title="Link to this definition">¶</a></dt>
+<dd><p>Returns true if a point v is fully within the polytope of a given state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>list</em><em> of </em><em>ints</em>) – The state n identifying the polytope P(n)</p></li>
+<li><p><strong>v</strong> (<em>np.array</em><em> of </em><em>floats</em>) – The point v</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The truth value of whether v is element of P(n)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.AbstractCapacitiveDeviceSimulator.set_maximum_polytope_slack">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_maximum_polytope_slack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maximum_slack</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.set_maximum_polytope_slack" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the maximum slack value for inclusing of a facet into the polytope.</p>
+<p>Sets the maximum distance the closest point of a transition can have to the polytope
+before it is discarded. Setting to 0 means that only transitions that actually touch the polytope
+are kept.</p>
+<p>Note that changing this value clears the cache.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qdarts.simulator.AbstractCapacitiveDeviceSimulator.slice">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.slice" title="Link to this definition">¶</a></dt>
+<dd><p>Restricts the simulator to the affine subspace v=m+Pv’</p>
+<p>Computes the slice through the device by setting v=m+Pv’, where v is the plunger gate voltages of the
+original device and v’ is the new coordinate system. Must be implemented by derived classes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>P</strong> (<em>MxK np.array</em><em> of </em><em>floats</em>) – The linear coefficient matrix. Here M is the number of voltage elements in v in the full simulation
+and K the dimensionality of the subspace.</p></li>
+<li><p><strong>m</strong> (<em>offset</em><em> of </em><em>the affine trnsformation.</em>)</p></li>
+<li><p><strong>proxy</strong> (<em>bool</em>) – Whether a proxy is returned. A proxy shares the cache, if possible. This is the case when P is invertible,
+especially this entails M=K. If cache sharing is possible, the simulation computes the original polytope and then
+applies the affine transformation. This can reduce run time a lot if several slices need to be computed for the
+same simulation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>A simulator object describing the simulation on the affine subspace. The current simulation object remains unchanged.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">QDarts</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../simulator.html">Simulator</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api.html#simulation-components">Simulation Components</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#interfaces">Interfaces</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="qdarts.capacitance_model.AbstractCapacitanceModel.html">qdarts.capacitance_model.AbstractCapacitanceModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.simulator.AbstractPolytopeSimulator.html">qdarts.simulator.AbstractPolytopeSimulator</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">qdarts.simulator.AbstractCapacitiveDeviceSimulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.__init__"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.boundaries"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.boundaries()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.cached_polytopes"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.cached_polytopes()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.compute_polytope"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.compute_polytope()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.compute_transition_equations"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.compute_transition_equations()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.find_boundary_intersection"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.find_boundary_intersection()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.find_state_of_voltage"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.find_state_of_voltage()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.get_maximum_polytope_slack"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.get_maximum_polytope_slack()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.inside_state"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.inside_state()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.set_maximum_polytope_slack"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.set_maximum_polytope_slack()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qdarts.simulator.AbstractCapacitiveDeviceSimulator.slice"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitiveDeviceSimulator.slice()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.noise_processes.AbstractNoiseProcess.html">qdarts.noise_processes.AbstractNoiseProcess</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qdarts.tunneling_simulator.AbstractSensorSim.html">qdarts.tunneling_simulator.AbstractSensorSim</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+      <li>Previous: <a href="qdarts.simulator.AbstractPolytopeSimulator.html" title="previous chapter">qdarts.simulator.AbstractPolytopeSimulator</a></li>
+      <li>Next: <a href="qdarts.noise_processes.AbstractNoiseProcess.html" title="next chapter">qdarts.noise_processes.AbstractNoiseProcess</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Oswin Krause, Jan Krzywda, Weikun Liu, Evert van Nieuwenburg.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
