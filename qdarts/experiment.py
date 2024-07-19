@@ -63,7 +63,7 @@ class Experiment(): #TODO: change name to the simulator name
         Returns:
         sim: CapacitiveDeviceSimulator object
         '''
-        capacitance_model = Model(config["C_Dg"], config["C_DD"], -1, ks= config["ks"])
+        capacitance_model = CapacitanceModel(config["C_Dg"], config["C_DD"], -1, ks= config["ks"])
         sim = CapacitiveDeviceSimulator(capacitance_model)     
         
         #Save the parameters

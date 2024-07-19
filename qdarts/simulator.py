@@ -1,6 +1,6 @@
 import numpy as np
 from qdarts.util_functions import is_invertible_matrix
-from qdarts.model import Model as Model
+from qdarts.capacitance_model import CapacitanceModel
 from qdarts.util_functions import compensate_simulator_sensors, fix_gates, find_point_on_transitions, axis_align_transitions
 from abc import ABCMeta, abstractmethod
 
