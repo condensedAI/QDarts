@@ -60,7 +60,7 @@ class AbstractPolytopeSimulator(metaclass=ABCMeta):
         """
         pass
 
-class BaseCapacitiveDeviceSimulator(AbstractPolytopeSimulator):
+class AbstractCapacitiveDeviceSimulator(AbstractPolytopeSimulator):
     """Base class for all objects that create device simulations from a Capacitive Model.
     
     This class includes all tools to compute and cache polytopes from the provided capacitive model.
@@ -84,6 +84,7 @@ class BaseCapacitiveDeviceSimulator(AbstractPolytopeSimulator):
         self.capacitance_model = capacitance_model
         self.cache = {}
     
+    @abstractmethod
     def slice(self, P, m, proxy=False):
         """ Restricts the simulator to the affine subspace v=m+Pv'
         
@@ -106,8 +107,9 @@ class BaseCapacitiveDeviceSimulator(AbstractPolytopeSimulator):
         -------
         A simulator object describing the simulation on the affine subspace. The current simulation object remains unchanged.
         """
-        raise NotImplementedError('slice: Derived class must implement this method.')
+        pass
     
+    @abstractmethod
     def compute_polytope(self, state):
         """
         Computes the polytope for a given state. 
@@ -124,7 +126,7 @@ class BaseCapacitiveDeviceSimulator(AbstractPolytopeSimulator):
         -------
         A Polytope object containing the full computed polytope.
         """
-        raise NotImplementedError('ceate_polytope: Derived class must implement this method.')
+        pass
         
     def compute_transition_equations(self, state_list, state_from):
         """ Computes the energy difference equations from target states to all states in the list.
@@ -144,18 +146,18 @@ class BaseCapacitiveDeviceSimulator(AbstractPolytopeSimulator):
         b: np.array, containing the N offsets, one for each equation. 
         """
         return self.capacitance_model.compute_transition_equations(state_list,state_from)
-        
+    
+    @abstractmethod    
     def get_maximum_polytope_slack(self):
         """Returns the maximum slack value for inclusing of a facet into the polytope.
         
         Returns the maximum energy distance the closest point of a transition can have to the polytope
         before it is discarded. Setting to 0 means that only transitions that actually touch the polytope
         are kept.
-        
-       
         """
-        raise NotImplementedError('get_maximum_polytope_slack: Derived class must implement this method.')
+        pass
     
+    @abstractmethod
     def set_maximum_polytope_slack(self, maximum_slack):
         """Sets the maximum slack value for inclusing of a facet into the polytope.
         
@@ -165,7 +167,7 @@ class BaseCapacitiveDeviceSimulator(AbstractPolytopeSimulator):
         
         Note that changing this value clears the cache.
         """
-        raise NotImplementedError('get_maximum_polytope_slack: Derived class must implement this method.')
+        pass
     
     def cached_polytopes(self):
         """
@@ -342,7 +344,7 @@ class BaseCapacitiveDeviceSimulator(AbstractPolytopeSimulator):
         
         return state
     
-class CapacitiveDeviceSimulator(BaseCapacitiveDeviceSimulator):
+class CapacitiveDeviceSimulator(AbstractCapacitiveDeviceSimulator):
     """
     This class simulates a quantum dot device based on a capacitance model.
     
@@ -353,7 +355,7 @@ class CapacitiveDeviceSimulator(BaseCapacitiveDeviceSimulator):
     The simulator will return, for each transition, a point on the transition line and the virtual gate.
     
     It also has the ability to take 2D slices through high dimensional voltage spaces to construct 2D 
-    projections of charge stability diagrams. See documentation of BaseCapacitiveDeviceSimulator for more details.
+    projections of charge stability diagrams. See documentation of AbstractCapacitiveDeviceSimulator for more details.
     """
     
     def __init__(self, capacitance_model):
@@ -397,7 +399,7 @@ class CapacitiveDeviceSimulator(BaseCapacitiveDeviceSimulator):
             
             return sliced_simulator
 
-class CapacitiveDeviceSimulatorProxy(BaseCapacitiveDeviceSimulator):
+class CapacitiveDeviceSimulatorProxy(AbstractCapacitiveDeviceSimulator):
 
     """
     This class is a slice proxy for the CapacitiveDeviceSimulator class. It gets returned by
@@ -406,7 +408,7 @@ class CapacitiveDeviceSimulatorProxy(BaseCapacitiveDeviceSimulator):
     caching at the expense of higher computation cost: all queries for polytopes are computed by the original simulator
     and thus if several different slices of the same simulator are needed, they can share computed polytopes.
     
-    For the methods, see the documentation of BaseCapacitiveDeviceSimulator
+    For the methods, see the documentation of AbstractCapacitiveDeviceSimulator
     """
     def __init__(self, simulator, P, m):
         super().__init__(simulator.capacitance_model.slice(P,m))

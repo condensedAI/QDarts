@@ -5,9 +5,9 @@ class AbstractNoiseProcess(metaclass=ABCMeta):
     """
     Models a noise process that produces possibly dependent samples :math:`\epsilon(v)_t`. The noise process
     can depend on the device voltages v and the noise can depend on all previous samples in the sequence. We assume
-    that :math:`\epsilon(v)_t` is vector valued and the number of elements is stored in the num_elements attribute
+    that :math:`\epsilon(v)_t` is vector valued and the number of elements is stored in the ``num_elements`` attribute
     
-    A sequence is started by calling start_sequence, at which point the newly sampled points are independent from
+    A sequence is started by calling ``start_sequence``, at which point the newly sampled points are independent from
     all previous samples. 
     
     Note that currently, the elements in the noise process are assumed to be drawn with equal time difference between samples.
@@ -61,19 +61,19 @@ class AbstractNoiseProcess(metaclass=ABCMeta):
         pass
 
 class OU_process(AbstractNoiseProcess):
-    """
-    Implements the Ornstein-Uhlenbeck noise process
+    """Implements the Ornstein-Uhlenbeck noise process
     
     This noise is independent of v. We have that
     
-    :math:`\epsilon(v)_{t+1}=a \epsilon(v)_t + \sqrt{1-a^2} \sigmama \epsilon_t`
+    .. math::
+        \epsilon(v)_{t+1}=a \epsilon(v)_t + \sqrt{1-a^2} \sigma \epsilon_t
     
     Where :math:`\epsilon_t` is independent gaussian noise and
     
-    :math:`a=e^{-\frac{\delta t}{t_c}}`
+    .. math::
+        a=e^{-\\frac{\Delta t}{t_c}}
     
     It is possible to generate multiple independent samples of the same process simultaneously.
-    
     """
     def __init__(self, sigma, tc, dt, num_elements):
         """ Instantiates the OU process with its process parameters.
@@ -115,13 +115,13 @@ class Cosine_Mean_Function(AbstractNoiseProcess):
     
         The mean term of the ith noise element is given as a set of cosine functions:
             
-        :math:`\mu_i(v)= sum_j a_{ij} \cos(2\pi (w_{ij}^T v+b_{ij}))`
+        :math:`\mu_i(v)= \sum_j a_{ij} \cos(2\pi (w_{ij}^T v+b_{ij}))`
         
         and the resulting noise is
         
-        :math:`\epsilon(v)_{t}=:math:`\mu(v) + \epsilon(v)^D_{t}`
+        :math:`\epsilon(v)_{t}=\mu(v) + \epsilon(v)^D_{t}`
         
-        where :math_`\epsilon(v)^D_{t}` is the decorated noise process.
+        where :math:`\epsilon(v)^D_{t}` is the decorated noise process.
         
         The user supplies the weight tensor W with elements :math:`W_{ijk}` so that W[i,j] is the vector :math:`w_{ij}` 
         and a matrix a with the amplitude values :math:`a_{ij}`. Finally, b is the matrix of offsets :math:`b_{ij}`, which can be left as None, 

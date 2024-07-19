@@ -37,7 +37,6 @@ class AbstractSensorSim(metaclass=ABCMeta):
             
             Parameters
             ----------
-            
             state: np.array of ints
                 the state of N dots, identifying the ground state polytope for which to generate the sensor state information
             A: LxK np.array of floats
@@ -48,6 +47,7 @@ class AbstractSensorSim(metaclass=ABCMeta):
                 The labels of the L basis states
         """
         pass
+    
     @abstractmethod
     def sample_sensor_equilibrium(self, v, H, mixed_state, sensor_state, beta):
         """ Computes a noisy average of the sensor response for a given mixed state.
@@ -57,8 +57,7 @@ class AbstractSensorSim(metaclass=ABCMeta):
             
             Parameters
             ----------
-            
-            v: np.array of floats:
+            v: np.array of floats
                 vector of K gate voltages defining the current system
             H: LxL np.array of floats
                 Hamiltonian of the system defined by v. Labels and basis are the same as in precompute_sensor_state
@@ -67,9 +66,11 @@ class AbstractSensorSim(metaclass=ABCMeta):
             sensor_state: 
                 Cached information returned by precompute_sensor_state. All information therein are internal to the
                 sensor simulator
-            beta: scaled inverse temperature parameter
+            beta: float
+                scaled inverse temperature parameter
         """
         pass
+            
     @abstractmethod
     def sample_sensor_configuration(self, sampled_configuration, v, H, mixed_state, sensor_state, beta):
         """ samples a sensor response for a given sampled elecron configuration
@@ -83,10 +84,9 @@ class AbstractSensorSim(metaclass=ABCMeta):
             
             Parameters
             ----------
-            
             sampled_configuration: np.array of ints
                 vector of N elements describing the sampled electron configuration.
-            v: np.array of floats:
+            v: np.array of floats
                 vector of K gate voltages defining the current system
             H: LxL np.array of floats
                 Hamiltonian of the system defined by v. Labels and basis are the same as in precompute_sensor_state
@@ -95,7 +95,8 @@ class AbstractSensorSim(metaclass=ABCMeta):
             sensor_state: 
                 Cached information returned by precompute_sensor_state. All information therein are internal to the
                 sensor simulator
-            beta: scaled inverse temperature parameter
+            beta: float
+                scaled inverse temperature parameter
         """
         pass
 
@@ -323,12 +324,6 @@ class LocalSystem:
     H: LxL np.array of floats
         Hamiltonian over the subspace spanned by the L basis state of the extended basis.
         See methods basis_labels and core_basis_indices
-    mixed_state: LxL np.array of floats
-        the mixed state matrix, defined as expm(-beta*H)
-    basis_labels: LxN np.array of ints
-        The labels of the L basis elements, indentified by their ground state electron configuration
-    core_basis_indices: np.array of ints
-        Indices into basis_labels that define the subset of core basis elements.
     """
     def __init__(self, v, H, state, sim):
         """ Creates the LocalSystem.
@@ -357,6 +352,8 @@ class LocalSystem:
     def mixed_state(self):
         """ Computes an approximate mixed state matrix over the full basis.
         
+        the mixed state matrix, defined as expm(-beta*H)
+        
         Note that this function approximated the true mixed state matrix by inly taking basis eleemnts into account
         that have a small energy difference to the ground state. This is a multiple of the polytope slack used by the
         capacitive simulation.
@@ -383,10 +380,12 @@ class LocalSystem:
         return self._compute_mixed_state(self.H[subset_indices,:][:, subset_indices])
     @property
     def basis_labels(self):
+        """The labels of the basis elements, indentified by their ground state electron configuration"""
         return self._sim.boundaries(self.state).additional_info["extended_polytope"].labels
     
     @property
     def core_basis_indices(self):
+        """Indices into basis_labels that define the subset of core basis elements."""
         return self._sim.boundaries(self.state).additional_info["extended_polytope"].core_basis_indices
         
     def sample_sensor_equilibrium(self):
@@ -438,12 +437,12 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
     Additionally, the simulation allows to add additional states. For example, for most sensor simulations to work, we also need
     other higher energy states to compute correct conductance. These additional states can be added by modifying the vector
     num_additional_neighbours. if the ith element in this vector is R>0, and s is a state in the core basis, then
-    the extended basis will also include the states s+k*e_i where |k|<=R and e_i is the ith basis vector.
+    the extended basis will also include the states :math:`s+ke_i` where :math:`|k|<=R` and :math:`e_i` is the ith basis vector.
     
-    The tunnel couplings T are included into the Hamiltonian the following way: let s_i and s_j be two states in the basis of the Hamiltonian
+    The tunnel couplings T are included into the Hamiltonian the following way: let :math:`s_i` and :math:`s_j` be two states in the basis of the Hamiltonian
     that differ only in the value of the electron configuration at dots i and j. 
-    More exactly, we have that s_i and s_j are related by moving an electron from state s_i to s_j or vice versa. 
-    Let H_kl be the off-diagonal matrix element of those states. Then we have H_kl = T_ij. 
+    More exactly, we have that :math:`s_i` and :math:`s_j` are related by moving an electron from state :math:`s_i` to :math:`s_j` or vice versa. 
+    Let :math:`H_{kl}` be the off-diagonal matrix element of those states. Then we have :math:`H_{kl} = T_{ij}`. 
     In all other cases, tunnel coupling is 0.
     
     The mixed state is then again computed approximately, for more info on that, see documentation of LocalSystem.

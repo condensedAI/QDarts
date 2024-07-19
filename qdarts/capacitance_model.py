@@ -8,7 +8,7 @@ from abc import ABCMeta, abstractmethod
 eV = 1.602e-19
 to_Farrad_per_eV = 1e-18/eV
     
-class BaseCapacitanceModel(metaclass=ABCMeta):
+class AbstractCapacitanceModel(metaclass=ABCMeta):
     """Base Class for all capacitance models. 
     
     This class provides all required meta information to compute capacitive energies of a system with electron configuration
@@ -288,7 +288,7 @@ class BaseCapacitanceModel(metaclass=ABCMeta):
         )
         return verified_polytope
 
-class CapacitanceModel(BaseCapacitanceModel):
+class CapacitanceModel(AbstractCapacitanceModel):
     """Implementation of a slight generalization of the constant interaction model.
     
     The constant interaction model defines
