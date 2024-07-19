@@ -14,9 +14,7 @@ import time
 plt.rcParams.update({'font.size': 18})
 
 # SIMULATION CONSTANTS
-SLOW_NOISE = {"tc": 250, 
-              "samples": 5, 
-              "virtual_samples": 200}
+SLOW_NOISE = {"tc": 50}
 
 
 
@@ -155,12 +153,13 @@ class Experiment(): #TODO: change name to the simulator name
         self.inner_dots = list(set(self.inner_dots) - set(sensor_config["sensor_dot_indices"]))
         
         # Define slow-noise generator
-        slow_noise_gen = OU_process(sig = sensor_config["noise_amplitude"]["slow_noise"], 
-                                tc = SLOW_NOISE["tc"], 
-                                dt = 1,  # the unit of time is the single measurment
-                                num_points=SLOW_NOISE["samples"], 
-                                num_sensors = len(sensor_config["sensor_dot_indices"]))  #TODO: LATER: implement 1/f noise
-                                
+        slow_noise_gen = OU_process( #TODO: LATER: implement 1/f noise
+            sigma = sensor_config["noise_amplitude"]["slow_noise"], 
+            tc = SLOW_NOISE["tc"], 
+            dt = 1,  # the unit of time is the single measurment
+            num_elements = len(sensor_config["sensor_dot_indices"])
+        )  
+            
         if "mean_field" in sensor_config.keys():
             mean_field_config = sensor_config["mean_field"]
             if mean_field_config["type"] == "Cosine_Mean_Function":
@@ -171,12 +170,15 @@ class Experiment(): #TODO: change name to the simulator name
         sensor_sim = NoisySensorDot(sensor_config["sensor_dot_indices"])
 
         # Configure sensor model
-        sensor_sim.config_noise(sigma = sensor_config["noise_amplitude"]["fast_noise"], 
-                            n_virtual_samples = SLOW_NOISE["virtual_samples"], 
-                            slow_noise_gen = slow_noise_gen)
+        sensor_sim.config_noise(
+            sigma = sensor_config["noise_amplitude"]["fast_noise"], 
+            slow_noise_gen = slow_noise_gen
+        )
         
-        sensor_sim.config_peak(g_max = 1.0, 
-                                peak_width_multiplier = sensor_config["peak_width_multiplier"]) 
+        sensor_sim.config_peak(
+            g_max = 1.0, 
+            peak_width_multiplier = sensor_config["peak_width_multiplier"]
+        ) 
 
 
         # Pring log of sensor parameters

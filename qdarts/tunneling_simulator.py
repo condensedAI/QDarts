@@ -1,4 +1,5 @@
 import numpy as np
+from abc import ABCMeta, abstractmethod
 from qdarts.util_functions import find_label
 from qdarts.simulator import BasePolytopeSimulator
 
@@ -7,14 +8,23 @@ def softmax(v,axis=None):
     y = np.exp(v-max_v)
     return y/np.sum(y,axis)
 
-class BaseSensorSim:
+class AbstractSensorSim(metaclass=ABCMeta):
     """ Base class defining the interface for all sensor simulations"""
     def __init__(self, num_sensors):
         """Initialized a sensor configuration with num_sensors sensor dots"""
         self.num_sensors = num_sensors
+        
+    @abstractmethod
     def slice(self, P, m):
         """Takes an affine subspace of the simulated model."""
-        raise NotImplementedError('slice is not implemented')
+        pass
+    
+    @abstractmethod
+    def start_measurement(self):
+        """Reinitializes the sensor as to generate independent noise samples"""
+        pass
+    
+    @abstractmethod
     def precompute_sensor_state(self, state, A, b, basis_labels):
         """ Allows the sensor to precompute internal information that is valid for a whole ground state polytope.
             
@@ -37,7 +47,8 @@ class BaseSensorSim:
             basis_labels: LxN np.array of ints
                 The labels of the L basis states
         """
-        return None
+        pass
+    @abstractmethod
     def sample_sensor_equilibrium(self, v, H, mixed_state, sensor_state, beta):
         """ Computes a noisy average of the sensor response for a given mixed state.
         
@@ -58,7 +69,8 @@ class BaseSensorSim:
                 sensor simulator
             beta: scaled inverse temperature parameter
         """
-        raise NotImplementedError('sample_sensor_equilibrium is not implemented')  
+        pass
+    @abstractmethod
     def sample_sensor_configuration(self, sampled_configuration, v, H, mixed_state, sensor_state, beta):
         """ samples a sensor response for a given sampled elecron configuration
         
@@ -85,12 +97,12 @@ class BaseSensorSim:
                 sensor simulator
             beta: scaled inverse temperature parameter
         """
-        raise NotImplementedError('sample_sensor_configuration is not implemented')  
+        pass
 
-class NoisySensorDot(BaseSensorSim):
+class NoisySensorDot(AbstractSensorSim):
     """ Simulates a sensor signal by computing the conductance of the sensor dots.
     
-        This class implements the interface of BaseSensorSim and for most points, the
+        This class implements the interface of AbstractSensorSim and for most points, the
         documentation there should be referred to. This simulation combines a simple
         estimation of the conductance g with two noise sources. A fast noise source
         that simulates gaussian white noise that is drawn for each query of the sensor response
@@ -112,19 +124,23 @@ class NoisySensorDot(BaseSensorSim):
         self.sensor_dot_ids = sensor_dot_ids
         self.g_max = 1
         self.fast_noise_var = 0.0
-        self.n_virtual_samples = 1
         self.peak_width_multiplier = 1
         self.slow_noise_gen=None
 
-    def config_noise(self, sigma, n_virtual_samples, slow_noise_gen = None):
+    def config_noise(self, sigma, slow_noise_gen = None):
         self.fast_noise_var = sigma**2
-        self.n_virtual_samples = n_virtual_samples
         self.slow_noise_gen = slow_noise_gen
+        
+        #initialize noise
+        self.start_measurement()
         
     def config_peak(self, g_max, peak_width_multiplier):
         self.g_max = g_max
         self.peak_width_multiplier = peak_width_multiplier
-        
+    
+    def start_measurement(self):
+        if not self.slow_noise_gen is None:
+            self.slow_noise_gen.start_sequence()
     def slice(self, P, m):
         #if there is no slow noise, there is nothing to slice
         if self.slow_noise_gen is None: return self
@@ -133,7 +149,6 @@ class NoisySensorDot(BaseSensorSim):
         sliced_sensor_dot = NoisySensorDot(self.sensor_dot_ids)
         sliced_sensor_dot.g_max = self.g_max
         sliced_sensor_dot.fast_noise_var = self.fast_noise_var
-        sliced_sensor_dot.n_virtual_samples = self.n_virtual_samples
         sliced_sensor_dot.peak_width_multiplier = self.peak_width_multiplier
         sliced_sensor_dot.slow_noise_gen = self.slow_noise_gen.slice(P,m)
         return sliced_sensor_dot
@@ -187,27 +202,17 @@ class NoisySensorDot(BaseSensorSim):
             eps_next = np.abs(np.diag(H)[terms]-np.diag(H)[neighbour_next])
             eps = np.minimum(eps_prev,eps_next)
             #add noise
-            eps = eps[:,None]+slow_noise[i:i+1,:]
+            eps = eps + slow_noise[i:i+1]
             if self.fast_noise_var > 0:
                 fast_noise = np.random.randn(*eps.shape)*np.sqrt(self.fast_noise_var)
                 eps += fast_noise
             eps *=beta 
-            var_logistic = (1/0.631*self.peak_width_multiplier)**2
-            # compute first and second moment of the noise. by law of large numbers, as n_virtual_samples->large
-            # the avg will become normally distributed.
-            #TODO: revert this to old logistic distribution, this is wrong.
-            norm_pdf = lambda x, mu,var: 1/np.sqrt(2*np.pi*var)*np.exp(-(x-mu)**2/(2*var))
-            mean_g = 4*norm_pdf(0,eps, var_logistic)
-            second_moment_g =  16*norm_pdf(0,eps, (self.fast_noise_var + var_logistic/2))* 0.5/np.sqrt(np.pi*var_logistic)
-            std_g = np.sqrt(np.abs(second_moment_g - mean_g**2)/self.n_virtual_samples)
             
-
-            #now sample from the approximation
-            g = beta*self.g_max*(mean_g + std_g*np.random.randn(*eps.shape))
-            #average over noise samples (just now 1)
-            g = np.mean(g,axis=1)
-            #save for the sensor
-            gs[sensor_id] = g
+            #we approximate the logistic peak of g with the peak of a normal distribution of same width
+            #todo: we can fully go back to the logistic peak
+            var_logistic = (1/0.631*self.peak_width_multiplier)**2
+            norm_pdf = lambda x, mu,var: 1/np.sqrt(2*np.pi*var)*np.exp(-(x-mu)**2/(2*var))
+            gs[sensor_id] = 4*norm_pdf(0,eps, var_logistic)
         return gs
     def sample_sensor_equilibrium(self, v, H, mixed_state, sensor_state, beta):
         results = np.zeros(len(self.sensor_dot_ids))
@@ -476,8 +481,8 @@ class ApproximateTunnelingSimulator(BasePolytopeSimulator):
             Alternatively an object with a method barrier_sim.get_tunnel_matrix(v) returning a DxD matrix, and which supports the slice operation.
         T: float
             Temperature in Kelvin. Good values are < 0.1
-        sensor_sim: Derived from BaseSensorSim
-            A sensor simulation that follows the interface of BaseSensorSim and which computes the sensor signal.
+        sensor_sim: Derived from AbstractSensorSim
+            A sensor simulation that follows the interface of AbstractSensorSim and which computes the sensor signal.
         """
         self.poly_sim = polytope_sim
         #compatibility to earlier code that uses matrices
@@ -661,7 +666,7 @@ class ApproximateTunnelingSimulator(BasePolytopeSimulator):
         H = self._create_hamiltonian(v, extended_polytope.A, extended_polytope.b, extended_polytope.TOp)
         system = LocalSystem(v, H, state, self)
         return system
-    def sensor_scan(self, v_start, v_end, resolution, v_start_state_hint, cache=True):
+    def sensor_scan(self, v_start, v_end, resolution, v_start_state_hint, cache=True, start_new_measurement=True):
         """ Computes a 1D sensor ramp scan.
         
         Computes a linear set of points between v_start and v_end and for each point computes the sensor signal.
@@ -683,6 +688,8 @@ class ApproximateTunnelingSimulator(BasePolytopeSimulator):
         cache: bool
             Whether the simulation should try to cache the computed polytopes. This might lead to a slower computation time
             for a scan compared to not using caching, but consecutive scans with similar ranges tend to be quicker.
+        start_new_measurement: bool
+            Whether the seimulated sensor measurement should be independent of any previous measurements.
         """
         #prepare start state
         state = self.poly_sim.find_state_of_voltage(v_start, state_hint = v_start_state_hint)
@@ -693,7 +700,8 @@ class ApproximateTunnelingSimulator(BasePolytopeSimulator):
         else:
             sim_slice = self
         
-        
+        if start_new_measurement:
+            sim_slice.sensor_sim.start_measurement()
         values = np.zeros((resolution, self.sensor_sim.num_sensors))
         for i,v0 in enumerate(np.linspace([0.0],[1.0], resolution)):
             if cache:
@@ -749,11 +757,12 @@ class ApproximateTunnelingSimulator(BasePolytopeSimulator):
         
         #now slice down to 2D for efficiency
         sim_slice = self.slice(P, m, proxy=True)
-            
+        
+        sim_slice.sensor_sim.start_measurement()
         values=np.zeros((resolution[0],resolution[1], self.sensor_sim.num_sensors))
         for i,v2 in enumerate(np.linspace(minV[1],maxV[1],resolution[1])):
             v_start = np.array([minV[0],v2])
             v_end = np.array([maxV[0],v2])
             line_start = sim_slice.poly_sim.find_state_of_voltage(v_start, state_hint = line_start)
-            values[i] = sim_slice.sensor_scan(v_start, v_end, resolution[0], line_start, cache=False)
+            values[i] = sim_slice.sensor_scan(v_start, v_end, resolution[0], line_start, cache=False, start_new_measurement=False)
         return values
