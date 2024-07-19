@@ -19,6 +19,9 @@ SLOW_NOISE = {"tc": 50}
 
 
 class Experiment(): #TODO: change name to the simulator name
+    """Experiment class that helps setup the different parts of the simulator into an easy to ue interface.
+    The usage of this class is best described by the tutorials in the example folder.
+    """
     def __init__(self, capacitance_config, tunneling_config = None, sensor_config = None, print_logs = True):
         '''
         capacitance_config: dictionary containing the capacitance model parameters
@@ -56,11 +59,13 @@ class Experiment(): #TODO: change name to the simulator name
     def deploy_capacitance_sim(self,config):
         '''
         Function that deploys a capacitance simulator.
-        ----------------
-        Arguments:
+        
+        Arguments
+        ---------
         config: dictionary containing the capacitance model parameters
-        ----------------
-        Returns:
+        
+        Returns
+        -------
         sim: CapacitiveDeviceSimulator object
         '''
         capacitance_model = CapacitanceModel(config["C_Dg"], config["C_DD"], -1, ks= config["ks"])
@@ -101,12 +106,14 @@ class Experiment(): #TODO: change name to the simulator name
     def deploy_tunneling_sim(self, capacitance_sim, tunneling_config):
         '''
         Function that deploys a tunneling simulator.
-        ----------------
-        Arguments:
+        
+        Arguments
+        ---------
         capacitance_sim: CapacitiveDeviceSimulator object
         tunneling_config: dictionary containing the tunneling model parameters
-        ----------------
-        Returns:
+        
+        Returns
+        -------
         tunneling_sim: ApproximateTunnelingSimulator object
         '''
         tunneling_matrix = tunneling_config["tunnel_couplings"]
@@ -142,11 +149,13 @@ class Experiment(): #TODO: change name to the simulator name
     def deploy_sensor_model(self, sensor_config):
         '''
         Function that deploys a sensor model.
-        ----------------
-        Arguments:
+        
+        Arguments
+        ---------
         config: dictionary containing the sensor model parameters
-        ----------------
-        Returns:
+        
+        Returns
+        -------
         sensor_sim: NoisySensorDot object
         '''
         # Separate between inner and sensor dots
@@ -200,16 +209,18 @@ class Experiment(): #TODO: change name to the simulator name
     def center_transition(self, simulator, target_state, target_transition, plane_axes, use_virtual_gates = False, compensate_sensors = False):
         '''
         Function that center the CSD at a given facet (transition) of the polytope (occupation state).
-        ----------------
-        Arguments:
+        
+        Arguments
+        ---------
         simulator: any simulator object
         target_state: int, the state at which the transition happens, e.g. [2,2] 
         target_transition: list of integers, the transition point e.g. [1,-1] would be the transition from [2,2] to [1,1]
         plane_axes: 2xN array, the axes of the transition which span the plane
         use_virtual_gates: bool, whether to use virtual gates
         compensate_sensors: bool, whether to compensate the sensors
-        ----------------
-        Returns:
+        
+        Returns
+        -------
         plane_axes: 2xN array, the axes spanning the cut through volage plane
         transition_sim: CapacitanceSimulator object, the transition simulator
         '''
@@ -261,12 +272,14 @@ class Experiment(): #TODO: change name to the simulator name
     def get_virtualised_sim(self, simulator, target_state):
         '''
         Function that takes a simulator and virtualises the gates specified by inner_dots.
-        ----------------
-        Arguments:
+        
+        Arguments
+        ---------
         simulator: AbstractPolytopeSimulator object
         target_state: int, the initial corner state guess
-        ----------------
-        Returns:
+
+        Returns
+        -------
         simulator: AbstractPolytopeSimulator object, the virtualised simulator
         '''
         gate_transitions = np.eye(self.N,dtype=int)[self.inner_dots]
@@ -278,12 +291,14 @@ class Experiment(): #TODO: change name to the simulator name
     def get_compensated_sim(self,simulator, target_state):
         '''
         Function that takes a capacitance simulator and compensates the sensors.
-        ----------------
-        Arguments:
+        
+        Arguments
+        ---------
         simulator: AbstractPolytopeSimulator object
         target_stater: int, the state at which sensor compensation happens
-        ----------------
-        Returns:
+
+        Returns
+        -------
         simulator: AbstractPolytopeSimulator object, the compensated simulator
         '''
         if not self.has_sensors:
@@ -298,14 +313,16 @@ class Experiment(): #TODO: change name to the simulator name
     def get_plot_args(self, x_voltages, y_voltages, plane_axes, v_offset = None):
         '''
         Function that returns the arguments for plotting the CSD.
-        ----------------
-        Arguments:
+        
+        Arguments
+        ---------
         x_voltages: list of floats, the x-axis voltages
         y_voltages: list of floats, the y-axis voltages
         plane_axes: 2xN array, the axes of the plane in which the CSD is to be rendered
         v_offset: Nx1 array, the offset voltage of all of the gates, which defines the origin of the plot
-        ----------------
-        Returns:
+
+        Returns
+        -------
         v_offset: Nx1 array, the offset voltage of all of the gates
         minV: 2x1 array, the minimum voltage of selected axes
         maxV: 2x1 array, the maximum voltage of selected axes
@@ -338,8 +355,9 @@ class Experiment(): #TODO: change name to the simulator name
                                use_sensor_signal = False, v_offset = None):
         '''
         Function that renders the capacitance CSD for a given set of voltages and axes.
-        ----------------
-        Arguments:
+        
+        Arguments
+        ---------
         x_voltages: list of floats, the x-axis voltages
         y_voltages: list of floats, the y-axis voltages
         plane_axes: 2xN array, the axes of the plane in which the CSD is to be rendered
@@ -350,8 +368,9 @@ class Experiment(): #TODO: change name to the simulator name
         compute_polytopes: bool, whether to compute the polytopes
         use_sensor_signal: bool, whether to use the sensor signal
         v_offset: Nx1 array, the offset voltage of all of the gates, which defines the origin of the plot
-        ----------------
-        Returns:
+        
+        Returns
+        -------
         xout, yout: list of floats, the x and y voltages
         CSD_data: 2D array, the CSD data
         polytopes: dictionary, the polytopes of the CSD. None if compute_polytopes is False
@@ -392,7 +411,7 @@ class Experiment(): #TODO: change name to the simulator name
         CSD_data = None
         polytopes = None
         if not use_sensor_signal or compute_polytopes:
-            backend, CSD_data, states =  get_CSD_data(csimulator, v_offset, np.array(plane_axes).T, minV, maxV, resolution, target_state)
+            backend, CSD_data, states =  get_CSD_data(csimulator, np.array(plane_axes).T,v_offset,  minV, maxV, resolution, target_state)
             CSD_data = CSD_data.T
         if compute_polytopes:
             v_offset_polytopes = [np.dot(v_offset,plane_axes[0]), np.dot(v_offset,plane_axes[1])]

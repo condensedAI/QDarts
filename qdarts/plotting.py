@@ -5,8 +5,8 @@ from matplotlib import pyplot as plt
 from numpy.distutils.misc_util import is_sequence
 #all code here is required for plotting in the provided notebook
 
-#function that finds a point inside a given polytope
 def find_feasible_point(halfspaces):
+    """Computes a feasible point by a polytope defined in halfspace format. internal."""
     norm_vector = np.reshape(np.linalg.norm(halfspaces[:, :-1], axis=1), (halfspaces.shape[0], 1))
     c = np.zeros((halfspaces.shape[1],))
     c[-1] = -1
@@ -17,6 +17,7 @@ def find_feasible_point(halfspaces):
 
 
 def plot_2D_polytope(ax,A,b,color,lower_bounds, label=None, linestyle='-',linewidth=1):
+    """Plots a single 2D polytope. internal. """
     eqs=np.hstack([A,b.reshape(-1,1)])
     #add constraints to polytope
     eqs = np.vstack([eqs,lower_bounds])
@@ -41,6 +42,7 @@ def plot_2D_polytope(ax,A,b,color,lower_bounds, label=None, linestyle='-',linewi
 
 
 def get_2D_polytope(A,b,color,lower_bounds, label=None, linestyle='-',linewidth=1):
+    """computes the corners of a 2D polytope from the provided polytope. internal"""
     eqs=np.hstack([A,b.reshape(-1,1)])
     #add constraints to polytope
     eqs = np.vstack([eqs,lower_bounds])
@@ -58,7 +60,8 @@ def get_2D_polytope(A,b,color,lower_bounds, label=None, linestyle='-',linewidth=
     
 
 
-def raster_CSD_states(simulation, v_0, P, minV, maxV, resolution, state_hint_lower_right):
+def raster_CSD_states(simulation, P, v_0, minV, maxV, resolution, state_hint_lower_right):
+    """Creates a grid of points in 2D space and computes for each point the ground state. Internal."""
     if not is_sequence(resolution):
         resolution = [resolution,resolution]
     states=np.zeros((resolution[0],resolution[1], simulation.num_dots),dtype=int)
@@ -77,7 +80,7 @@ def raster_CSD_states(simulation, v_0, P, minV, maxV, resolution, state_hint_low
 
 
 
-def get_CSD_data(simulation, v_0, P, lower_left, upper_right, resolution, state_hint_lower_left):
+def get_CSD_data(simulation, P, v_0, lower_left, upper_right, resolution, state_hint_lower_left):
     """
     Function that computes a Charge Stability Diagram from a simulation of a device.
     The function plots the states at voltages v=v_0+P*x where x is a vector with elements 
@@ -89,6 +92,8 @@ def get_CSD_data(simulation, v_0, P, lower_left, upper_right, resolution, state_
     which is based on the charge onfiguration at a position. This is overlayed with a line plot indicating the
     exact transition points between states. Optionally each region is labelled using the exact electron state.
 
+    Parameters
+    ----------
     simulation: the device simulation to raster
     ax: matplotlib axis object to plot into
     v_0: the origin of the coordinate system to plot.
@@ -111,13 +116,17 @@ def get_CSD_data(simulation, v_0, P, lower_left, upper_right, resolution, state_
     simulation_slice = simulation.slice(P, v_0, proxy=True)
     
     #compute CSD
-    states = raster_CSD_states(simulation_slice, np.zeros(2), np.eye(2), minV, maxV, resolution, corner_state)
+    states = raster_CSD_states(simulation_slice, np.eye(2), np.zeros(2), minV, maxV, resolution, corner_state)
     color_weights = np.linspace(1,2.7,simulation_slice.num_dots)
     CSD_data = 1+np.sum(color_weights.reshape(1,1,-1)*states,axis=2)
     return simulation_slice, CSD_data, states
 
 
 def get_polytopes(states, simulation_slice, minV, maxV, V_offset):
+    """For each unique state in the provided state list, computes the corners of the polytope. of the 2D sliced simulation.
+    
+    This function is used for plotting of the exact state lines of the underlying capacitive model. 
+    """
     #iterate over the list of different states and plot their sliced polytope
     
     states = [tuple(s) for s in states.reshape(-1,simulation_slice.num_dots).tolist()]
@@ -143,6 +152,7 @@ def plot_polytopes(ax, polytopes, fontsize = 10, color = "w",
                    axes_rescale = 1, only_labels = False, only_edges = False,
                    skip_dots = []
                    ):
+    """Plot the polytopes computes by get_polytopes"""
     xlim = ax.get_xlim()
     ylim = ax.get_ylim()
 
