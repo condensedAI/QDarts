@@ -2,8 +2,9 @@ import numpy as np
 from qdarts.util_functions import is_invertible_matrix
 from qdarts.model import Model as Model
 from qdarts.util_functions import compensate_simulator_sensors, fix_gates, find_point_on_transitions, axis_align_transitions
+from abc import ABCMeta, abstractmethod
 
-class BasePolytopeSimulator:
+class AbstractPolytopeSimulator(metaclass=ABCMeta):
     """ Base class for all simulation objects that can compute and return polytopes.
     
         The class only has a single method boundaries which returns the boundary description of the polytope
@@ -20,6 +21,8 @@ class BasePolytopeSimulator:
     def __init__(self, num_dots, num_inputs):
         self.num_dots = num_dots
         self.num_inputs = num_inputs
+        
+    @abstractmethod
     def boundaries(self, state):
         """
         Returns the polytope P(n) of a given state n with all its boundaries, labels and meta information.
@@ -33,8 +36,9 @@ class BasePolytopeSimulator:
         -------
         The polytope P(n)
         """
-        raise NotImplementedError("BasePolytopeSimulator.boundaries needs to be implemented by derived class.")
+        pass
         
+    @abstractmethod
     def slice(self, P, m, proxy=False):
         """ Restricts the simulator to the affine subspace v=m+Pv'
         
@@ -54,9 +58,9 @@ class BasePolytopeSimulator:
         -------
         A simulator object describing the simulation on the affine subspace. The current simulation object remains unchanged.
         """
-        raise NotImplementedError('BasePolytopeSimulator.slice needs to be implemented by derived class.')
+        pass
 
-class BaseCapacitiveDeviceSimulator(BasePolytopeSimulator):
+class BaseCapacitiveDeviceSimulator(AbstractPolytopeSimulator):
     """Base class for all objects that create device simulations from a Capacitive Model.
     
     This class includes all tools to compute and cache polytopes from the provided capacitive model.

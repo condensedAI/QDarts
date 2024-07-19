@@ -263,11 +263,11 @@ class Experiment(): #TODO: change name to the simulator name
         Function that takes a simulator and virtualises the gates specified by inner_dots.
         ----------------
         Arguments:
-        simulator: BasePolytopeSimulator object
+        simulator: AbstractPolytopeSimulator object
         target_state: int, the initial corner state guess
         ----------------
         Returns:
-        simulator: BasePolytopeSimulator object, the virtualised simulator
+        simulator: AbstractPolytopeSimulator object, the virtualised simulator
         '''
         gate_transitions = np.eye(self.N,dtype=int)[self.inner_dots]
         #TODO: Default target state is lower left corner state (initial guess). In future user could specify!
@@ -280,11 +280,11 @@ class Experiment(): #TODO: change name to the simulator name
         Function that takes a capacitance simulator and compensates the sensors.
         ----------------
         Arguments:
-        simulator: BasePolytopeSimulator object
+        simulator: AbstractPolytopeSimulator object
         target_stater: int, the state at which sensor compensation happens
         ----------------
         Returns:
-        simulator: BasePolytopeSimulator object, the compensated simulator
+        simulator: AbstractPolytopeSimulator object, the compensated simulator
         '''
         if not self.has_sensors:
                 raise ValueError("Compensating sensors requires a sensor model.")

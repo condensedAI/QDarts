@@ -1,7 +1,7 @@
 import numpy as np
 from abc import ABCMeta, abstractmethod
 from qdarts.util_functions import find_label
-from qdarts.simulator import BasePolytopeSimulator
+from qdarts.simulator import AbstractPolytopeSimulator
 
 def softmax(v,axis=None):
     max_v = np.max(v)
@@ -412,7 +412,7 @@ class LocalSystem:
         sensor_state = self._sim.boundaries(self.state).additional_info["sensor_state"]
         return self._sim.sensor_sim.sample_sensor_configuration(sampled_configuration, self.v, self.H, self.mixed_state, sensor_state, self.beta)
         
-class ApproximateTunnelingSimulator(BasePolytopeSimulator):
+class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
     """Simulator for approximate charge tunneling in a quantum dot device.
     
     The simulator extends the supplied capacitive simulation by creating a Hamiltionian H,
@@ -427,7 +427,7 @@ class ApproximateTunnelingSimulator(BasePolytopeSimulator):
     For computing the tunnel coupling parameters, this class can make use of an additional Tunnel barrier simulation, but it
     is also possible to just supply a NxN constant matrix of tunnel couplings between all D dots in the array. 
     
-    Finally, the class follows the interface of BasePolytopeSimulator, which means it is possible to directly query the information
+    Finally, the class follows the interface of AbstractPolytopeSimulator, which means it is possible to directly query the information
     of the underlying polytopes of the simulation. This is there to unify slicing between simulators.
     
     Implementation details:

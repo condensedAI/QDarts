@@ -201,7 +201,7 @@ def fix_gates(simulator, gate_ids, gate_values, proxy=False):
     
     Parameters
     ----------
-    simulator: BasePolytopeSimulator
+    simulator: AbstractPolytopeSimulator
         The simulator object for which gates are to be fixed
     gate_ids: list of int
         The indices of the gates in the voltage vector
@@ -234,7 +234,7 @@ def axis_align_transitions(simulator, target_state, transitions, compensation_ga
     
     Parameters
     ----------
-    simulator: BasePolytopeSimulator
+    simulator: AbstractPolytopeSimulator
         The simulator object which is to be transformed
     target_state: list of int
         The state from which the transitions are extracted
@@ -285,7 +285,7 @@ def compensate_simulator_sensors(simulator, target_state, compensation_gates, se
     
     Parameters
     ----------
-    simulator: BasePolytopeSimulator
+    simulator: AbstractPolytopeSimulator
         The simulator object which is to be transformed
     target_state: list of int
         The state from which the transitions are extracted
