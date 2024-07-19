@@ -15,7 +15,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="qdarts.simulator.AbstractPolytopeSimulator" href="qdarts.simulator.AbstractPolytopeSimulator.html" />
-    <link rel="prev" title="qdarts.noise_processes.Cosine_Mean_Function" href="qdarts.noise_processes.Cosine_Mean_Function.html" />
+    <link rel="prev" title="qdarts.polytope.Polytope" href="qdarts.polytope.Polytope.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -231,7 +231,7 @@ This function doe snothing if polytope.must_verify=False</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>polytope</strong> (<em>Polytope</em>) – The polytope P(n) to be verified</p></li>
+<li><p><strong>polytope</strong> (<a class="reference internal" href="qdarts.polytope.Polytope.html#qdarts.polytope.Polytope" title="qdarts.polytope.Polytope"><em>Polytope</em></a>) – The polytope P(n) to be verified</p></li>
 <li><p><strong>maximum_slack</strong> (<em>float</em>) – The maximum distance in eV after which a transition of the polytope is discarded</p></li>
 </ul>
 </dd>
@@ -262,43 +262,54 @@ This function doe snothing if polytope.must_verify=False</p>
 
 
 <h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.experiment.Experiment.html">qdarts.experiment.Experiment</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.capacitance_model.CapacitanceModel.html">qdarts.capacitance_model.CapacitanceModel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.simulator.CapacitiveDeviceSimulator.html">qdarts.simulator.CapacitiveDeviceSimulator</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html">qdarts.tunneling_simulator.ApproximateTunnelingSimulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.tunneling_simulator.TunnelBarrierModel.html">qdarts.tunneling_simulator.TunnelBarrierModel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.tunneling_simulator.NoisySensorDot.html">qdarts.tunneling_simulator.NoisySensorDot</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.noise_processes.OU_process.html">qdarts.noise_processes.OU_process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.noise_processes.Cosine_Mean_Function.html">qdarts.noise_processes.Cosine_Mean_Function</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.tunneling_simulator.LocalSystem.html">qdarts.tunneling_simulator.LocalSystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.polytope.Polytope.html">qdarts.polytope.Polytope</a></li>
+</ul>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../simulator.html">Simulator</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../api.html#simulation-components">Simulation Components</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../api.html#interfaces">Interfaces</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">qdarts.capacitance_model.AbstractCapacitanceModel</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.num_dots"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.num_dots</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.num_inputs"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.num_inputs</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.bounds_limits"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.bounds_limits</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.__init__"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.__init__()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.compute_polytope_for_state"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.compute_polytope_for_state()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.compute_transition_equations"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.compute_transition_equations()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.enumerate_neighbours"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.enumerate_neighbours()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.slice"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.slice()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.verify_polytope"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.verify_polytope()</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">qdarts.capacitance_model.AbstractCapacitanceModel</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.num_dots"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.num_dots</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.num_inputs"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.num_inputs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.bounds_limits"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.bounds_limits</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.__init__"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.compute_polytope_for_state"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.compute_polytope_for_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.compute_transition_equations"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.compute_transition_equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.enumerate_neighbours"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.enumerate_neighbours()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.slice"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.slice()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qdarts.capacitance_model.AbstractCapacitanceModel.verify_polytope"><code class="docutils literal notranslate"><span class="pre">AbstractCapacitanceModel.verify_polytope()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="qdarts.simulator.AbstractPolytopeSimulator.html">qdarts.simulator.AbstractPolytopeSimulator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="qdarts.noise_processes.AbstractNoiseProcess.html">qdarts.noise_processes.AbstractNoiseProcess</a></li>
-<li class="toctree-l3"><a class="reference internal" href="qdarts.tunneling_simulator.AbstractSensorSim.html">qdarts.tunneling_simulator.AbstractSensorSim</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.simulator.AbstractPolytopeSimulator.html">qdarts.simulator.AbstractPolytopeSimulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.simulator.AbstractCapacitiveDeviceSimulator.html">qdarts.simulator.AbstractCapacitiveDeviceSimulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.noise_processes.AbstractNoiseProcess.html">qdarts.noise_processes.AbstractNoiseProcess</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qdarts.tunneling_simulator.AbstractSensorSim.html">qdarts.tunneling_simulator.AbstractSensorSim</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
-  <li><a href="../api.html">API</a><ul>
-      <li>Previous: <a href="qdarts.noise_processes.Cosine_Mean_Function.html" title="previous chapter">qdarts.noise_processes.Cosine_Mean_Function</a></li>
+      <li>Previous: <a href="qdarts.polytope.Polytope.html" title="previous chapter">qdarts.polytope.Polytope</a></li>
       <li>Next: <a href="qdarts.simulator.AbstractPolytopeSimulator.html" title="next chapter">qdarts.simulator.AbstractPolytopeSimulator</a></li>
-  </ul></li>
   </ul></li>
 </ul>
 </div>
