@@ -34,7 +34,7 @@ html_static_path = ['_static']
 
 import sys
 import os
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../src'))
 autosummary_generate = True
 autosummary_imported_members = True
 
