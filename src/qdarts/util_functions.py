@@ -297,6 +297,11 @@ def compensate_simulator_sensors(simulator, target_state, compensation_gates, se
         detuning parameter for each sensor which allows to move the sensor on a pre-specified point of the peak.
     sensor_slope_detuning: float 
         (Experimental) scaling factor that moves the compensation linearly from perfect compensation (0) to no compensation (1).
+        
+    Returns
+    -------
+    sliced_sim: the sliced simulation that is created from the computed compensation parameters
+    compensation_transform: a linear function that for any point v in the original coordinate system finds the point with the compensation applied in the new coordinate system
     """
     if len(sensor_ids) != len(compensation_gates):
         raise ValueError('Number of gates for compensation must equal number of sensors')
@@ -355,7 +360,7 @@ def compensate_simulator_sensors(simulator, target_state, compensation_gates, se
     comp_det = normals.T@ np.linalg.inv(normals @ normals.T)
     #now use the compensation to define sensor detunings
     v_detuning = comp_det @ sensor_detunings
-    v -= v_detuning #use detuning to move the point away from the transition
+    v_detuned = v - v_detuning #use detuning to move the point away from the transition
     
     
     
@@ -379,6 +384,10 @@ def compensate_simulator_sensors(simulator, target_state, compensation_gates, se
     #relative voltages to this (arbitrary) point. Tis would make it impossible
     #to plot the same region with different compensation points 
     #instead, we will now take v and move it such, that the other gates are 0.
-    v_zero = v - P[:,other_gates]@v[other_gates]
+    v_zero = v_detuned - P[:,other_gates]@v_detuned[other_gates]
     
-    return simulator.slice(P, v_zero,True)
+    P_inv = np.linalg.inv(P)
+    def compensation_transform(v):
+        #find the linear transformation such, that v is mapped on v_detuned
+        return P_inv@(v-v_zero)-v_detuning
+    return simulator.slice(P, v_zero,True), compensation_transform

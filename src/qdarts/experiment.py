@@ -308,7 +308,7 @@ class Experiment(): #TODO: change name to the simulator name
                                     target_state=target_state,
                                     compensation_gates=self.sensor_config["sensor_dot_indices"],
                                     sensor_ids = self.sensor_config["sensor_dot_indices"], 
-                                    sensor_detunings = self.sensor_config["sensor_detunings"])
+                                    sensor_detunings = self.sensor_config["sensor_detunings"])[0]
     
     def get_plot_args(self, x_voltages, y_voltages, plane_axes, v_offset = None):
         '''
@@ -414,8 +414,7 @@ class Experiment(): #TODO: change name to the simulator name
             backend, CSD_data, states =  get_CSD_data(csimulator, np.array(plane_axes).T,v_offset,  minV, maxV, resolution, target_state)
             CSD_data = CSD_data.T
         if compute_polytopes:
-            v_offset_polytopes = [np.dot(v_offset,plane_axes[0]), np.dot(v_offset,plane_axes[1])]
-            polytopes = get_polytopes(states, backend, minV, maxV,  v_offset_polytopes)
+            polytopes = get_polytopes(states, backend, minV, maxV)
                 
         
         # Part for the sensor signal:

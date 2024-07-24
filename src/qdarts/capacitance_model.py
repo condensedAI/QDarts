@@ -371,7 +371,7 @@ class CapacitanceModel(AbstractCapacitanceModel):
         N = len(state)
         
         S = np.eye(N)
-        if self.ks != None:
+        if self.ks is not None:
             S_values = self.S_cache[state,range(N)]
             S = np.diag(S_values)
 

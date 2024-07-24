@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>API Usage Tutorial &#8212; QDarts  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=61cd365c" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API" href="api.html" />
+    <link rel="prev" title="QDarts" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="api-usage-tutorial">
+<h1>API Usage Tutorial<a class="headerlink" href="#api-usage-tutorial" title="Link to this heading">¶</a></h1>
+<p>QDarts comes with two API-levels, the <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> class that simplifies many of the most common applications at the cost
+of flexibility. It is build on top of the low-level API, that gives access to the full power of QDarts. It is possile to mix both
+APIs, for example, it is possible, to construct a simulator using the <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> class and then modify it using the low-level API.</p>
+<p>The code for this tutorial is provided in the ipython notebook <code class="docutils literal notranslate"><span class="pre">examples/api_tutorial.ipynb</span></code>. To keep the tutorial concise,
+we only include the most important lines here that are needed to create the simulator,
+but we skip definition of capacitance parameters etc. For this, directly reading the tutorials is best.</p>
+<p>The simulated device is a dcevice with 6 dots, of which three are sensor dots. It is controlled by 9 plunger gates, 1 for each dot and
+three that govern barrier gates between the three dots that are not sensor dots. The device is defined using a set of parameter matrices
+that govern the capacitances between the 9 gates and 6 dots, as well as the affect the 9 gates have on the barrier potential and therefore the tunnel coupling.</p>
+<section id="construction-of-the-capacitive-simulation">
+<h2>Construction of the capacitive simulation<a class="headerlink" href="#construction-of-the-capacitive-simulation" title="Link to this heading">¶</a></h2>
+<p>As first step, we need to initialize the capacitive simulation.
+It depends on a capacitive model, which creates the capacitive energy function and which depends on a number of
+parameters, the capacitanca matrices between plunger gates and dots,  <code class="docutils literal notranslate"><span class="pre">C_DG</span></code>, the interdot capacitances <code class="docutils literal notranslate"><span class="pre">C_DD</span></code>,
+a lower bound on the gate voltages <code class="docutils literal notranslate"><span class="pre">bounds_limits</span></code> and optionaly a parameter <code class="docutils literal notranslate"><span class="pre">ks</span></code> that governs the deviation from the constant interaction
+model and which can be set to <code class="docutils literal notranslate"><span class="pre">None</span></code>. With these parameters, creating the capacitive simulation is straight forward:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qdarts.capacitance_model</span> <span class="kn">import</span> <span class="n">CapacitanceModel</span>
+<span class="kn">from</span> <span class="nn">qdarts.simulator</span> <span class="kn">import</span> <span class="n">CapacitiveDeviceSimulator</span>
+
+<span class="n">capacitance_model</span> <span class="o">=</span> <span class="n">CapacitanceModel</span><span class="p">(</span><span class="n">C_DG</span><span class="p">,</span> <span class="n">C_DD</span><span class="p">,</span> <span class="n">bounds_limits</span><span class="p">,</span> <span class="n">ks</span><span class="o">=</span><span class="n">ks</span><span class="p">)</span>
+<span class="n">capacitive_sim</span> <span class="o">=</span> <span class="n">CapacitiveDeviceSimulator</span><span class="p">(</span><span class="n">capacitance_model</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The capacitance simulation is purely classical. It can only be used to query the ground state of the electron configuration given a set of gate voltages,
+as well as for each electron configuration the polytope of gate voltages that lead to the ground state configuration. Both features together are enough,
+to plot a charge stability diagram and to exactly compute the boundaries of ground states within the diagram.</p>
+</section>
+<section id="plotting-the-charge-stability-diagram">
+<h2>Plotting the Charge Stability Diagram<a class="headerlink" href="#plotting-the-charge-stability-diagram" title="Link to this heading">¶</a></h2>
+<p>For ploting, we have two helper functions. First, <code class="docutils literal notranslate"><span class="pre">get_CSD_states</span></code> computes for a 2D grid of gate voltages the ground state. This is done by computing a standard 2D grid
+that is then transformed into gate-voltage space. This transformation is done via a linear transformation <span class="math notranslate nohighlight">\(v=m+P&#64;v'\)</span>, where v is the full vector of gate plunger voltages,
+in our case 9 values, and and <span class="math notranslate nohighlight">\(m\)</span> and <span class="math notranslate nohighlight">\(P\)</span> are projection parameters, where <span class="math notranslate nohighlight">\(m\)</span> is a 9 dimensional vector and <span class="math notranslate nohighlight">\(P\)</span> a 9x2 matrix.
+This defines a local 2D coordinate system transformation from the 2D grid <span class="math notranslate nohighlight">\(v'\)</span> to <span class="math notranslate nohighlight">\(v\)</span>. With this, it is possible to create a plot in any two coordinate axes.
+If we pick the grid of <span class="math notranslate nohighlight">\(v'\)</span> values as symmetric around 0, then <span class="math notranslate nohighlight">\(m\)</span> can be interpreted as the midpoint of the scan that we compute next.</p>
+<p>the question is, how we can obtain these values. We can use the capacitive simulation to query points of interest. For example, when we are interested in the scan around
+a point on the state where there is a single electron on each inner dot and 5 electrons on each sensor dot, we can query it simply via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">capacitive_sim</span><span class="o">.</span><span class="n">boundaries</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">point_inside</span>
+</pre></div>
+</div>
+<p>And if we want to perform a scan over the axes of the first and third plunger gate (which in our simulation are strongest coupled to the first and third inner dot) we can
+set:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N_gates</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">P</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">P</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>Now that we have the projection, we can define the minimum and maximum values of <span class="math notranslate nohighlight">\(v'\)</span> in both directions and choose an image resolution.
+Then, we can use <code class="docutils literal notranslate"><span class="pre">get_CSD_data</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qdarts.plotting</span> <span class="kn">import</span> <span class="n">get_CSD_data</span>
+
+<span class="n">minV</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.01</span><span class="p">,</span><span class="o">-</span><span class="mf">0.01</span><span class="p">]</span>
+<span class="n">maxV</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">]</span>
+<span class="n">resolution</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="n">sliced_csim</span><span class="p">,</span> <span class="n">CSD_data</span><span class="p">,</span> <span class="n">states</span> <span class="o">=</span>  <span class="n">get_CSD_data</span><span class="p">(</span><span class="n">capacitive_sim</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span><span class="n">m</span><span class="p">,</span>  <span class="n">minV</span><span class="p">,</span> <span class="n">maxV</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">target_state</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The last parameter is needed to provide the simulation with an initial guess of which might be the ground state of the bottom left corner of the plot.
+This guess does not need to be exact. This function returns three things: first, a simulation <code class="docutils literal notranslate"><span class="pre">sliced_csim</span></code> that is defined on the transformed space <span class="math notranslate nohighlight">\(v'\)</span> and serves as a cache for
+computed values. We will talk more about these slices later in the tutorial. The second result, <code class="docutils literal notranslate"><span class="pre">CSD_data</span></code> is a plottable 2D grid of values in which each ground state configuration is assigned
+a different value. Finally, <code class="docutils literal notranslate"><span class="pre">states</span></code> is an array of all ground states for each grid point. We can plot this directly with matplotlib:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">minV</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">maxV</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">resolution</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">minV</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">maxV</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">resolution</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span><span class="n">ys</span><span class="p">,</span><span class="n">CSD_data</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The resulting grid is a rastered low resolution image (TODO add image). We can improve on this by plotting the exact boundaries between the two ground states using <code class="docutils literal notranslate"><span class="pre">get_polytopes</span></code> and <code class="docutils literal notranslate"><span class="pre">plot_polytopes</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">polytopes</span> <span class="o">=</span> <span class="n">get_polytopes</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">sliced_csim</span><span class="p">,</span> <span class="n">minV</span><span class="p">,</span> <span class="n">maxV</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">minV</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">maxV</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">minV</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">maxV</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plot_polytopes</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">(),</span><span class="n">polytopes</span><span class="p">,</span> <span class="n">skip_dots</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that this function computes the polytopes based on the low dimensional sliced simulation returned by <code class="docutils literal notranslate"><span class="pre">get_CSD_data</span></code> as well as its computed array of states. The function also prints the labels
+of each state, and the option <code class="docutils literal notranslate"><span class="pre">skip_dots</span></code> allows to skip the part of the electron configuration we are not interested in. In this case, we skipped the 3 sensor dots.</p>
+</section>
+<section id="creation-of-a-tunneling-simulation">
+<h2>Creation of a tunneling simulation<a class="headerlink" href="#creation-of-a-tunneling-simulation" title="Link to this heading">¶</a></h2>
+<p>Now that we are able to generate a CSD, we want to also simulate tunneling and simulate a more realistic sensor signal (todo: explain):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qdarts.tunneling_simulator</span> <span class="kn">import</span> <span class="n">NoisySensorDot</span><span class="p">,</span> <span class="n">ApproximateTunnelingSimulator</span>
+
+<span class="n">sensor_model</span> <span class="o">=</span> <span class="n">NoisySensorDot</span><span class="p">(</span><span class="n">sensor_dots</span><span class="p">)</span> <span class="c1">#a model of the sensor dots that just needs which dot has which index</span>
+<span class="n">sensor_model</span><span class="o">.</span><span class="n">config_peak</span><span class="p">(</span><span class="n">g_max</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">peak_width_multiplier</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="c1">#make the sensor peak broader</span>
+<span class="n">tunneling_sim</span> <span class="o">=</span> <span class="n">ApproximateTunnelingSimulator</span><span class="p">(</span><span class="n">capacitive_sim</span><span class="p">,</span> <span class="c1">#the underlying polytope simulation</span>
+                                             <span class="n">tunnel_couplings</span><span class="p">,</span>  <span class="c1">#constant tunnel couplings</span>
+                                             <span class="n">temperature</span><span class="p">,</span> <span class="c1">#device temperature, should be &lt;=100mK</span>
+                                             <span class="n">sensor_model</span><span class="p">)</span> <span class="c1">#our sensor model simulation</span>
+
+<span class="n">capacitive_sim</span><span class="o">.</span><span class="n">set_maximum_polytope_slack</span><span class="p">(</span><span class="mi">5</span><span class="o">/</span><span class="n">tunneling_sim</span><span class="o">.</span><span class="n">beta</span><span class="p">)</span> <span class="c1">#adding slack to keep more states that are likely to affect the hamiltonian</span>
+<span class="n">tunneling_sim</span><span class="o">.</span><span class="n">num_additional_neighbours</span><span class="p">[</span><span class="n">sensor_dots</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1">#adding additional states for the sensor dots</span>
+</pre></div>
+</div>
+<p>Finally, we can create a similar plot as before. We use the same values for ´´m´´ and ´´P´´ as for the previous simulation, so that we can compare the two plots.
+Note that since the device has three sensor dots, the output is a 3 dimensional tensor where the last dimension is the number of sensor dots and we plot below only
+the output of the third sensor:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sensor_values</span> <span class="o">=</span> <span class="n">tunneling_sim</span><span class="o">.</span><span class="n">sensor_scan_2D</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">minV</span><span class="p">,</span> <span class="n">maxV</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">target_state</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span><span class="n">ys</span><span class="p">,</span><span class="n">sensor_values</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="slicing-and-sensor-compensation">
+<h2>Slicing and sensor compensation<a class="headerlink" href="#slicing-and-sensor-compensation" title="Link to this heading">¶</a></h2>
+<p>The last plot shos that most of the sensor signal is very low and there is only a small signal with a peak. This is because of the missing sensor compensation: the sensor peak
+is capacitely affected by the plunger gates and thus changing the voltages changes the sensor signal. Since the sensor peak is very small, these changes make it difficult to make out
+the charge stability diagram. What we need is sensor compensation, i.e., a change of coordinate system where the sensor plunger voltage is corrected for the cross-talk from the other gates.
+Moreover, the sensor peak is not centered. This is because we used as mid-point a point inside the polytop, but the sensor peaks are only on the boundaries between polytopes with different number of
+electrons on the sensor dots. Thus, we need to change our coordinate system and tune the sensor to a better point.</p>
+<p>This change of coordinate system is achieved in the simulator via slicing. In the previous examples, we defined a matrix <code class="docutils literal notranslate"><span class="pre">P</span></code> and vector <code class="docutils literal notranslate"><span class="pre">m</span></code> to generate the plot. We said that this changed the coordinate
+system via <span class="math notranslate nohighlight">\(v=m+Pv'\)</span>, where <code class="docutils literal notranslate"><span class="pre">v'</span></code> was a 2D case. This operation is called slicing and a simulation can be sliced via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sliced_sim</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">m</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This works on all simulator objects and it returns a new simulation with gate voltages <code class="docutils literal notranslate"><span class="pre">v'</span></code>. This works in any dimensions, not just 2 and it is used in most simulation transformation code.
+QDarts makes use of this in all its transformation code. For example, compensating the sensor dot:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qdarts.simulator</span> <span class="kn">import</span> <span class="n">compensate_simulator_sensors</span>
+
+<span class="n">compensated_tsim</span><span class="p">,</span> <span class="n">compensation_transform</span> <span class="o">=</span> <span class="n">compensate_simulator_sensors</span><span class="p">(</span>
+    <span class="n">tunneling_sim</span><span class="p">,</span> <span class="c1">#the simulator object to compensate</span>
+    <span class="n">target_state</span><span class="o">=</span><span class="n">target_state</span><span class="p">,</span> <span class="c1">#the electron configuration around which to compensate</span>
+    <span class="n">compensation_gates</span><span class="o">=</span> <span class="n">sensor_plungers</span><span class="p">,</span> <span class="c1">#the ids of the sensor gate plungers. Here: [6,7,8]</span>
+    <span class="n">sensor_ids</span> <span class="o">=</span> <span class="n">sensor_dots</span><span class="p">,</span><span class="c1">#the ids of the sensor dots. Here: [3,4,5],</span>
+    <span class="n">sensor_detunings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.005</span><span class="p">,</span><span class="o">-</span><span class="mf">0.005</span><span class="p">,</span><span class="o">-</span><span class="mf">0.005</span><span class="p">])</span> <span class="c1">#shift of the sensor dot plungers</span>
+<span class="p">)</span>
+<span class="n">m_comp</span> <span class="o">=</span> <span class="n">compensation_transform</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">sensor_values</span> <span class="o">=</span> <span class="n">compensated_tsim</span><span class="o">.</span><span class="n">sensor_scan_2D</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">m_comp</span><span class="p">,</span> <span class="n">minV</span><span class="p">,</span> <span class="n">maxV</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">target_state</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span><span class="n">ys</span><span class="p">,</span><span class="n">sensor_values</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">QDarts</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Usage Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">QDarts</a></li>
+      <li>Next: <a href="api.html" title="next chapter">API</a></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Oswin Krause, Jan Krzywda, Weikun Liu, Evert van Nieuwenburg.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/api_tutorial.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

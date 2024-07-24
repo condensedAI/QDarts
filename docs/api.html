@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>API &#8212; QDarts  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=61cd365c" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qdarts.experiment.Experiment" href="interfaces/qdarts.experiment.Experiment.html" />
+    <link rel="prev" title="API Usage Tutorial" href="api_tutorial.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="api">
+<h1>API<a class="headerlink" href="#api" title="Link to this heading">¶</a></h1>
+<p>In the following, we will describe the core components of our API</p>
+<section id="experiment-class">
+<h2>Experiment Class<a class="headerlink" href="#experiment-class" title="Link to this heading">¶</a></h2>
+<p>For a quick start for uing the simulator, there is the Experiment class that is also used
+in the example notebook. We refer to the notebook for a detailled usage example.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="interfaces/qdarts.experiment.Experiment.html#qdarts.experiment.Experiment" title="qdarts.experiment.Experiment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiment.Experiment</span></code></a>(capacitance_config[, ...])</p></td>
+<td><p>Experiment class that helps setup the different parts of the simulator into an easy to ue interface.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="simulation-components">
+<h2>Simulation Components<a class="headerlink" href="#simulation-components" title="Link to this heading">¶</a></h2>
+<p>The main components to build your own simulations are shown below.
+We first need to create a Capacitance model that generates a
+capacitive energy function <span class="math notranslate nohighlight">\(E(v,n)\)</span>. With this, we can start
+to generate a purely capacitive simulation.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="interfaces/qdarts.capacitance_model.CapacitanceModel.html#qdarts.capacitance_model.CapacitanceModel" title="qdarts.capacitance_model.CapacitanceModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capacitance_model.CapacitanceModel</span></code></a>(C_g, C_D, ...)</p></td>
+<td><p>Implementation of a slight generalization of the constant interaction model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="interfaces/qdarts.simulator.CapacitiveDeviceSimulator.html#qdarts.simulator.CapacitiveDeviceSimulator" title="qdarts.simulator.CapacitiveDeviceSimulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulator.CapacitiveDeviceSimulator</span></code></a>(...)</p></td>
+<td><p>This class simulates a quantum dot device based on a capacitance model.</p></td>
+</tr>
+</tbody>
+</table>
+<p>This simulation is rather basic and can only compute areas of voltages that lead to the same ground
+state, so called coulomb diamonds. This can already be used to generate
+Charge Stability diagrams by computing 2D slices through the set of polytopes,
+but those will not look very realistic, nor will they include tunneling.</p>
+<p>To move beyond this simulation, we need to drastically improve the modeling.
+This next step is based on the full tunneling simulator that requires a simulation
+of the sensor dot and a simulation of tunnel barriers - the latter can be simplified by
+just providing a matrix of constant tunnel couplings.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.ApproximateTunnelingSimulator.html#qdarts.tunneling_simulator.ApproximateTunnelingSimulator" title="qdarts.tunneling_simulator.ApproximateTunnelingSimulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tunneling_simulator.ApproximateTunnelingSimulator</span></code></a>(...)</p></td>
+<td><p>Simulator for approximate charge tunneling in a quantum dot device.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.TunnelBarrierModel.html#qdarts.tunneling_simulator.TunnelBarrierModel" title="qdarts.tunneling_simulator.TunnelBarrierModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tunneling_simulator.TunnelBarrierModel</span></code></a>(...)</p></td>
+<td><p>Model of the tunnel barriers of a device</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.NoisySensorDot.html#qdarts.tunneling_simulator.NoisySensorDot" title="qdarts.tunneling_simulator.NoisySensorDot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tunneling_simulator.NoisySensorDot</span></code></a>(...)</p></td>
+<td><p>Simulates a sensor signal by computing the conductance of the sensor dots.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The simulation of the sensor dot can optionally make use of a noise model in order
+to generate dependent noise. For this, we currently offer the following two classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="interfaces/qdarts.noise_processes.OU_process.html#qdarts.noise_processes.OU_process" title="qdarts.noise_processes.OU_process"><code class="xref py py-obj docutils literal notranslate"><span class="pre">noise_processes.OU_process</span></code></a>(sigma, tc, dt, ...)</p></td>
+<td><p>Implements the Ornstein-Uhlenbeck noise process</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="interfaces/qdarts.noise_processes.Cosine_Mean_Function.html#qdarts.noise_processes.Cosine_Mean_Function" title="qdarts.noise_processes.Cosine_Mean_Function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">noise_processes.Cosine_Mean_Function</span></code></a>(...[, b])</p></td>
+<td><p>Decorator of an random process that models an additive mean term that depends on the gate voltages.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="data-classes">
+<h2>Data Classes<a class="headerlink" href="#data-classes" title="Link to this heading">¶</a></h2>
+<p>Finally, both levels of simulations have their own data classes. The polytope class is returned by the
+boundaries method by any simulator and the local system is returned by the tunneling simulator. Both describe
+the local state of the simulator in some region.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.LocalSystem.html#qdarts.tunneling_simulator.LocalSystem" title="qdarts.tunneling_simulator.LocalSystem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tunneling_simulator.LocalSystem</span></code></a>(v, H, state, sim)</p></td>
+<td><p>Class describing a quantum system defined by the gate voltages of a simulated device.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="interfaces/qdarts.polytope.Polytope.html#qdarts.polytope.Polytope" title="qdarts.polytope.Polytope"><code class="xref py py-obj docutils literal notranslate"><span class="pre">polytope.Polytope</span></code></a>(state)</p></td>
+<td><p>Represents the polytope P(n) defined by all gate voltages v in a device that have capacitive ground state n.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="interfaces">
+<h2>Interfaces<a class="headerlink" href="#interfaces" title="Link to this heading">¶</a></h2>
+<p>QDarts offers a set of interfaces and base classes that can serve as a primer to how to extend the simulator by
+replacing existing components. In most cases, only a few specialized functions need to be implemented as the base
+class implements most of the important logic. Please note that QDarts is under active development, all of these
+interfaces are subject to change.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="interfaces/qdarts.capacitance_model.AbstractCapacitanceModel.html#qdarts.capacitance_model.AbstractCapacitanceModel" title="qdarts.capacitance_model.AbstractCapacitanceModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capacitance_model.AbstractCapacitanceModel</span></code></a>(...)</p></td>
+<td><p>Base Class for all capacitance models.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="interfaces/qdarts.simulator.AbstractPolytopeSimulator.html#qdarts.simulator.AbstractPolytopeSimulator" title="qdarts.simulator.AbstractPolytopeSimulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulator.AbstractPolytopeSimulator</span></code></a>(...)</p></td>
+<td><p>Base class for all simulation objects that can compute and return polytopes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="interfaces/qdarts.simulator.AbstractCapacitiveDeviceSimulator.html#qdarts.simulator.AbstractCapacitiveDeviceSimulator" title="qdarts.simulator.AbstractCapacitiveDeviceSimulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulator.AbstractCapacitiveDeviceSimulator</span></code></a>(...)</p></td>
+<td><p>Base class for all objects that create device simulations from a Capacitive Model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="interfaces/qdarts.noise_processes.AbstractNoiseProcess.html#qdarts.noise_processes.AbstractNoiseProcess" title="qdarts.noise_processes.AbstractNoiseProcess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">noise_processes.AbstractNoiseProcess</span></code></a>(...)</p></td>
+<td><p>Models a noise process that produces possibly dependent samples <span class="math notranslate nohighlight">\(\epsilon(v)_t\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="interfaces/qdarts.tunneling_simulator.AbstractSensorSim.html#qdarts.tunneling_simulator.AbstractSensorSim" title="qdarts.tunneling_simulator.AbstractSensorSim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tunneling_simulator.AbstractSensorSim</span></code></a>(...)</p></td>
+<td><p>Base class defining the interface for all sensor simulations</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">QDarts</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api_tutorial.html">API Usage Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="api_tutorial.html" title="previous chapter">API Usage Tutorial</a></li>
+      <li>Next: <a href="interfaces/qdarts.experiment.Experiment.html" title="next chapter">qdarts.experiment.Experiment</a></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Oswin Krause, Jan Krzywda, Weikun Liu, Evert van Nieuwenburg.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/api.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -122,7 +122,7 @@ def get_CSD_data(simulation, P, v_0, lower_left, upper_right, resolution, state_
     return simulation_slice, CSD_data, states
 
 
-def get_polytopes(states, simulation_slice, minV, maxV, V_offset):
+def get_polytopes(states, simulation_slice, minV, maxV):
     """For each unique state in the provided state list, computes the corners of the polytope. of the 2D sliced simulation.
     
     This function is used for plotting of the exact state lines of the underlying capacitive model. 
@@ -145,7 +145,7 @@ def get_polytopes(states, simulation_slice, minV, maxV, V_offset):
         upper_bounds_graph = np.hstack([np.eye(2), -(maxV+0.05*abs(maxV))[:,None]])
         lower_bounds = np.vstack([lower_bounds_graph, upper_bounds_graph])
         corners = get_2D_polytope(A,b,"white",lower_bounds)
-        polytope_list[str(state)] = np.array(corners+V_offset)
+        polytope_list[str(state)] = np.array(corners)
     return polytope_list
 
 def plot_polytopes(ax, polytopes, fontsize = 10, color = "w", 
