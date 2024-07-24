@@ -8,13 +8,18 @@ authors = [
 ]
 description = "A package for simulating realistic quantum dot arrays and their charge transitions."
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-
+dependencies = [
+  'cvxpy >= 1.5',
+  'matplotlib >= 3.8',
+  'numpy >= 1.26',
+  'scipy >= 1.11'
+]
 [project.urls]
 Homepage = "https://github.com/condensedAI/QDarts"
 Issues = "https://github.com/condensedAI/QDarts"
