@@ -1,12 +1,17 @@
 # Minimal makefile for Sphinx documentation
 #
-
 # You can set these variables from the command line, and also
 # from the environment for the first two.
 SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
-SOURCEDIR     = sphinx
+SPHINXSOURCEDIR     = sphinx
 BUILDDIR      = build
+PYTHONBUILD ?= python3 -m build
 
-docs: Makefile
-	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
+.PHONY: doc build
+
+doc:
+	@$(SPHINXBUILD) -M html "$(SPHINXSOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
+	cp -r build/html/* docs/
+build:
+	@$(PYTHONBUILD)
