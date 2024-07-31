@@ -2,3 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
+examples/C_DD.npy
+examples/C_Dg.npy
+examples/csd_data.npy
+examples/polytopes_data.npy
+examples/tunnel_couplings.npy
+examples/x_axis.npy
+examples/y_axis.npy
