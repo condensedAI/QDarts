@@ -73,7 +73,7 @@ class Experiment(): #TODO: change name to the simulator name
         self.inner_dots = list(np.arange(self.N))  #indces of the dots. NOTE: no sensor at this point   
         
         if self.print_logs:
-            if config["ks"] == None:
+            if config["ks"] != None:
                 # Print log of capacitance parameters
                 log = """
                 Capacitance model deployed with the following parameters:
