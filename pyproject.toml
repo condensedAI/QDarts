@@ -17,8 +17,8 @@ classifiers = [
 dependencies = [
   'cvxpy >= 1.5',
   'matplotlib >= 3.8',
-  'numpy >= 1.26',
-  'scipy >= 1.11'
+  'numpy < 2.0',
+  'scipy <=1.12.0,>= 1.6.0'
 ]
 [project.urls]
 Homepage = "https://github.com/condensedAI/QDarts"
