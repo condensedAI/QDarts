@@ -20,6 +20,44 @@ def solve_linear_problem(prob):
        prob.solve(verbose=False, solver=cp.CLARABEL, max_iter=100000)
     except cp.SolverError:
         prob.solve(solver=cp.GLPK)
+        
+        
+def _compute_polytope_slacks_1D(A,b):
+    """Special case called by compute_polytope_slacks when A has a single column"""
+    w=A.reshape(-1)
+    #compute the single point fulfilling the constraint
+    x=-b/w
+    
+    #check whether the constraint is a lower or upper bound
+    is_lower = (w < 0)
+    #count the constraints for checking whether we have both lower and upper bounds
+    num_lower = np.sum(is_lower)
+    
+    #now find the lower and upper bounds of the interval that fulfill all constraints
+    if num_lower > 0:
+        lower_x = np.max(x[is_lower])
+    else:
+        lower_x = -np.inf
+    if num_lower < len(A):
+        upper_x = np.min(x[~is_lower])
+    else:
+        upper_x = np.inf
+    #handling of infeasibility
+    #since the slacks are defined as smallest violation of the constraints,
+    #if the polytope is infeasible, the slack for the lower bound constraints
+    #must be computed based on the upper bound and vice versa
+    if lower_x> upper_x:
+        temp = lower_x
+        lower_x = upper_x
+        upper_x = temp
+        
+    #compute slacks: 
+    slacks_lower = -(is_lower*(w*lower_x+b))
+    slacks_upper = -((~is_lower)*(w*upper_x+b))
+    
+    slacks = slacks_lower + slacks_upper 
+    return slacks
+    
 
 def compute_polytope_slacks(A, b, maximum_slack):
     """Computes the slacks of each candidate transition of a ground state polytope.
@@ -71,9 +109,14 @@ def compute_polytope_slacks(A, b, maximum_slack):
     
     #we return the vector of eps values for all equations so that the user can filter transitions afterwards
     
-    #first two special cases:
+    #first special cases.
+    #only one constraint? feasible qwith slack 0
     if len(b) == 1:
         return np.zeros(1)
+    
+    #1D problems can be solved efficiently
+    if A.shape[1] == 1:
+        return _compute_polytope_slacks_1D(A,b)
     
     #now we know there is a polyope and we can compute its sides
     N = len(A)
