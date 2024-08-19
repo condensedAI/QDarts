@@ -191,7 +191,7 @@ class AbstractCapacitanceModel(metaclass=ABCMeta):
                 b = b[~zero_const]
                 state_list = state_list[~zero_const]
             # ... and check for this batch whether we can filter out non-touching ones
-            slacks = compute_polytope_slacks(A,b, maximum_slack)
+            slacks = compute_polytope_slacks(A,b, self.bounds_normals, self.bounds_limits, maximum_slack)
             keep = slacks <= maximum_slack+1.e-8
             
             #if we have kept nothing, this means there is a set of equations that is not fullfillable
@@ -274,7 +274,7 @@ class AbstractCapacitanceModel(metaclass=ABCMeta):
         """
         if not polytope.must_verify:
             return polytope
-        slacks = compute_polytope_slacks(polytope.A, polytope.b, maximum_slack)
+        slacks = compute_polytope_slacks(polytope.A, polytope.b, self.bounds_normals, self.bounds_limits, maximum_slack)
         keep = slacks <= maximum_slack + 1.e-8
         touching = slacks <= 1.e-6
         point_inside, _ = compute_maximum_inscribed_circle(polytope.A[touching], polytope.b[touching], self.bounds_normals, self.bounds_limits)

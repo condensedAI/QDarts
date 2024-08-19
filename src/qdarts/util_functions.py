@@ -1,5 +1,6 @@
 import cvxpy as cp
 import numpy as np
+from scipy.spatial import HalfspaceIntersection
 
 def is_invertible_matrix(A,max_cond=1.e8):
     """ Returns true if A is an invertible matrix.
@@ -58,8 +59,31 @@ def _compute_polytope_slacks_1D(A,b):
     slacks = slacks_lower + slacks_upper 
     return slacks
     
+    
+def _compute_polytope_slacks_2D(A,b, bounds_A, bounds_b):
+    """Special case in 2D solved via halfspace intersection"""
+    
+    #first we use halfspace intersection to compute all corners of the final polytope
+    #find a point fulfilling all constraints
+    feasible_point, _ = compute_maximum_inscribed_circle(A, b, bounds_A, bounds_b)
+    #bring all constraints together in matrix form
+    halfspaces_poly = np.concatenate([A,b.reshape(-1,1)],axis=1)
+    halfspaces_bounds = np.concatenate([bounds_A,bounds_b.reshape(-1,1)],axis=1)
+    halfspaces = np.concatenate([halfspaces_poly,halfspaces_bounds],axis=0)
+    hs = HalfspaceIntersection(halfspaces, feasible_point)
+    intersections = hs.intersections
+    
+    #now compute slacks. since the slack is computed as the solution of a linear programming problem,
+    #the solution must lie on one of the vertices.
+    slacks_intersections = A@(intersections.T)+b.reshape(-1,1)
+    
+    min_slacks = np.min(-slacks_intersections,axis=1)
+    slacks = np.maximum(min_slacks, np.zeros(min_slacks.shape))
+    
+    return slacks
+    
 
-def compute_polytope_slacks(A, b, maximum_slack):
+def compute_polytope_slacks(A, b, bounds_A, bounds_b, maximum_slack):
     """Computes the slacks of each candidate transition of a ground state polytope.
     
     The polytope is given by all points x, such that :math:`Ax+b<0`. There might be boundaries
@@ -74,6 +98,9 @@ def compute_polytope_slacks(A, b, maximum_slack):
     if this inequality holds exactly with slack :math:`s=0`, we say that the ith transition touches
     the polytope and the larger slack is, the more distant is the polytope
     
+    Computing the slack can be difficult in the presence of unbounded polytopes. For this reason additional linear bound
+    constraints need to be provided that ensure that all polytopes are bounded.
+    
     The function computes the minimum slack for all transitions in :math:`A_i` and :math:`b_i`. 
     The default slack is needed if for some reason it is not possible to compute the slack due to numerical
     difficulties.
@@ -84,8 +111,12 @@ def compute_polytope_slacks(A, b, maximum_slack):
         The linear coefficients of the N affine linear equations in K dimensions
     b: N np.array of floats
         The constant offsets of the N affine linear equations
+    bounds_A: N'xK np.array of floats
+        The linear coefficients of N' additional constraint that ensure that polytopes are bounded.
+    bounds_b: N' np.array of floats
+        The constant offsets of the N' bounds
     maximum_slack: float
-        Value for the maximum acceptable slack for transitions to be considered near the polytop.
+        Value for the maximum acceptable slack for transitions to be considered near the polytope.
         TODO: review whether this parameter is needed.
     """
     
@@ -114,9 +145,12 @@ def compute_polytope_slacks(A, b, maximum_slack):
     if len(b) == 1:
         return np.zeros(1)
     
-    #1D problems can be solved efficiently
+    #1D and 2D problems can be solved efficiently
     if A.shape[1] == 1:
         return _compute_polytope_slacks_1D(A,b)
+    if A.shape[1] == 0:
+        return _compute_polytope_slacks_2D(A,b, bounds_A, bounds_b)
+        
     
     #now we know there is a polyope and we can compute its sides
     N = len(A)
