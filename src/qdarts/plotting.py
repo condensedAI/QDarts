@@ -2,8 +2,17 @@ import numpy as np
 from scipy.spatial import HalfspaceIntersection, ConvexHull
 from scipy.optimize import linprog
 from matplotlib import pyplot as plt
-from numpy.distutils.misc_util import is_sequence
 #all code here is required for plotting in the provided notebook
+def is_sequence(seq):
+    if isinstance(seq, str):
+        return False
+    try:
+        len(seq)
+    except Exception:
+        return False
+    return True
+
+
 
 def find_feasible_point(halfspaces):
     """Computes a feasible point by a polytope defined in halfspace format. internal."""
