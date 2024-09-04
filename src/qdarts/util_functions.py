@@ -379,6 +379,7 @@ def compensate_simulator_sensors(simulator, target_state, compensation_gates, se
     -------
     sliced_sim: the sliced simulation that is created from the computed compensation parameters
     compensation_transform: a linear function that for any point v in the original coordinate system finds the point with the compensation applied in the new coordinate system
+    tuning_point: a vector of gate voltages that indicates the exact compensation point of the simulation
     """
     if len(sensor_ids) != len(compensation_gates):
         raise ValueError('Number of gates for compensation must equal number of sensors')
@@ -467,4 +468,4 @@ def compensate_simulator_sensors(simulator, target_state, compensation_gates, se
     def compensation_transform(v):
         #find the linear transformation such, that v is mapped on v_detuned
         return P_inv@(v-v_zero)-v_detuning
-    return simulator.slice(P, v_zero,True), compensation_transform
+    return simulator.slice(P, v_zero,True), compensation_transform, P_inv@(v_detuned-v_zero)
