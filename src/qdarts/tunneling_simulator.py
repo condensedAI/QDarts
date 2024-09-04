@@ -117,8 +117,7 @@ class NoisySensorDot(AbstractSensorSim):
         The noise can be configured via config_noise. The noise is modeled as an additive 
         noise on the sensor peak position in voltage space. Thus, at peaks or valleys, the noise
         is small while on the sides of the peak, where the derivatives are largest, the noise will
-        affect measurements the most. No additional sensor noise is modeled and the user can for example
-        add white noise on top to model the noise added by the measurements.
+        affect measurements the most. Additional signal  noise is then modeled by adding white gaussian noise.
     """
     def __init__(self, sensor_dot_ids):
         super().__init__(len(sensor_dot_ids))
@@ -127,11 +126,12 @@ class NoisySensorDot(AbstractSensorSim):
         self.fast_noise_var = 0.0
         self.peak_width_multiplier = 1
         self.slow_noise_gen=None
+        self.signal_noise_scale = 0.0
 
-    def config_noise(self, sigma, slow_noise_gen = None):
+    def config_noise(self, sigma, signal_noise_scale, slow_noise_gen = None):
         self.fast_noise_var = sigma**2
         self.slow_noise_gen = slow_noise_gen
-        
+        self.signal_noise_scale=signal_noise_scale
         #initialize noise
         self.start_measurement()
         
@@ -151,6 +151,7 @@ class NoisySensorDot(AbstractSensorSim):
         sliced_sensor_dot.g_max = self.g_max
         sliced_sensor_dot.fast_noise_var = self.fast_noise_var
         sliced_sensor_dot.peak_width_multiplier = self.peak_width_multiplier
+        sliced_sensor_dot.signal_noise_scale = self.signal_noise_scale
         sliced_sensor_dot.slow_noise_gen = self.slow_noise_gen.slice(P,m)
         return sliced_sensor_dot
     
@@ -213,7 +214,7 @@ class NoisySensorDot(AbstractSensorSim):
             #todo: we can fully go back to the logistic peak
             var_logistic = (1/0.631*self.peak_width_multiplier)**2
             norm_pdf = lambda x, mu,var: 1/np.sqrt(2*np.pi*var)*np.exp(-(x-mu)**2/(2*var))
-            gs[sensor_id] = 4*norm_pdf(0,eps, var_logistic)
+            gs[sensor_id] = self.g_max*4*norm_pdf(0,eps, var_logistic)
         return gs
     def sample_sensor_equilibrium(self, v, H, mixed_state, sensor_state, beta):
         results = np.zeros(len(self.sensor_dot_ids))
@@ -224,6 +225,9 @@ class NoisySensorDot(AbstractSensorSim):
             g = gs[sensor_id]
             p = np.diag(mixed_state)[terms]
             results[i] = np.sum(p*g)/np.sum(p)
+        var_logistic = (1/0.631*self.peak_width_multiplier)**2
+        scale = self.g_max*self.signal_noise_scale*4/np.sqrt(2*np.pi*var_logistic)
+        results += scale*np.random.randn(len(results))
         return results
         
     def sample_sensor_configuration(self, sampled_configuration, v, H, mixed_state, sensor_state, beta):
@@ -235,6 +239,8 @@ class NoisySensorDot(AbstractSensorSim):
             terms,neighbour_prev, neighbour_next,terms_labels = sensor_state[sensor_id]
             label_pos = find_label(terms_labels, sampled_configuration)
             results[i] = gs[sensor_id][label_pos]
+        scale = self.g_max*self.signal_noise_scale*4/np.sqrt(2*np.pi*var_logistic)
+        results += scale*np.random.randn(len(results))
         return results
         
 class TunnelBarrierModel:

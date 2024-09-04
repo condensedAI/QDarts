@@ -158,6 +158,14 @@ class Experiment(): #TODO: change name to the simulator name
         -------
         sensor_sim: NoisySensorDot object
         '''
+        if not "noise_amplitude" in sensor_config.keys():
+            sensor_config["noise_amplitude"]={}
+        if not "fast_noise" in sensor_config["noise_amplitude"]:
+            sensor_config["noise_amplitude"]["fast_noise"]=0.0
+        if not "slow_noise" in sensor_config["noise_amplitude"]:
+            sensor_config["noise_amplitude"]["slow_noise"]=0.0
+        if not "signal_noise" in sensor_config["noise_amplitude"]:
+            sensor_config["noise_amplitude"]["signal_noise"]=0.0 
         # Separate between inner and sensor dots
         self.inner_dots = list(set(self.inner_dots) - set(sensor_config["sensor_dot_indices"]))
         
@@ -181,9 +189,9 @@ class Experiment(): #TODO: change name to the simulator name
         # Configure sensor model
         sensor_sim.config_noise(
             sigma = sensor_config["noise_amplitude"]["fast_noise"], 
+            signal_noise_scale = sensor_config["noise_amplitude"]["signal_noise"], 
             slow_noise_gen = slow_noise_gen
         )
-        
         sensor_sim.config_peak(
             g_max = 1.0, 
             peak_width_multiplier = sensor_config["peak_width_multiplier"]
@@ -199,9 +207,11 @@ class Experiment(): #TODO: change name to the simulator name
             Coulomb peak width: {} meV
             Slow noise amplitude: {} ueV
             Fast noise amplitude: {} ueV
+            Signal noise scale: {}
             """.format(sensor_config["sensor_dot_indices"], np.array(sensor_config["sensor_detunings"])*1e3, 
                     np.round(2*sensor_config["peak_width_multiplier"]*self.tunneling_config["temperature"]*86*1e-3/0.631,2),
-                    np.round(sensor_config["noise_amplitude"]["slow_noise"]*1e6,4),np.round(sensor_config["noise_amplitude"]["fast_noise"]*1e6,4))
+                    np.round(sensor_config["noise_amplitude"]["slow_noise"]*1e6,4),np.round(sensor_config["noise_amplitude"]["fast_noise"]*1e6,4)
+                    ,np.round(sensor_config["noise_amplitude"]["signal_noise"],5))
             print(log)
         return sensor_sim
         
