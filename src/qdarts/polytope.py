@@ -112,7 +112,7 @@ class Polytope:
     
         transformed = Polytope(self.state)
         
-        transformed_point_inside = np.linalg.inv(P)@self.point_inside + m
+        transformed_point_inside = np.linalg.inv(P)@(self.point_inside - m)
         transformed.set_polytope(
             self.labels,
             self.A@P, #we know the line equations
