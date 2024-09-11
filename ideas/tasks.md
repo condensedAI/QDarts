@@ -1,0 +1,4 @@
+- Physics-inspired, CIM.
+- Model search
+- Feature extraction is missing in Eliska
+- 
