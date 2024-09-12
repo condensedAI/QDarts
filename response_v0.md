@@ -13,9 +13,7 @@ I know that these types of simulations are routinely done in many experimental a
  (I do understand that this even-odd effect is related to the spin degree of freedom, which is admittedly missing from the current version of the package, but I also feel that this effect is qualitatively different from other spin effects, and also straightforward to implement in the existing framework. )*
 
 **Response** 
-We appreciate the suggestion. This observation will be implemented in a future version of the code, along with other spin-related effects. However, for the current version of the code, in order to be consistent with the spirit of the package, i.e., the absence of spin degree of freedom, we decided not to include this effect. One can argue that implementing only a subset of spin effects might lead to inconsistencies and artifacts.
-
-Nevertheless, we revisited the manuscript to include the discussion and anticipate the future version of the code.
+We appreciate the suggestion. We have implemented this observation into the simulator and included it also in the manuscript. To be preise, when the number of electrons on the pair of dots affected by a transition is even, we increase the tunnel coupling by sqrt(2).
 
 > In reality, the value of effective tunnel coupling depends on the parity of the number of electrons in the dots, with an enhancement by a factor of √2 expected for an even number of electrons. However, this effect originates from the spin degree of freedom and is a direct consequence of the symmetry of the lowest energy states—the singlets of double and single occupation. In the current version of the code, we do not include the spin degree of freedom; therefore, the even-odd effect is not present. We plan to include the spin degree of freedom in future versions of the code, which will allow us to capture this effect.
 
