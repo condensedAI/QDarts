@@ -540,11 +540,28 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
         return sliced_tunneling_sim
         
     def _compute_tunneling_op(self, state_list):
-        """Computes the mapping between tunnel coupling and hamiltonian off diagonal elements.
+        """Computes the mapping between tunnel coupling and hamiltonian off diagonal elements
+        and also also computes a multiplicative weight for each tunnel coupling based on the number
+        of affected electrons during the state transitions.
+        
+        We currently only add tunnel coupling between two states n,m if they describe the transition of a single
+        electron between two dots i and j. In this case the tunnel coupling is w*T_ij where w=1 if the 
+        total number of electrons on dots i and j is odd, otherwise w=sqrt(2).
+        Parameters
+        ----------
+        state_list: list of vectors of ints 
+            The list of states that describe a subset of the fokh basis of the Hamiltonian.
+            
+        Returns
+        -------
+        TOp: a mapping TOP(n,m)=i*num_dots+j, the index in the flattened matrix of tunnel couplings 
+        TOpW: weight matrix W(n,m).
+        
         """
         N = state_list.shape[0]
         n_dots = state_list.shape[1]
         TOp = np.zeros((N,N),dtype=int)
+        TOpW = np.ones((N,N))
         
         sums = np.sum(state_list,axis=1)
         for i,s1 in enumerate(state_list):
@@ -566,7 +583,16 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
                     ind = idxs[0]*n_dots + idxs[1]
                 TOp[i,j] = ind
                 TOp[j,i] = ind
-        return TOp
+                
+                
+                #compute weight. If the total number of electrons on the affected dots
+                #is even, the tunneling strength is multiplied by sqrt(2)
+                pos_changes = (s1 != s2)
+                num_electrons_affected = np.sum(pos_changes*s1)
+                if num_electrons_affected % 2 == 0:
+                    TOpW[i,j] = np.sqrt(2)
+                    TOpW[j,i] = TOpW[i,j]
+        return TOp, TOpW
         
     def _create_state_list(self, state, direct_neighbours):
         """ Creates the extended basis
@@ -619,11 +645,12 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
             #create full set of transition equations
             A,b = self.poly_sim.compute_transition_equations(state_list, state)
             
-            TOp = self._compute_tunneling_op(state_list)
+            TOp,TOpW = self._compute_tunneling_op(state_list)
             extended_polytope = status=type('',(object,),{})()
             extended_polytope.A = A
             extended_polytope.b = b
             extended_polytope.TOp = TOp
+            extended_polytope.TOpW = TOpW
             extended_polytope.labels = state_list
             extended_polytope.core_basis_indices = polytope_base_indx
             polytope.additional_info["extended_polytope"] = extended_polytope
@@ -631,7 +658,7 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
             #also compute the sensor info
             polytope.additional_info['sensor_state'] = self.sensor_sim.precompute_sensor_state(state, A, b, state_list)
         return polytope
-    def _create_hamiltonian(self, v, A, b, TOp):
+    def _create_hamiltonian(self, v, A, b, TOp,TOpW):
         """ Computes the hamiltonian at the given gate voltages
         """
         tunnel_matrix = self.barrier_sim.get_tunnel_matrix(v)
@@ -641,7 +668,7 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
         if tunnel_matrix is None:
             return np.diag(energy_diff)
         else:
-            t_term = ((tunnel_matrix.reshape(-1)[TOp.reshape(-1)]).reshape(N,N))
+            t_term = ((tunnel_matrix.reshape(-1)[TOp.reshape(-1)]).reshape(N,N))*TOpW
             return np.diag(energy_diff)-t_term
     
     def compute_local_system(self, v, state, search_ground_state = True):
@@ -668,7 +695,7 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
             state = self.poly_sim.find_state_of_voltage(v, state_hint = state)
         polytope = self.boundaries(state)
         extended_polytope = polytope.additional_info['extended_polytope']
-        H = self._create_hamiltonian(v, extended_polytope.A, extended_polytope.b, extended_polytope.TOp)
+        H = self._create_hamiltonian(v, extended_polytope.A, extended_polytope.b, extended_polytope.TOp, extended_polytope.TOpW)
         system = LocalSystem(v, H, state, self)
         return system
     def sensor_scan(self, v_start, v_end, resolution, v_start_state_hint, cache=True, start_new_measurement=True):
@@ -720,7 +747,7 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
             values[i] = system.sample_sensor_equilibrium()
         return values
         
-    def sensor_scan_2D(self, P, m, minV, maxV, resolution, state_hint_lower_left):
+    def sensor_scan_2D(self, P, m, minV, maxV, resolution, state_hint_lower_left,cache=True):
         """ Computes the sensor signal on a 2D grid of points.
         
         For the exact computation of points, see sensor_scan.
@@ -751,6 +778,9 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
             Guess for the state n for point described by the grid position minV. The simulator will use this
             guess as a starting point for the search of the correct state if this guess is wrong. Note that P(n)
             must intersect with the affine slice, if slicing was used.
+        cache: bool
+            Whether the simulation should try to cache the computed polytopes. This might lead to a slower computation time
+            for a scan compared to not using caching, but consecutive scans with similar ranges tend to be quicker.
         """
         if P.shape[1] != 2:
             raise ValueError("P must have two columns")
@@ -761,7 +791,7 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
         line_start = self.poly_sim.find_state_of_voltage(m+P@minV, state_hint = state_hint_lower_left)
         
         #now slice down to 2D for efficiency
-        sim_slice = self.slice(P, m, proxy=True)
+        sim_slice = self.slice(P, m, proxy=cache)
         
         sim_slice.sensor_sim.start_measurement()
         values=np.zeros((resolution[0],resolution[1], self.sensor_sim.num_sensors))
@@ -769,5 +799,5 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
             v_start = np.array([minV[0],v2])
             v_end = np.array([maxV[0],v2])
             line_start = sim_slice.poly_sim.find_state_of_voltage(v_start, state_hint = line_start)
-            values[i] = sim_slice.sensor_scan(v_start, v_end, resolution[0], line_start, cache=False, start_new_measurement=False)
+            values[i] = sim_slice.sensor_scan(v_start, v_end, resolution[0], line_start, cache=True, start_new_measurement=False)
         return values
