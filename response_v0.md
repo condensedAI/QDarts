@@ -62,7 +62,7 @@ Moreover, the model is refined to account for the noise and the tunnel coupling 
 We have bench-marked this code against our own which has a more brute force approach and found the present code to be much more efficient in particular toward a large number of quantum dots and charge number. We would therefore encourage experimentalists to use this code to simulate their charge stability diagram of an open array.*
 
 **Response** 
-We appriciate the effort made by the reviewer to test the code and provide feedback. We are glad that the code was found to be efficient and easy to use. At the same time, we are grateful for the suggestion of improving the installation process. 
+We appriciate the effort made by the reviewer to test the code and provide feedback. We are glad that the code was found to be efficient and easy to use. At the same time, we are grateful for the suggestion of improving the installation process.  
 
 To improve user experience, we have developed transparent documentation and installation instructions, which is available at https://condensedai.github.io/QDarts/. We have also recorded a video tutorial that will be available on the project's website. 
 
@@ -71,12 +71,14 @@ TODO: VIDEO (JAN)
 1. *There are still some functionalities that are missing and which could definitely benefit to the community to simulate more complex array. These are recommendations, and a bit beyond our expertise to estimate the technical feasibility.
 First of all, the ability to work with a finite number of charge in the array would be very helpful to simulate isolated arrays which is a widely used approach in experiments (see Flentje, et al. Nat Commun. 8, 501 (2017) or Meyer et al. Nano Lett. 24, 11593 (2023) or Yang, et al. Nature 580, 350–354 (2020).)*
 
-AT SOME POINT I WAS SUGGESTING FIXING NUMBER OF ELECTRONS. HOW EASY IT IS TO IMPLEMENT? 
+**Response** 
 
-TODO: FIXED NUMBER OF ELECTRONS (OSWIN)
-
+This is a great suggestion, unfortunately it is at least partially difficult to implement. If the goal is to simulate a real array, then often only some dots are decoupled from the reservoir, while sensor dots need to be connected to the reservoir to work. Your suggestion is easy to implement without a sensor dot, in this case, this can be achieved by writing a wrapper around the CapacitanceModel class to limit the neighbour enumeration of a state. (e.g., call CapacitanceModel.enumerate_neighbours and then remove all returned states that do not leave the total number of electrons constant). However, the full implementation with partial reservoir connection requires serious implementation effort and we would like not having to support a partial implementation that is reasonably easy to implement by the user.
+However, we believe that restricting transitions is not the way to go. Instead our goal is to implement transition dynamics into the array, based on barrier gates and tunnel coupling strength. While this allows to implement effects like latching, setting the transition speed for certain reservoir transitions to 0 can be used to efficiently implement this effect. We aim to implement this in a follow-up publication.
 
 3. *Second, instead of using charge detection, probing the quantum capacitance through gate-based reflectometry would be a nice functionality. For instance, reproducing RF signal on stability diagrams for different parameters such as tunnel coupling, lever arm, frequency etc… would be extremely useful. This readout method is believed to be scalable approach to control and read spins in large array (Crippa, et al. Nat Commun 10, 2776 (2019), Veldhorst, et al. Nat Commun 8, 1766 (2017).)*
+
+**Response** 
  
  We are grateful for this suggestion. In order to make the code more versatile and useful for a wider range of applications, we implemented the vannila version of in-situ reflectometry and provided its description in the new subsection of the manuscript. We also included a new example file that demonstrates the use of this feature.
 
