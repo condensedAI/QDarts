@@ -26,8 +26,9 @@ def solve_linear_problem(prob):
 def _compute_polytope_slacks_1D(A,b):
     """Special case called by compute_polytope_slacks when A has a single column"""
     w=A.reshape(-1)
+    close_to_zero = (np.abs(w)<1.e-6*np.max(w))
     #compute the single point fulfilling the constraint
-    x=-b/w
+    x=-b/(w+close_to_zero*1.e-6*np.max(w))
     
     #check whether the constraint is a lower or upper bound
     is_lower = (w < 0)
