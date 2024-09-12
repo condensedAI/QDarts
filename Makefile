@@ -12,6 +12,6 @@ PYTHONBUILD ?= python3 -m build
 
 doc:
 	@$(SPHINXBUILD) -M html "$(SPHINXSOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
-	cp -r build/html/* docs/
+	cp -r $(BUILDDIR)/html/* docs/
 build:
 	@$(PYTHONBUILD)
