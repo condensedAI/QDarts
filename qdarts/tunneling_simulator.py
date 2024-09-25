@@ -226,6 +226,7 @@ class ApproximateTunnelingSimulator:
     def _create_hamiltonian(self, v, A, b, tunnel_matrix, TOp):
         N = A.shape[0]
         energy_diff = -(A@v+b)
+
         diags = np.sort(energy_diff)
         if tunnel_matrix is None:
             return np.diag(energy_diff)
@@ -233,10 +234,9 @@ class ApproximateTunnelingSimulator:
             t_term = ((tunnel_matrix.reshape(-1)[TOp.reshape(-1)]).reshape(N,N))
             return np.diag(energy_diff)-t_term
     
-    def sensor_scan(self, v_start, v_end, resolution, v_start_state_hint, use_proxy=True):
+    def sensor_scan(self, v_start, v_end, resolution, v_start_state_hint, use_proxy=True, insitu_axis=None):
         #prepare start state
         state = self.poly_sim.find_state_of_voltage(v_start, state_hint = v_start_state_hint)
-        
         P=(v_end - v_start).reshape(-1,1)
         if use_proxy:
             sim_slice = self.slice(P, v_start, proxy=use_proxy)
@@ -245,7 +245,13 @@ class ApproximateTunnelingSimulator:
         
         
         polytope = sim_slice._get_polytope(state)
-        values = np.zeros((resolution, self.sensor_sim.num_sensors))
+
+        if insitu_axis is not None:
+        
+            values = np.zeros((resolution, 1))
+
+        else:
+            values = np.zeros((resolution, self.sensor_sim.num_sensors))
         for i,v0 in enumerate(np.linspace([0.0],[1.0], resolution)):
             if use_proxy:
                 v = v0
@@ -254,18 +260,23 @@ class ApproximateTunnelingSimulator:
             if not sim_slice.poly_sim.inside_state(v, state):
                 state = sim_slice.poly_sim.find_state_of_voltage(v,state_hint=state)
                 polytope = sim_slice._get_polytope(state)
-            
             #compute mixed state of the current voltage configuration
             extended_polytope = polytope.additional_info['extended_polytope']
             H = sim_slice._create_hamiltonian(v, extended_polytope.A, extended_polytope.b, self.tunnel_matrix, extended_polytope.TOp)
-            mixed_state = sim_slice._compute_mixed_state(H)
             
-            #compute sensor response for the mixed state
-            sensor_state = polytope.additional_info['sensor_state']
-            values[i] = sim_slice.sensor_sim.eval_sensor(H, mixed_state, sensor_state, self.beta)
+            if insitu_axis is not None:
+                dv = 0.0001
+                dH = sim_slice._create_hamiltonian(np.array(v)+dv*np.array(insitu_axis), extended_polytope.A, extended_polytope.b, self.tunnel_matrix, extended_polytope.TOp)
+                values[i] = sim_slice.get_tc(H, dH)
+            else:
+                mixed_state = sim_slice._compute_mixed_state(H)
+                
+                #compute sensor response for the mixed state
+                sensor_state = polytope.additional_info['sensor_state']
+                values[i] = sim_slice.sensor_sim.eval_sensor(H, mixed_state, sensor_state, self.beta)
         return values
         
-    def sensor_scan_2D(self, v_offset, P, minV, maxV, resolution, state_hint_lower_left):
+    def sensor_scan_2D(self, v_offset, P, minV, maxV, resolution, state_hint_lower_left, insitu_axis):
         if P.shape[1] != 2:
             raise ValueError("P must have two columns")
         if isinstance(resolution, int):
@@ -277,10 +288,27 @@ class ApproximateTunnelingSimulator:
         #now slice down to 2D for efficiency
         sim_slice = self.slice(P, v_offset, proxy=True)
             
-        values=np.zeros((resolution[0],resolution[1], self.sensor_sim.num_sensors))
+        if insitu_axis is None:
+            values=np.zeros((resolution[0],resolution[1], self.sensor_sim.num_sensors))
+
+        else:
+            values=np.zeros((resolution[0],resolution[1],1))
+
         for i,v2 in enumerate(np.linspace(minV[1],maxV[1],resolution[1])):
             v_start = np.array([minV[0],v2])
             v_end = np.array([maxV[0],v2])
             line_start = sim_slice.poly_sim.find_state_of_voltage(v_start, state_hint = line_start)
-            values[i] = sim_slice.sensor_scan(v_start, v_end, resolution[0], line_start, use_proxy=False)
+            values[i] = sim_slice.sensor_scan(  v_start, v_end, resolution[0], line_start, use_proxy=False, insitu_axis=insitu_axis)
         return values
+
+    def get_tc(self, H, dH):
+            
+            ind0 = np.argsort(np.diag(H))[:2]
+            tc = H[ind0[0],ind0[1]]
+            eps = H[ind0[0],ind0[0]] - H[ind0[1],ind0[1]]
+
+            dind0 = np.argsort(np.diag(dH))[:2]
+            dtc = dH[dind0[0],dind0[1]]
+            deps = dH[dind0[0],dind0[0]] - dH[dind0[1],dind0[1]]
+
+            return deps/np.sqrt(dtc**2 + deps**2) - eps/np.sqrt(tc**2 + eps**2)

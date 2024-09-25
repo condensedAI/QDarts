@@ -73,7 +73,7 @@ class Experiment(): #TODO: change name to the simulator name
         self.inner_dots = list(np.arange(self.N))  #indces of the dots. NOTE: no sensor at this point   
         
         if self.print_logs:
-            if config["ks"] == None:
+            if config["ks"] is not None:
                 # Print log of capacitance parameters
                 log = """
                 Capacitance model deployed with the following parameters:
@@ -332,7 +332,8 @@ class Experiment(): #TODO: change name to the simulator name
     def generate_CSD(self, x_voltages, y_voltages, plane_axes, target_state = None, 
                                target_transition = None, use_virtual_gates = False, 
                                compensate_sensors = False, compute_polytopes = False,
-                               use_sensor_signal = False, v_offset = None):
+                               use_sensor_signal = False, v_offset = None,
+                               insitu_axis = None):
         '''
         Function that renders the capacitance CSD for a given set of voltages and axes.
         ----------------
@@ -392,16 +393,17 @@ class Experiment(): #TODO: change name to the simulator name
             if not use_sensor_signal:
                 return xout,yout, CSD_data.T, polytopes, sensor_values, v_offset
         
+
+        
+
         # Part for the sensor signal:
         self.print_logs = False
         simulator = self.deploy_tunneling_sim(csimulator, self.tunneling_config)
-        sensor_values = simulator.sensor_scan_2D(v_offset, plane_axes.T, minV, maxV, resolution, target_state)
+        sensor_values = simulator.sensor_scan_2D(v_offset, plane_axes.T, minV, maxV, resolution, target_state, insitu_axis)
 
         if compute_polytopes:
             backend, CSD_data, states =  get_CSD_data(csimulator, v_offset, np.array(plane_axes).T, minV, maxV, resolution,
-                                                       target_state)
+                                                    target_state)
             V_offset_polytopes = [np.dot(v_offset,plane_axes[0]), np.dot(v_offset,plane_axes[1])]
-            polytopes = get_polytopes(states, backend, minV, maxV,   V_offset_polytopes)
+            polytopes = get_polytopes(states, backend, minV, maxV,  V_offset_polytopes)
         return xout, yout, CSD_data.T, polytopes, sensor_values, v_offset
-        
-        

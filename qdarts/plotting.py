@@ -141,7 +141,7 @@ def get_polytopes(states, simulation_slice, minV, maxV, V_offset):
 
 def plot_polytopes(ax, polytopes, fontsize = 10, color = "w", 
                    axes_rescale = 1, only_labels = False, only_edges = False,
-                   skip_dots = []
+                   skip_dots = [], alpha = 1
                    ):
     xlim = ax.get_xlim()
     ylim = ax.get_ylim()
@@ -151,7 +151,7 @@ def plot_polytopes(ax, polytopes, fontsize = 10, color = "w",
         hull = ConvexHull(polytopes[polytope])
         if not only_labels:
             for i,simplex in enumerate(hull.simplices):
-                ax.plot(corners[simplex, 0]* axes_rescale , corners[simplex, 1]* axes_rescale , "-", c="w", lw=1)
+                ax.plot(corners[simplex, 0]* axes_rescale , corners[simplex, 1]* axes_rescale , "-", c=color, lw=1, alpha = alpha)
         if not only_edges:
             box_mid  = (np.array(np.min(corners, axis=0)) + np.array(np.max(corners, axis=0)))/2*axes_rescale
             # skip skip_dots entries to polytope
