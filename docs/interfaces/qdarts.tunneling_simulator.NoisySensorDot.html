@@ -50,8 +50,7 @@ parameters.</p>
 <p>The noise can be configured via config_noise. The noise is modeled as an additive
 noise on the sensor peak position in voltage space. Thus, at peaks or valleys, the noise
 is small while on the sides of the peak, where the derivatives are largest, the noise will
-affect measurements the most. No additional sensor noise is modeled and the user can for example
-add white noise on top to model the noise added by the measurements.</p>
+affect measurements the most. Additional signal  noise is then modeled by adding white gaussian noise.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="qdarts.tunneling_simulator.NoisySensorDot.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sensor_dot_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.NoisySensorDot.__init__" title="Link to this definition">¶</a></dt>
@@ -64,7 +63,7 @@ add white noise on top to model the noise added by the measurements.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.NoisySensorDot.__init__" title="qdarts.tunneling_simulator.NoisySensorDot.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(sensor_dot_ids)</p></td>
 <td><p>Initialized a sensor configuration with num_sensors sensor dots</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.NoisySensorDot.config_noise" title="qdarts.tunneling_simulator.NoisySensorDot.config_noise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_noise</span></code></a>(sigma[, slow_noise_gen])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.NoisySensorDot.config_noise" title="qdarts.tunneling_simulator.NoisySensorDot.config_noise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_noise</span></code></a>(sigma, signal_noise_scale[, ...])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#qdarts.tunneling_simulator.NoisySensorDot.config_peak" title="qdarts.tunneling_simulator.NoisySensorDot.config_peak"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_peak</span></code></a>(g_max, peak_width_multiplier)</p></td>
@@ -89,7 +88,7 @@ add white noise on top to model the noise added by the measurements.</p>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="qdarts.tunneling_simulator.NoisySensorDot.config_noise">
-<span class="sig-name descname"><span class="pre">config_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_noise_gen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.NoisySensorDot.config_noise" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">config_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_noise_scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_noise_gen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.NoisySensorDot.config_noise" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

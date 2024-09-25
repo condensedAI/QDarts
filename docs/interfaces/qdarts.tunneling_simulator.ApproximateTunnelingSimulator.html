@@ -221,7 +221,7 @@ for a scan compared to not using caching, but consecutive scans with similar ran
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan_2D">
-<span class="sig-name descname"><span class="pre">sensor_scan_2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minV</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxV</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_hint_lower_left</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan_2D" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sensor_scan_2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minV</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxV</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_hint_lower_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qdarts.tunneling_simulator.ApproximateTunnelingSimulator.sensor_scan_2D" title="Link to this definition">¶</a></dt>
 <dd><p>Computes the sensor signal on a 2D grid of points.</p>
 <p>For the exact computation of points, see sensor_scan.</p>
 <p>The grid is defined the following way: Let w_ij be a 2D vector that is part of a regular
@@ -242,6 +242,8 @@ describes the number of points along each axes of the grid.</p></li>
 <li><p><strong>state_hint_lower_left</strong> (<em>np.array</em><em> of </em><em>int</em>) – Guess for the state n for point described by the grid position minV. The simulator will use this
 guess as a starting point for the search of the correct state if this guess is wrong. Note that P(n)
 must intersect with the affine slice, if slicing was used.</p></li>
+<li><p><strong>cache</strong> (<em>bool</em>) – Whether the simulation should try to cache the computed polytopes. This might lead to a slower computation time
+for a scan compared to not using caching, but consecutive scans with similar ranges tend to be quicker.</p></li>
 </ul>
 </dd>
 </dl>

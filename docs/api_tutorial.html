@@ -37,18 +37,20 @@
 <h1>API Usage Tutorial<a class="headerlink" href="#api-usage-tutorial" title="Link to this heading">¶</a></h1>
 <p>QDarts comes with two API-levels, the <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> class that simplifies many of the most common applications at the cost
 of flexibility. It is build on top of the low-level API, that gives access to the full power of QDarts. It is possile to mix both
-APIs, for example, it is possible, to construct a simulator using the <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> class and then modify it using the low-level API.</p>
+APIs, for example, it is possible to construct a simulator using the <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> class and then modify it using the low-level API.
+In the following, we will explain the low-level API (The usage of the high-level api is described in the ipython notebook located in <code class="docutils literal notranslate"><span class="pre">examples/figures_scipost.ipynb</span></code>
+that also reproduces all figures of our publication).</p>
 <p>The code for this tutorial is provided in the ipython notebook <code class="docutils literal notranslate"><span class="pre">examples/api_tutorial.ipynb</span></code>. To keep the tutorial concise,
 we only include the most important lines here that are needed to create the simulator,
-but we skip definition of capacitance parameters etc. For this, directly reading the tutorials is best.</p>
+but we skip definition of capacitance parameters etc. For this, directly reading the code is best.</p>
 <p>The simulated device is a dcevice with 6 dots, of which three are sensor dots. It is controlled by 9 plunger gates, 1 for each dot and
 three that govern barrier gates between the three dots that are not sensor dots. The device is defined using a set of parameter matrices
-that govern the capacitances between the 9 gates and 6 dots, as well as the affect the 9 gates have on the barrier potential and therefore the tunnel coupling.</p>
+that govern the capacitances between the 9 gates and 6 dots, as well as the effect the 9 gates have on the barrier potential and therefore the tunnel coupling.</p>
 <section id="construction-of-the-capacitive-simulation">
 <h2>Construction of the capacitive simulation<a class="headerlink" href="#construction-of-the-capacitive-simulation" title="Link to this heading">¶</a></h2>
 <p>As first step, we need to initialize the capacitive simulation.
 It depends on a capacitive model, which creates the capacitive energy function and which depends on a number of
-parameters, the capacitanca matrices between plunger gates and dots,  <code class="docutils literal notranslate"><span class="pre">C_DG</span></code>, the interdot capacitances <code class="docutils literal notranslate"><span class="pre">C_DD</span></code>,
+parameters, the capacitanc matrices between plunger gates and dots,  <code class="docutils literal notranslate"><span class="pre">C_DG</span></code>, the interdot capacitances <code class="docutils literal notranslate"><span class="pre">C_DD</span></code>,
 a lower bound on the gate voltages <code class="docutils literal notranslate"><span class="pre">bounds_limits</span></code> and optionaly a parameter <code class="docutils literal notranslate"><span class="pre">ks</span></code> that governs the deviation from the constant interaction
 model and which can be set to <code class="docutils literal notranslate"><span class="pre">None</span></code>. With these parameters, creating the capacitive simulation is straight forward:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qdarts.capacitance_model</span> <span class="kn">import</span> <span class="n">CapacitanceModel</span>
@@ -58,15 +60,16 @@ model and which can be set to <code class="docutils literal notranslate"><span c
 <span class="n">capacitive_sim</span> <span class="o">=</span> <span class="n">CapacitiveDeviceSimulator</span><span class="p">(</span><span class="n">capacitance_model</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The capacitance simulation is purely classical. It can only be used to query the ground state of the electron configuration given a set of gate voltages,
-as well as for each electron configuration the polytope of gate voltages that lead to the ground state configuration. Both features together are enough,
+<p>The capacitance simulation is purely classical and fits to the simulation of typical GaAs spin-qubit devices.
+It can only be used to query the ground state of the electron configuration given a set of gate voltages,
+as well as for each electron configuration the polytope of gate voltages that lead to the ground state configuration. Both features together are enough
 to plot a charge stability diagram and to exactly compute the boundaries of ground states within the diagram.</p>
 </section>
 <section id="plotting-the-charge-stability-diagram">
 <h2>Plotting the Charge Stability Diagram<a class="headerlink" href="#plotting-the-charge-stability-diagram" title="Link to this heading">¶</a></h2>
 <p>For ploting, we have two helper functions. First, <code class="docutils literal notranslate"><span class="pre">get_CSD_states</span></code> computes for a 2D grid of gate voltages the ground state. This is done by computing a standard 2D grid
 that is then transformed into gate-voltage space. This transformation is done via a linear transformation <span class="math notranslate nohighlight">\(v=m+P&#64;v'\)</span>, where v is the full vector of gate plunger voltages,
-in our case 9 values, and and <span class="math notranslate nohighlight">\(m\)</span> and <span class="math notranslate nohighlight">\(P\)</span> are projection parameters, where <span class="math notranslate nohighlight">\(m\)</span> is a 9 dimensional vector and <span class="math notranslate nohighlight">\(P\)</span> a 9x2 matrix.
+in our case 9 values. The variables <span class="math notranslate nohighlight">\(m\)</span> and <span class="math notranslate nohighlight">\(P\)</span> are projection parameters, where <span class="math notranslate nohighlight">\(m\)</span> is a 9 dimensional vector and <span class="math notranslate nohighlight">\(P\)</span> a 9x2 matrix.
 This defines a local 2D coordinate system transformation from the 2D grid <span class="math notranslate nohighlight">\(v'\)</span> to <span class="math notranslate nohighlight">\(v\)</span>. With this, it is possible to create a plot in any two coordinate axes.
 If we pick the grid of <span class="math notranslate nohighlight">\(v'\)</span> values as symmetric around 0, then <span class="math notranslate nohighlight">\(m\)</span> can be interpreted as the midpoint of the scan that we compute next.</p>
 <p>the question is, how we can obtain these values. We can use the capacitive simulation to query points of interest. For example, when we are interested in the scan around
@@ -101,7 +104,9 @@ a different value. Finally, <code class="docutils literal notranslate"><span cla
 <span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span><span class="n">ys</span><span class="p">,</span><span class="n">CSD_data</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The resulting grid is a rastered low resolution image (TODO add image). We can improve on this by plotting the exact boundaries between the two ground states using <code class="docutils literal notranslate"><span class="pre">get_polytopes</span></code> and <code class="docutils literal notranslate"><span class="pre">plot_polytopes</span></code>:</p>
+<p>The resulting grid is a rastered low resolution image.</p>
+<a class="reference internal image-reference" href="_images/api_csd_raster.png"><img alt="_images/api_csd_raster.png" class="align-center" src="_images/api_csd_raster.png" style="width: 297.0px; height: 208.0px;" /></a>
+<p>We can improve on this by plotting the exact boundaries between the two ground states using <code class="docutils literal notranslate"><span class="pre">get_polytopes</span></code> and <code class="docutils literal notranslate"><span class="pre">plot_polytopes</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">polytopes</span> <span class="o">=</span> <span class="n">get_polytopes</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">sliced_csim</span><span class="p">,</span> <span class="n">minV</span><span class="p">,</span> <span class="n">maxV</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">minV</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">maxV</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">minV</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">maxV</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -109,24 +114,39 @@ a different value. Finally, <code class="docutils literal notranslate"><span cla
 </pre></div>
 </div>
 <p>Note that this function computes the polytopes based on the low dimensional sliced simulation returned by <code class="docutils literal notranslate"><span class="pre">get_CSD_data</span></code> as well as its computed array of states. The function also prints the labels
-of each state, and the option <code class="docutils literal notranslate"><span class="pre">skip_dots</span></code> allows to skip the part of the electron configuration we are not interested in. In this case, we skipped the 3 sensor dots.</p>
+of each state, and the option <code class="docutils literal notranslate"><span class="pre">skip_dots</span></code> allows to skip the part of the electron configuration we are not interested in. In this case, we skipped the 3 sensor dots.
+Adding the last two plotting commands together, the resulting plot should look like this:</p>
+<a class="reference internal image-reference" href="_images/api_csd_grid.png"><img alt="_images/api_csd_grid.png" class="align-center" src="_images/api_csd_grid.png" style="width: 298.0px; height: 209.0px;" /></a>
 </section>
 <section id="creation-of-a-tunneling-simulation">
 <h2>Creation of a tunneling simulation<a class="headerlink" href="#creation-of-a-tunneling-simulation" title="Link to this heading">¶</a></h2>
-<p>Now that we are able to generate a CSD, we want to also simulate tunneling and simulate a more realistic sensor signal (todo: explain):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qdarts.tunneling_simulator</span> <span class="kn">import</span> <span class="n">NoisySensorDot</span><span class="p">,</span> <span class="n">ApproximateTunnelingSimulator</span>
-
-<span class="n">sensor_model</span> <span class="o">=</span> <span class="n">NoisySensorDot</span><span class="p">(</span><span class="n">sensor_dots</span><span class="p">)</span> <span class="c1">#a model of the sensor dots that just needs which dot has which index</span>
+<p>Now that we are able to generate a CSD, we want to also simulate tunneling and simulate a more realistic sensor signal.
+For this, we need to create a few objects. First, we have to decide on a sensor simulator. The default choice is the <code class="docutils literal notranslate"><span class="pre">NoisySensorDot</span></code>
+which simulates a sequence of sensor reflectometry peaks on one or more sensor dots:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sensor_model</span> <span class="o">=</span> <span class="n">NoisySensorDot</span><span class="p">(</span><span class="n">sensor_dots</span><span class="p">)</span> <span class="c1">#a model of the sensor dots that just needs which dot has which index</span>
 <span class="n">sensor_model</span><span class="o">.</span><span class="n">config_peak</span><span class="p">(</span><span class="n">g_max</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">peak_width_multiplier</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="c1">#make the sensor peak broader</span>
-<span class="n">tunneling_sim</span> <span class="o">=</span> <span class="n">ApproximateTunnelingSimulator</span><span class="p">(</span><span class="n">capacitive_sim</span><span class="p">,</span> <span class="c1">#the underlying polytope simulation</span>
-                                             <span class="n">tunnel_couplings</span><span class="p">,</span>  <span class="c1">#constant tunnel couplings</span>
-                                             <span class="n">temperature</span><span class="p">,</span> <span class="c1">#device temperature, should be &lt;=100mK</span>
-                                             <span class="n">sensor_model</span><span class="p">)</span> <span class="c1">#our sensor model simulation</span>
-
-<span class="n">capacitive_sim</span><span class="o">.</span><span class="n">set_maximum_polytope_slack</span><span class="p">(</span><span class="mi">5</span><span class="o">/</span><span class="n">tunneling_sim</span><span class="o">.</span><span class="n">beta</span><span class="p">)</span> <span class="c1">#adding slack to keep more states that are likely to affect the hamiltonian</span>
-<span class="n">tunneling_sim</span><span class="o">.</span><span class="n">num_additional_neighbours</span><span class="p">[</span><span class="n">sensor_dots</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1">#adding additional states for the sensor dots</span>
 </pre></div>
 </div>
+<p>The constructor takes the indexes of the dots we want to use as sensor dots and each entry in this list will produce one sensor signal, the quantum capacitance measured
+at the sensor dot. In the next line we add configuration options. <code class="docutils literal notranslate"><span class="pre">g_max</span></code> is just a scaling factor of the signal, which we leave at 1. The default sensor peak is simulated using only the
+temperature of the dot and does not take broadening due to RF power into account. To compensate for this, we introduce a broadening factor that can make the peak wider. in our experience, values between
+5 and 20 work well. There are more options to add here, for example the noise model of the signal, but for this tutorial, we do not add noise to keep it simple. You can check the documentation
+of <code class="docutils literal notranslate"><span class="pre">NoisySensorDot</span></code> for more details on that.</p>
+<p>Now, with our configured sensor dot, we create the simulation using tunnel coupling:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tunneling_sim</span> <span class="o">=</span> <span class="n">ApproximateTunnelingSimulator</span><span class="p">(</span><span class="n">capacitive_sim</span><span class="p">,</span> <span class="c1">#the underlying polytope simulation</span>
+                                             <span class="n">tunnel_couplings</span><span class="p">,</span>  <span class="c1">#symmetric tunnel coupling matrix T_ij which stores the tunnel coupling between dots i and j</span>
+                                             <span class="n">temperature</span><span class="p">,</span> <span class="c1">#electron temperature, should be &lt;=200mK</span>
+                                             <span class="n">sensor_model</span><span class="p">)</span> <span class="c1">#our sensor model simulation</span>
+</pre></div>
+</div>
+<p>The tunneling simulation is very expensive, and by default it tries to minimize the number of basis elements for the computed Hamiltonians by excluding states with energies that are large compared to
+a chosen slack. By default the slack is 0, and thus all states that are not direct neighbours of our polytope (i.e., they do not share a facet) will be excluded. By increasing the slack proportional to
+the inverse temperature, we add more states that might still be relevant for tunneling. Further, the sensor dot simulation relies on the existence of states that add or remove an electron from the sensor dot.
+These can easily be excluded from the simulation and therefore we enfore in the simulation that states with additional electrons added/subtracted on the sensor dot are always present.</p>
+<blockquote>
+<div><p>capacitive_sim.set_maximum_polytope_slack(5/tunneling_sim.beta) #adding slack to keep more states that are likely to affect the hamiltonian
+tunneling_sim.num_additional_neighbours[sensor_dots] = 2 #adding additional states for the sensor dots</p>
+</div></blockquote>
 <p>Finally, we can create a similar plot as before. We use the same values for ´´m´´ and ´´P´´ as for the previous simulation, so that we can compare the two plots.
 Note that since the device has three sensor dots, the output is a 3 dimensional tensor where the last dimension is the number of sensor dots and we plot below only
 the output of the third sensor:</p>
@@ -134,13 +154,18 @@ the output of the third sensor:</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span><span class="n">ys</span><span class="p">,</span><span class="n">sensor_values</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>This plots results in the sensor signal</p>
+<a class="reference internal image-reference" href="_images/api_tunnel_raster.png"><img alt="_images/api_tunnel_raster.png" class="align-center" src="_images/api_tunnel_raster.png" style="width: 297.0px; height: 208.0px;" /></a>
+<p>which again can be overlayed with our grid as before:</p>
+<a class="reference internal image-reference" href="_images/api_tunnel_grid.png"><img alt="_images/api_tunnel_grid.png" class="align-center" src="_images/api_tunnel_grid.png" style="width: 298.0px; height: 209.0px;" /></a>
 </section>
 <section id="slicing-and-sensor-compensation">
 <h2>Slicing and sensor compensation<a class="headerlink" href="#slicing-and-sensor-compensation" title="Link to this heading">¶</a></h2>
-<p>The last plot shos that most of the sensor signal is very low and there is only a small signal with a peak. This is because of the missing sensor compensation: the sensor peak
-is capacitely affected by the plunger gates and thus changing the voltages changes the sensor signal. Since the sensor peak is very small, these changes make it difficult to make out
-the charge stability diagram. What we need is sensor compensation, i.e., a change of coordinate system where the sensor plunger voltage is corrected for the cross-talk from the other gates.
-Moreover, the sensor peak is not centered. This is because we used as mid-point a point inside the polytop, but the sensor peaks are only on the boundaries between polytopes with different number of
+<p>The last plot shows that most of the sensor signal is very low and there is only a small area with a peak. This is because of the missing sensor compensation: the sensor peak
+is capacitely affected by the plunger gates and thus changing the voltages changes the sensor signal. On the previous plot we already configured a wide width of the peak (<code class="docutils literal notranslate"><span class="pre">peak_width_multiplier</span> <span class="pre">=</span> <span class="pre">20`</span></code>) to make
+this effect small, but in reality many devices have very narrow and clear peaks.
+What we need is sensor compensation, i.e., a change of coordinate system where the sensor plunger voltage is corrected for the cross-talk from the other gates so that we stay on the sensor peak as well as possible.
+Moreover, the sensor peak is not centered. This is because we used as mid-point a point inside the polytope, but the sensor peaks are only on the boundaries between polytopes with different number of
 electrons on the sensor dots. Thus, we need to change our coordinate system and tune the sensor to a better point.</p>
 <p>This change of coordinate system is achieved in the simulator via slicing. In the previous examples, we defined a matrix <code class="docutils literal notranslate"><span class="pre">P</span></code> and vector <code class="docutils literal notranslate"><span class="pre">m</span></code> to generate the plot. We said that this changed the coordinate
 system via <span class="math notranslate nohighlight">\(v=m+Pv'\)</span>, where <code class="docutils literal notranslate"><span class="pre">v'</span></code> was a 2D case. This operation is called slicing and a simulation can be sliced via:</p>
@@ -149,20 +174,32 @@ system via <span class="math notranslate nohighlight">\(v=m+Pv'\)</span>, where 
 </div>
 <p>This works on all simulator objects and it returns a new simulation with gate voltages <code class="docutils literal notranslate"><span class="pre">v'</span></code>. This works in any dimensions, not just 2 and it is used in most simulation transformation code.
 QDarts makes use of this in all its transformation code. For example, compensating the sensor dot:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qdarts.simulator</span> <span class="kn">import</span> <span class="n">compensate_simulator_sensors</span>
-
-<span class="n">compensated_tsim</span><span class="p">,</span> <span class="n">compensation_transform</span> <span class="o">=</span> <span class="n">compensate_simulator_sensors</span><span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compensated_tsim</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span><span class="n">m_comp</span> <span class="o">=</span> <span class="n">compensate_simulator_sensors</span><span class="p">(</span>
     <span class="n">tunneling_sim</span><span class="p">,</span> <span class="c1">#the simulator object to compensate</span>
-    <span class="n">target_state</span><span class="o">=</span><span class="n">target_state</span><span class="p">,</span> <span class="c1">#the electron configuration around which to compensate</span>
-    <span class="n">compensation_gates</span><span class="o">=</span> <span class="n">sensor_plungers</span><span class="p">,</span> <span class="c1">#the ids of the sensor gate plungers. Here: [6,7,8]</span>
-    <span class="n">sensor_ids</span> <span class="o">=</span> <span class="n">sensor_dots</span><span class="p">,</span><span class="c1">#the ids of the sensor dots. Here: [3,4,5],</span>
-    <span class="n">sensor_detunings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.005</span><span class="p">,</span><span class="o">-</span><span class="mf">0.005</span><span class="p">,</span><span class="o">-</span><span class="mf">0.005</span><span class="p">])</span> <span class="c1">#shift of the sensor dot plungers</span>
+    <span class="n">target_state</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="c1">#the electron configuration around which to compensate</span>
+    <span class="n">compensation_gates</span><span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">],</span> <span class="c1">#the ids of the sensor gate plungers.</span>
+    <span class="n">sensor_ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span><span class="c1">#the ids of the sensor dots.</span>
+    <span class="n">sensor_detunings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.0005</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0005</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0005</span><span class="p">])</span> <span class="c1">#shift of the sensor dot plungers</span>
 <span class="p">)</span>
-<span class="n">m_comp</span> <span class="o">=</span> <span class="n">compensation_transform</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
-<span class="n">sensor_values</span> <span class="o">=</span> <span class="n">compensated_tsim</span><span class="o">.</span><span class="n">sensor_scan_2D</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">m_comp</span><span class="p">,</span> <span class="n">minV</span><span class="p">,</span> <span class="n">maxV</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">target_state</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span><span class="n">ys</span><span class="p">,</span><span class="n">sensor_values</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>This function returns the sensor compensated simulator object, which has its gates transformed such, that changing the gate voltages of any gate plunger other the sensor dot plungers does not change the
+chemical potential of the sensor dot and thus leaves the sensor signal constant, except when a transition happens. This function relies on the user to supply the ids of the sensor dots and which elements of the voltage
+vector are the sensor plungers (for example, the sensor dot with id 3 has plunger 6 as its plunger gate). Since in our model the capacitance parameters of the model vary with the occupation number, we have to
+indicate the target state. Further, we have to supply a vector of sensor detunings that indicate on which position we are on the snesor detuning axis, i.e., the sensor peak. This value is relative to the peak maximum,
+a value of 0 will return the exact peak max, which is a value that is typically avoided in practice due to the low signal to noise ratio. Additional to the sensor compensation object, the function returns also as third
+return value the exact tuning point, i.e., the voltage vector that identifies the flank point for the given state. We can use this to plot a 2D charge stability diagram with the returned point as its center.
+We also show in the point below how to query the internal modified capacitance simulator using <code class="docutils literal notranslate"><span class="pre">compensated_tsim.poly_sim</span></code> in order to compute the state boundaries:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sensor_values</span> <span class="o">=</span> <span class="n">compensated_tsim</span><span class="o">.</span><span class="n">sensor_scan_2D</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">m_comp</span><span class="p">,</span> <span class="n">minV</span><span class="p">,</span> <span class="n">maxV</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">target_state</span><span class="p">)</span>
+<span class="n">sliced_tsim</span><span class="p">,</span> <span class="n">CSD_data</span><span class="p">,</span> <span class="n">states</span> <span class="o">=</span>  <span class="n">get_CSD_data</span><span class="p">(</span><span class="n">compensated_tsim</span><span class="o">.</span><span class="n">poly_sim</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span><span class="n">m_comp</span><span class="p">,</span>  <span class="n">minV</span><span class="p">,</span> <span class="n">maxV</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">target_state</span><span class="p">)</span>
+<span class="n">polytopes</span> <span class="o">=</span> <span class="n">get_polytopes</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">sliced_tsim</span><span class="p">,</span> <span class="n">minV</span><span class="p">,</span> <span class="n">maxV</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Plotting the computed <code class="docutils literal notranslate"><span class="pre">`sensor_values</span></code> and <code class="docutils literal notranslate"><span class="pre">polytopes</span></code> as before, leads to</p>
+<a class="reference internal image-reference" href="_images/api_tunnel_comp.png"><img alt="_images/api_tunnel_comp.png" class="align-center" src="_images/api_tunnel_comp.png" style="width: 298.0px; height: 209.0px;" /></a>
+<p>As you can see, the sensors are almost perfectly compensated, leading to almost perfectly flat polytopes with no visible shape of a sensor peak. The [1,1,1] state indicates a color in the middle of the peak
+and we can see how single electron transitions change the position on the peak due to the change of color on the polytopes. It is similarly possible to compensate any other gates and thus to compute virtual coordinates,
+for this we refer to the documentation of <code class="docutils literal notranslate"><span class="pre">axis_align_transitions</span></code>.</p>
 </section>
 </section>
 
