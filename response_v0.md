@@ -96,3 +96,6 @@ $$
 P_\mathbf{n}(\mathbf{v}) = \frac{1}{2} \left(1 - \frac{\epsilon_{\mathbf{n}\mathbf{m}}(\mathbf{v})}{\sqrt{\epsilon_{\mathbf{n}\mathbf{m}}(\mathbf{v})^2 + 4t_{\mathbf{n}\mathbf{m}}^2(\mathbf{v})}}\right)
 $$
 Intuitively we assume the signal is proportional to the change in quantum capacitance, caused by motion of the electron between the dots induced by the modulation of the gate voltages. At this point, we have not included the other effects contributing to in-situ signal including sisyphus resistance and tunneling capacitance, however their contribution is expected to be relatively weaker [Vigneau et al. (2023)].
+
+Below we are attaching the signal produced by the current version of insitu reflectometry code, for the example of the two dots system:
+![alt text](image.png)
