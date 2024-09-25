@@ -468,5 +468,5 @@ def compensate_simulator_sensors(simulator, target_state, compensation_gates, se
     P_inv = np.linalg.inv(P)
     def compensation_transform(v):
         #find the linear transformation such, that v is mapped on v_detuned
-        return P_inv@(v-v_zero)-v_detuning
-    return simulator.slice(P, v_zero,True), compensation_transform, P_inv@(v_detuned-v_zero)
+        return P_inv@(v-v_zero-v_detuning)
+    return simulator.slice(P, v_zero,True), compensation_transform, compensation_transform(v)
