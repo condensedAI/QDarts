@@ -76,11 +76,7 @@ class Experiment(): #TODO: change name to the simulator name
         self.inner_dots = list(np.arange(self.N))  #indces of the dots. NOTE: no sensor at this point   
         
         if self.print_logs:
-<<<<<<< HEAD:src/qdarts/experiment.py
             if not config["ks"] is None:
-=======
-            if config["ks"] is not None:
->>>>>>> origin/review:qdarts/experiment.py
                 # Print log of capacitance parameters
                 log = """
                 Capacitance model deployed with the following parameters:
