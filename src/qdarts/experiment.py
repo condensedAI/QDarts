@@ -76,7 +76,11 @@ class Experiment(): #TODO: change name to the simulator name
         self.inner_dots = list(np.arange(self.N))  #indces of the dots. NOTE: no sensor at this point   
         
         if self.print_logs:
+<<<<<<< HEAD:src/qdarts/experiment.py
             if not config["ks"] is None:
+=======
+            if config["ks"] is not None:
+>>>>>>> origin/review:qdarts/experiment.py
                 # Print log of capacitance parameters
                 log = """
                 Capacitance model deployed with the following parameters:
@@ -362,7 +366,8 @@ class Experiment(): #TODO: change name to the simulator name
     def generate_CSD(self, x_voltages, y_voltages, plane_axes, target_state = None, 
                                target_transition = None, use_virtual_gates = False, 
                                compensate_sensors = False, compute_polytopes = False,
-                               use_sensor_signal = False, v_offset = None):
+                               use_sensor_signal = False, v_offset = None,
+                               insitu_axis = None):
         '''
         Function that renders the capacitance CSD for a given set of voltages and axes.
         
@@ -427,11 +432,17 @@ class Experiment(): #TODO: change name to the simulator name
             polytopes = get_polytopes(states, backend, minV, maxV)
                 
         
-        # Part for the sensor signal:
-        sensor_values = None
-        if use_sensor_signal:
-            sensor_values = simulator.sensor_scan_2D(plane_axes, v_offset, minV, maxV, resolution, target_state)
 
-        return xout, yout, CSD_data, polytopes, sensor_values, v_offset
         
-        
+
+        # Part for the sensor signal:
+        self.print_logs = False
+        simulator = self.deploy_tunneling_sim(csimulator, self.tunneling_config)
+        sensor_values = simulator.sensor_scan_2D(v_offset, plane_axes.T, minV, maxV, resolution, target_state, insitu_axis)
+
+        if compute_polytopes:
+            backend, CSD_data, states =  get_CSD_data(csimulator, v_offset, np.array(plane_axes).T, minV, maxV, resolution,
+                                                    target_state)
+            V_offset_polytopes = [np.dot(v_offset,plane_axes[0]), np.dot(v_offset,plane_axes[1])]
+            polytopes = get_polytopes(states, backend, minV, maxV,  V_offset_polytopes)
+        return xout, yout, CSD_data.T, polytopes, sensor_values, v_offset
