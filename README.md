@@ -17,7 +17,7 @@ The package supports Python 3.6 and later. To install the package, run the follo
     pip install qdarts
 
 ## Manuscript
-The package is based on the manuscript by [Krzywda et al., QDarts: A Quantum Dot Array Transition Simulator for finding charge transitions in the presence of finite tunnel couplings, non-constant charging energies and sensor dots](https://arxiv.org/abs/2404.02064). The manuscript has been submitted to the SciPost Physics Codebases.
+The package is based on the manuscript by [Krzywda et al., QDarts: A Quantum Dot Array Transition Simulator for finding charge transitions in the presence of finite tunnel couplings, non-constant charging energies and sensor dots](). The manuscript has been submitted to the SciPost Physics Codebases.
 
 ## Examples
 The package provides a simple example to demonstrate the usage of the package. The example is available in the examples qatpack/examples folder. The example demonstrates the simulation of a quantum dot array with sensor dots, tunnel couplings, and non-constant charging energy. 
