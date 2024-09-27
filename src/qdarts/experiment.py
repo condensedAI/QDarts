@@ -362,7 +362,7 @@ class Experiment(): #TODO: change name to the simulator name
     def generate_CSD(self, x_voltages, y_voltages, plane_axes, target_state = None, 
                                target_transition = None, use_virtual_gates = False, 
                                compensate_sensors = False, compute_polytopes = False,
-                               use_sensor_signal = False, v_offset = None):
+                               use_sensor_signal = False, v_offset = None, insitu_axis = None):
         '''
         Function that renders the capacitance CSD for a given set of voltages and axes.
         
@@ -430,7 +430,7 @@ class Experiment(): #TODO: change name to the simulator name
         # Part for the sensor signal:
         sensor_values = None
         if use_sensor_signal:
-            sensor_values = simulator.sensor_scan_2D(plane_axes, v_offset, minV, maxV, resolution, target_state)
+            sensor_values = simulator.sensor_scan_2D(plane_axes, v_offset, minV, maxV, resolution, target_state,insitu_axis=insitu_axis)
 
         return xout, yout, CSD_data, polytopes, sensor_values, v_offset
         

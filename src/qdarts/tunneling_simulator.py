@@ -670,6 +670,19 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
         else:
             t_term = ((tunnel_matrix.reshape(-1)[TOp.reshape(-1)]).reshape(N,N))*TOpW
             return np.diag(energy_diff)-t_term
+        
+
+    def get_displacement(self, H, dH):
+        """ Computes the displacement of the ground state"""
+        ind0 = np.argsort(np.diag(H))[:2]
+        tc = H[ind0[0],ind0[1]]
+        eps = H[ind0[0],ind0[0]] - H[ind0[1],ind0[1]]
+
+        dind0 = np.argsort(np.diag(dH))[:2]
+        dtc = dH[dind0[0],dind0[1]]
+        deps = dH[dind0[0],dind0[0]] - dH[dind0[1],dind0[1]]
+
+        return deps/np.sqrt(dtc**2 + deps**2) - eps/np.sqrt(tc**2 + eps**2)
     
     def compute_local_system(self, v, state, search_ground_state = True):
         """ Computes a full description of the local quantum system and returns the LocalSystem object.
@@ -698,7 +711,9 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
         H = self._create_hamiltonian(v, extended_polytope.A, extended_polytope.b, extended_polytope.TOp, extended_polytope.TOpW)
         system = LocalSystem(v, H, state, self)
         return system
-    def sensor_scan(self, v_start, v_end, resolution, v_start_state_hint, cache=True, start_new_measurement=True):
+    
+
+    def sensor_scan(self, v_start, v_end, resolution, v_start_state_hint, cache=True, start_new_measurement=True, insitu_axis = None):
         """ Computes a 1D sensor ramp scan.
         
         Computes a linear set of points between v_start and v_end and for each point computes the sensor signal.
@@ -722,6 +737,8 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
             for a scan compared to not using caching, but consecutive scans with similar ranges tend to be quicker.
         start_new_measurement: bool
             Whether the seimulated sensor measurement should be independent of any previous measurements.
+        insitu_axis: list or None
+            The axis along which the modulated signal is applied, insitu_axis @ plane_axes. If none, the code uses standard sensor dot approach. If a list it computes changes in quantum capacitance
         """
         #prepare start state
         state = self.poly_sim.find_state_of_voltage(v_start, state_hint = v_start_state_hint)
@@ -734,7 +751,11 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
         
         if start_new_measurement:
             sim_slice.sensor_sim.start_measurement()
-        values = np.zeros((resolution, self.sensor_sim.num_sensors))
+        
+        if insitu_axis is None:
+            values = np.zeros((resolution, self.sensor_sim.num_sensors))
+        else:
+            values = np.zeros((resolution,1))
         for i,v0 in enumerate(np.linspace([0.0],[1.0], resolution)):
             if cache:
                 v = v0
@@ -744,10 +765,17 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
                 state = sim_slice.poly_sim.find_state_of_voltage(v,state_hint=state)
             
             system = sim_slice.compute_local_system(v, state, search_ground_state = False)
-            values[i] = system.sample_sensor_equilibrium()
+            if insitu_axis is None:
+                values[i] = system.sample_sensor_equilibrium()
+            else:
+                # inisitu reflecometry
+                dv = 0.0001
+                system2 = sim_slice.compute_local_system(np.array(v)+dv*np.array(insitu_axis), state, search_ground_state = False)
+                a =  sim_slice.get_displacement(system.H, system2.H)
+                values[i] = a
         return values
         
-    def sensor_scan_2D(self, P, m, minV, maxV, resolution, state_hint_lower_left,cache=True):
+    def sensor_scan_2D(self, P, m, minV, maxV, resolution, state_hint_lower_left,cache=True, insitu_axis = None):
         """ Computes the sensor signal on a 2D grid of points.
         
         For the exact computation of points, see sensor_scan.
@@ -781,6 +809,8 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
         cache: bool
             Whether the simulation should try to cache the computed polytopes. This might lead to a slower computation time
             for a scan compared to not using caching, but consecutive scans with similar ranges tend to be quicker.
+        insitu_axis: list or None
+            The axis along which the modulated signal is applied. If none, the code uses standard sensor dot approach. If a list it computes changes in quantum capacitance.
         """
         if P.shape[1] != 2:
             raise ValueError("P must have two columns")
@@ -789,15 +819,26 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
         
         #obtain initial guess for state
         line_start = self.poly_sim.find_state_of_voltage(m+P@minV, state_hint = state_hint_lower_left)
-        
+
+
         #now slice down to 2D for efficiency
         sim_slice = self.slice(P, m, proxy=cache)
+        if insitu_axis is None:
+            sim_slice.sensor_sim.start_measurement()
+            values=np.zeros((resolution[0],resolution[1], self.sensor_sim.num_sensors))
+            
         
-        sim_slice.sensor_sim.start_measurement()
-        values=np.zeros((resolution[0],resolution[1], self.sensor_sim.num_sensors))
+        else:
+            values=np.zeros((resolution[0],resolution[1],1))        
+
+        
+        
         for i,v2 in enumerate(np.linspace(minV[1],maxV[1],resolution[1])):
             v_start = np.array([minV[0],v2])
             v_end = np.array([maxV[0],v2])
             line_start = sim_slice.poly_sim.find_state_of_voltage(v_start, state_hint = line_start)
-            values[i] = sim_slice.sensor_scan(v_start, v_end, resolution[0], line_start, cache=True, start_new_measurement=False)
+            values[i] = sim_slice.sensor_scan(v_start, v_end, resolution[0], line_start, cache=False, start_new_measurement=False, insitu_axis=insitu_axis)  #changed cache to False?
         return values
+    
+
+    
