@@ -222,8 +222,7 @@ class AbstractCapacitanceModel(metaclass=ABCMeta):
             transition_slacks.append(slacks[keep])
             states.append(state_list[keep])
 
-        # TODO: this code is currently untested and might break.
-        # Keep iterating over the list, merging facets, until they are all merged
+        # TODO: this doesn't work ... max_slacks is not initiated
         while len(As) > 1:
             # Take the next set of As, bs and states, and merge them into a new set
             A = np.vstack(As[:2])

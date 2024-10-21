@@ -165,27 +165,25 @@ class NoisySensorDot(AbstractSensorSim):
         sliced_sensor_dot.slow_noise_gen = self.slow_noise_gen.slice(P, m)
         return sliced_sensor_dot
 
-    def precompute_sensor_state(self, state, A, b, labels):
+    def precompute_sensor_state(self, labels):
         sensor_state = {}
         for i, sensor_id in enumerate(self.sensor_dot_ids):
             labels_nosens = np.delete(labels, sensor_id, axis=1)
-            labels_unique, inverse_index = np.unique(
-                labels_nosens, return_inverse=True, axis=0
-            )
+            _, inverse_index = np.unique(labels_nosens, return_inverse=True, axis=0)
 
             labels_sens = labels[:, sensor_id]
             sorted_ind = np.lexsort((labels_sens, inverse_index))
 
             relevant_label_indices = []
             prev = []
-            next = []
+            nex = []
             cur = -1
             last = None
             last_2 = None
             for ind in sorted_ind:
-                l = labels_nosens[ind]
-                if np.any(l != cur):
-                    cur = l
+                label = labels_nosens[ind]
+                if np.any(label != cur):
+                    cur = label
                     last = None
                     last_2 = None
                 else:
@@ -197,9 +195,9 @@ class NoisySensorDot(AbstractSensorSim):
                     last = ind
             terms = np.array(relevant_label_indices, dtype=int)
             prev = np.array(prev, dtype=int)
-            next = np.array(next, dtype=int)
+            nex = np.array(nex, dtype=int)
             terms_labels = labels[terms, :]
-            sensor_state[sensor_id] = (terms, prev, next, terms_labels)
+            sensor_state[sensor_id] = (terms, prev, nex, terms_labels)
         return sensor_state
 
     def _precompute_g(self, v, H, sensor_state, beta):
@@ -263,7 +261,10 @@ class NoisySensorDot(AbstractSensorSim):
             label_pos = find_label(terms_labels, sampled_configuration)
             results[i] = gs[sensor_id][label_pos]
         scale = (
-            self.g_max * self.signal_noise_scale * 4 / np.sqrt(2 * np.pi * var_logistic)
+            self.g_max
+            * self.signal_noise_scale
+            * 4
+            / np.sqrt(2 * np.pi * self.var_logistic)
         )
         results += scale * np.random.randn(len(results))
         return results
@@ -419,7 +420,7 @@ class LocalSystem:
 
     @property
     def basis_labels(self):
-        """The labels of the basis elements, indentified by their ground state electron configuration"""
+        """The labels of the basis elements, identified by their ground state electron configuration"""
         return (
             self._sim.boundaries(self.state).additional_info["extended_polytope"].labels
         )
@@ -703,7 +704,7 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
             A, b = self.poly_sim.compute_transition_equations(state_list, state)
 
             TOp, TOpW = self._compute_tunneling_op(state_list)
-            extended_polytope = status = type("", (object,), {})()
+            extended_polytope = type("", (object,), {})()
             extended_polytope.A = A
             extended_polytope.b = b
             extended_polytope.TOp = TOp
@@ -728,7 +729,7 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
             return np.diag(energy_diff)
         else:
             t_term = ((tunnel_matrix.reshape(-1)[TOp.reshape(-1)]).reshape(N, N)) * TOpW
-            return np.diag(energy_diff) - t_term
+            return diags - t_term
 
     def get_displacement(self, H, dH):
         """Computes the displacement of the ground state"""

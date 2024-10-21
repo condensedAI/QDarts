@@ -309,7 +309,7 @@ class AbstractCapacitiveDeviceSimulator(AbstractPolytopeSimulator):
             if self.inside_state(v_intersect, transition_state):
                 return transition_state, v_intersect
         if not self.inside_state(v_intersect, transition_state):
-            if deep_search == False:
+            if not (deep_search):
                 print(old_v, new_v, state)
                 raise LookupError()
 
@@ -397,7 +397,7 @@ class CapacitiveDeviceSimulator(AbstractCapacitiveDeviceSimulator):
         if proxy is None:
             proxy = is_invertible
 
-        if proxy == True:
+        if proxy:
             sliced_proxy = CapacitiveDeviceSimulatorProxy(self, P, m)
             return sliced_proxy
         else:
@@ -455,7 +455,7 @@ class CapacitiveDeviceSimulatorProxy(AbstractCapacitiveDeviceSimulator):
         if proxy is None:
             proxy = True
 
-        if proxy == True:
+        if proxy:
             return CapacitiveDeviceSimulatorProxy(self, P, m)
         else:
             new_P = self.P @ P

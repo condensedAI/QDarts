@@ -1,6 +1,18 @@
-from qdarts.simulator import *
-from qdarts.tunneling_simulator import *
+from qdarts.simulator import CapacitiveDeviceSimulator
+from qdarts.tunneling_simulator import (
+    TunnelBarrierModel,
+    ApproximateTunnelingSimulator,
+    NoisySensorDot,
+)
 from qdarts.noise_processes import OU_process, Cosine_Mean_Function
+from qdarts.capacitance_model import CapacitanceModel
+from qdarts.util_functions import (
+    find_point_on_transitions,
+    fix_gates,
+    find_label,
+    compensate_simulator_sensors,
+    axis_align_transitions,
+)
 
 # for the algorithm
 import numpy as np
@@ -49,15 +61,15 @@ class Experiment:  # TODO: change name to the simulator name
         self.has_sensors = False
 
         # Check requirements for sensor and tunneling configurations
-        if tunneling_config != None and sensor_config == None:
+        if tunneling_config is not None and sensor_config is None:
             raise ValueError(
                 "Specifying a tunneling configuration also requires a sensor configuration."
             )
-        if tunneling_config == None and sensor_config != None:
+        if tunneling_config is None and sensor_config is not None:
             raise ValueError(
                 "Specifying a sensor configuration also requires a tunneling configuration."
             )
-        if tunneling_config != None:
+        if tunneling_config is not None:
             self.sensor_model = self.deploy_sensor_model(sensor_config)
             self.tunneling_sim = self.deploy_tunneling_sim(
                 self.capacitance_sim, tunneling_config
@@ -87,7 +99,7 @@ class Experiment:  # TODO: change name to the simulator name
         self.N = len(config["C_Dg"])  # number of dots
         self.inner_dots = list(
             np.arange(self.N)
-        )  # indces of the dots. NOTE: no sensor at this point
+        )  # indices of the dots. NOTE: no sensor at this point
 
         if self.print_logs:
             if config["ks"] is not None:
