@@ -116,7 +116,7 @@ class NoisySensorDot(AbstractSensorSim):
     and a slow noise source that models time dependent noise between different invocations
     of the sensor.
 
-    The shape of the simulated sensor peak can be configured via config_peak, in which
+    The shape of the simulated sensor peak can be configured ´via config_peak, in which
     height and with of the peak can be adapted. Currently, all sensor dots share these
     parameters.
 
@@ -134,7 +134,6 @@ class NoisySensorDot(AbstractSensorSim):
         self.peak_width_multiplier = 1
         self.slow_noise_gen = None
         self.signal_noise_scale = 0.0
-        self.var_logistic = 0.0
 
     def config_noise(self, sigma, signal_noise_scale, slow_noise_gen=None):
         self.fast_noise_var = sigma**2
@@ -165,11 +164,13 @@ class NoisySensorDot(AbstractSensorSim):
         sliced_sensor_dot.slow_noise_gen = self.slow_noise_gen.slice(P, m)
         return sliced_sensor_dot
 
-    def precompute_sensor_state(self, labels):
+    def precompute_sensor_state(self, state, A, b, labels):
         sensor_state = {}
         for i, sensor_id in enumerate(self.sensor_dot_ids):
             labels_nosens = np.delete(labels, sensor_id, axis=1)
-            _, inverse_index = np.unique(labels_nosens, return_inverse=True, axis=0)
+            labels_unique, inverse_index = np.unique(
+                labels_nosens, return_inverse=True, axis=0
+            )
 
             labels_sens = labels[:, sensor_id]
             sorted_ind = np.lexsort((labels_sens, inverse_index))
@@ -190,7 +191,7 @@ class NoisySensorDot(AbstractSensorSim):
                     if last_2 is not None:
                         relevant_label_indices.append(last)
                         prev.append(last_2)
-                        next.append(ind)
+                        nex.append(ind)
                     last_2 = last
                     last = ind
             terms = np.array(relevant_label_indices, dtype=int)
@@ -253,18 +254,15 @@ class NoisySensorDot(AbstractSensorSim):
     ):
         results = np.zeros(len(self.sensor_dot_ids))
         gs = self._precompute_g(v, H, sensor_state, beta)
-
         for i, sensor_id in enumerate(self.sensor_dot_ids):
             terms, neighbour_prev, neighbour_next, terms_labels = sensor_state[
                 sensor_id
             ]
             label_pos = find_label(terms_labels, sampled_configuration)
             results[i] = gs[sensor_id][label_pos]
+        var_logistic = (1 / 0.631 * self.peak_width_multiplier) ** 2
         scale = (
-            self.g_max
-            * self.signal_noise_scale
-            * 4
-            / np.sqrt(2 * np.pi * self.var_logistic)
+            self.g_max * self.signal_noise_scale * 4 / np.sqrt(2 * np.pi * var_logistic)
         )
         results += scale * np.random.randn(len(results))
         return results
@@ -420,7 +418,7 @@ class LocalSystem:
 
     @property
     def basis_labels(self):
-        """The labels of the basis elements, identified by their ground state electron configuration"""
+        """The labels of the basis elements, indentified by their ground state electron configuration"""
         return (
             self._sim.boundaries(self.state).additional_info["extended_polytope"].labels
         )
