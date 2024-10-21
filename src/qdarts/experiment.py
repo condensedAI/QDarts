@@ -68,7 +68,11 @@ class Experiment(): #TODO: change name to the simulator name
         -------
         sim: CapacitiveDeviceSimulator object
         '''
-        capacitance_model = CapacitanceModel(config["C_Dg"], config["C_DD"], -1, ks= config["ks"])
+        if not "lower_bound" in config.keys():
+            lower_bound = -1.0
+        else:
+            lower_bound = config["lower_bound"]
+        capacitance_model = CapacitanceModel(config["C_Dg"], config["C_DD"], lower_bound, ks= config["ks"])
         sim = CapacitiveDeviceSimulator(capacitance_model)     
         
         #Save the parameters
