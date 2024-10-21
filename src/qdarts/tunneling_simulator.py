@@ -147,7 +147,7 @@ class NoisySensorDot(AbstractSensorSim):
         self.peak_width_multiplier = peak_width_multiplier
 
     def start_measurement(self):
-        if not self.slow_noise_gen is None:
+        if self.slow_noise_gen is not None:
             self.slow_noise_gen.start_sequence()
 
     def slice(self, P, m):
@@ -177,35 +177,35 @@ class NoisySensorDot(AbstractSensorSim):
 
             relevant_label_indices = []
             prev = []
-            next = []
+            nex = []
             cur = -1
             last = None
             last_2 = None
             for ind in sorted_ind:
-                l = labels_nosens[ind]
-                if np.any(l != cur):
-                    cur = l
+                lab = labels_nosens[ind]
+                if np.any(lab != cur):
+                    cur = lab
                     last = None
                     last_2 = None
                 else:
-                    if not last_2 is None:
+                    if last_2 is not None:
                         relevant_label_indices.append(last)
                         prev.append(last_2)
-                        next.append(ind)
+                        nex.append(ind)
                     last_2 = last
                     last = ind
             terms = np.array(relevant_label_indices, dtype=int)
             prev = np.array(prev, dtype=int)
-            next = np.array(next, dtype=int)
+            nex = np.array(nex, dtype=int)
             terms_labels = labels[terms, :]
-            sensor_state[sensor_id] = (terms, prev, next, terms_labels)
+            sensor_state[sensor_id] = (terms, prev, nex, terms_labels)
         return sensor_state
 
     def _precompute_g(self, v, H, sensor_state, beta):
         results = np.zeros(len(self.sensor_dot_ids))
         gs = {}
         slow_noise = np.zeros((results.shape[0], 1))
-        if not self.slow_noise_gen is None:
+        if self.slow_noise_gen is not None:
             slow_noise = self.slow_noise_gen(v)
         for i, sensor_id in enumerate(self.sensor_dot_ids):
             terms, neighbour_prev, neighbour_next, _ = sensor_state[sensor_id]
@@ -224,11 +224,12 @@ class NoisySensorDot(AbstractSensorSim):
             # we approximate the logistic peak of g with the peak of a normal distribution of same width
             # todo: we can fully go back to the logistic peak
             var_logistic = (1 / 0.631 * self.peak_width_multiplier) ** 2
-            norm_pdf = (
-                lambda x, mu, var: 1
-                / np.sqrt(2 * np.pi * var)
-                * np.exp(-((x - mu) ** 2) / (2 * var))
-            )
+
+            def norm_pdf(x, mu, var):
+                return (
+                    1 / np.sqrt(2 * np.pi * var) * np.exp(-((x - mu) ** 2) / (2 * var))
+                )
+
             gs[sensor_id] = self.g_max * 4 * norm_pdf(0, eps, var_logistic)
         return gs
 
@@ -248,6 +249,7 @@ class NoisySensorDot(AbstractSensorSim):
         results += scale * np.random.randn(len(results))
         return results
 
+    # TODO: This function is identical to the previous one ?
     def sample_sensor_configuration(
         self, sampled_configuration, v, H, mixed_state, sensor_state, beta
     ):
@@ -260,6 +262,7 @@ class NoisySensorDot(AbstractSensorSim):
             ]
             label_pos = find_label(terms_labels, sampled_configuration)
             results[i] = gs[sensor_id][label_pos]
+        var_logistic = (1 / 0.631 * self.peak_width_multiplier) ** 2
         scale = (
             self.g_max * self.signal_noise_scale * 4 / np.sqrt(2 * np.pi * var_logistic)
         )
@@ -691,7 +694,7 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
         state = np.asarray(state)
         polytope = self.poly_sim.boundaries(state)
         # cache features_out info in polytope structure
-        if not "extended_polytope" in polytope.additional_info.keys():
+        if "extended_polytope" not in polytope.additional_info.keys():
             # create a list of all neighbour states of interest for use in the Hamiltonian
             state_list, polytope_base_indx = self._create_state_list(
                 state, polytope.labels
@@ -701,7 +704,7 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
             A, b = self.poly_sim.compute_transition_equations(state_list, state)
 
             TOp, TOpW = self._compute_tunneling_op(state_list)
-            extended_polytope = status = type("", (object,), {})()
+            extended_polytope = type("", (object,), {})()
             extended_polytope.A = A
             extended_polytope.b = b
             extended_polytope.TOp = TOp
@@ -721,7 +724,6 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
         tunnel_matrix = self.barrier_sim.get_tunnel_matrix(v)
         N = A.shape[0]
         energy_diff = -(A @ v + b)
-        diags = np.sort(energy_diff)
         if tunnel_matrix is None:
             return np.diag(energy_diff)
         else:
