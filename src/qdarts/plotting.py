@@ -2,6 +2,7 @@ import numpy as np
 from scipy.spatial import HalfspaceIntersection, ConvexHull
 from scipy.optimize import linprog
 from qdarts.util_functions import is_sequence
+from tqdm import tqdm
 
 
 def find_feasible_point(halfspaces):
@@ -79,6 +80,8 @@ def raster_CSD_states(
     line_start = simulation.find_state_of_voltage(
         v_0 + P @ np.array([minV[0], minV[1]]), state_hint_lower_right
     )
+    pbar = tqdm(total=np.prod(resolution), desc="Rastering CSD")
+    # TODO: this is terrible in terms of performance
     for i, v1 in enumerate(np.linspace(minV[0], maxV[0], resolution[0])):
         state = line_start
         for j, v2 in enumerate(np.linspace(minV[1], maxV[1], resolution[1])):
@@ -89,6 +92,7 @@ def raster_CSD_states(
             if j == 0:
                 line_start = state
             states[i, j] = state
+            pbar.update(1)
     return states
 
 
@@ -103,21 +107,31 @@ def get_CSD_data(
     pixel of the rastered plot.
 
     By default, a background image is plotted
-    which is based on the charge onfiguration at a position. This is overlayed with a line plot indicating the
+    which is based on the charge configuration at a position. This is overlaid with a line plot indicating the
     exact transition points between states. Optionally each region is labelled using the exact electron state.
 
     Parameters
     ----------
-    simulation: the device simulation to raster
-    ax: matplotlib axis object to plot into
-    v_0: the origin of the coordinate system to plot.
-    P: coordinate system. A nx2 axis where n is the number of gates in simulation.
-    lower_left: minimum value in x for both axes
-    upper_right: maximum value of x in both axes
-    resolution: number of sampled points in each direction of x. either single number or one per axis.
-    state_hint_lower_left: starting point to guess the initial state of the lower left corner. must not be empty within sim.
-    draw_labels: whether to draw the label of the state in a region
-    draw_background: whether to draw a color map of the states of the CSD.
+        simulation:
+            the device simulation to raster
+        ax:
+            matplotlib axis object to plot into
+        v_0:
+            the origin of the coordinate system to plot.
+        P:
+            coordinate system. A nx2 axis where n is the number of gates in simulation.
+        lower_left:
+            minimum value in x for both axes
+        upper_right:
+            maximum value of x in both axes
+        resolution:
+            number of sampled points in each direction of x. either single number or one per axis.
+        state_hint_lower_left:
+            starting point to guess the initial state of the lower left corner. must not be empty within sim.
+        draw_labels:
+            whether to draw the label of the state in a region
+        draw_background:
+            whether to draw a color map of the states of the CSD.
     """
     minV = np.array(lower_left)
     maxV = np.array(upper_right)
@@ -221,34 +235,3 @@ def plot_polytopes(
                     va="center",
                     fontsize=fontsize,
                 )
-
-
-"""
-def get_polytopes(states, simulation_slice, minV, maxV):
-    #iterate over the list of different states and plot their sliced polytope
-    draw_labels = True
-    states = [tuple(s) for s in states.reshape(-1,simulation_slice.num_dots).tolist()]
-    state_list = set(states)
-    polytope_list = []
-    for state in state_list:
-        polytope_list.append(simulation_slice.boundaries(state))
-        print(polytope_list[-1])
-        #get the polytope
-        polytope=simulation_slice.boundaries(state)
-        A=polytope.A
-        b=polytope.b
-        
-        #check if polytope is empty and continue otherwise (should never trigger)
-        if A.shape[0] == 0:
-            continue
-        lower_bounds_graph = np.hstack([-np.eye(2), (minV-0.05*abs(minV))[:,None]])
-        upper_bounds_graph = np.hstack([np.eye(2), -(maxV+0.05*abs(maxV))[:,None]])
-        lower_bounds = np.vstack([lower_bounds_graph, upper_bounds_graph])
-        point_inside,box = plot_2D_polytope(ax,A,b,"white",lower_bounds)
-        print(box)
-        if draw_labels and not box is None:
-            box_mid = (box[0]+box[1])/2
-            # Add charge state text 
-            if( box_mid[0] > minV[0] and  box_mid[0] < maxV[0] and box_mid[1] > minV[1] and box_mid[1] < maxV[1] ):
-                ax.text(box_mid[0], box_mid[1], str(state), c="white",ha='center', va='center')
-"""

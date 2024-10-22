@@ -909,7 +909,6 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
         line_start = self.poly_sim.find_state_of_voltage(
             m + P @ minV, state_hint=state_hint_lower_left
         )
-
         # now slice down to 2D for efficiency
         sim_slice = self.slice(P, m, proxy=cache)
         if insitu_axis is None:

@@ -237,8 +237,13 @@ class AbstractCapacitiveDeviceSimulator(AbstractPolytopeSimulator):
         return np.all(f < 1.0e-8)
 
     def find_boundary_intersection(
-        self, old_v, new_v, state, epsilon=1.0e-6, deep_search=True
-    ):
+        self,
+        old_v: np.ndarray,
+        new_v: np.ndarray,
+        state: np.ndarray,
+        epsilon: float = 1.0e-6,
+        deep_search: bool = True,
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Computes an intersection of a ray with the boundary of a polytope and computes the new state
 
         For a given state and a voltage old_v within the polytope of this state and a point new_v outside the polytope,
@@ -279,7 +284,7 @@ class AbstractCapacitiveDeviceSimulator(AbstractPolytopeSimulator):
         ts = -b_line[positive] / A_line[positive]
         transition_idx = np.argmin(ts)
 
-        # construct point of cosest hit
+        # construct point of closest hit
         transition_state = state + polytope.labels[positive[transition_idx]]
         v_intersect = old_v + (1 + epsilon) * ts[transition_idx] * direction
         if self.inside_state(v_intersect, transition_state):

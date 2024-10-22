@@ -530,6 +530,9 @@ class Experiment:  # TODO: change name to the simulator name
         # Part for the sensor signal:
         sensor_values = None
         if use_sensor_signal:
+            # TODO: How does this work ? The long chain of condition makes it hard
+            # to understand what's going on ... Arguments like plane_axes share the
+            # same name but end up having a completely different shape depending on the flags
             sensor_values = simulator.sensor_scan_2D(
                 plane_axes,
                 v_offset,
