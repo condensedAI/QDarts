@@ -2,6 +2,7 @@ import numpy as np
 from scipy.spatial import HalfspaceIntersection, ConvexHull
 from scipy.optimize import linprog
 from qdarts.util_functions import is_sequence
+from qdarts.simulator import AbstractCapacitiveDeviceSimulator
 from tqdm import tqdm
 
 
@@ -97,7 +98,13 @@ def raster_CSD_states(
 
 
 def get_CSD_data(
-    simulation, P, v_0, lower_left, upper_right, resolution, state_hint_lower_left
+    simulation: AbstractCapacitiveDeviceSimulator,
+    P: np.ndarray,
+    v_0: np.ndarray,
+    lower_left: list[float],
+    upper_right: list[float],
+    resolution: list[float],
+    state_hint_lower_left: list[int],
 ):
     """
     Function that computes a Charge Stability Diagram from a simulation of a device.
@@ -114,12 +121,10 @@ def get_CSD_data(
     ----------
         simulation:
             the device simulation to raster
-        ax:
-            matplotlib axis object to plot into
-        v_0:
-            the origin of the coordinate system to plot.
         P:
             coordinate system. A nx2 axis where n is the number of gates in simulation.
+        v_0:
+            the origin of the coordinate system to plot.
         lower_left:
             minimum value in x for both axes
         upper_right:
@@ -128,10 +133,6 @@ def get_CSD_data(
             number of sampled points in each direction of x. either single number or one per axis.
         state_hint_lower_left:
             starting point to guess the initial state of the lower left corner. must not be empty within sim.
-        draw_labels:
-            whether to draw the label of the state in a region
-        draw_background:
-            whether to draw a color map of the states of the CSD.
     """
     minV = np.array(lower_left)
     maxV = np.array(upper_right)

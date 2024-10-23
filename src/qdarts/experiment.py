@@ -13,6 +13,7 @@ from qdarts.util_functions import (
     compensate_simulator_sensors,
     axis_align_transitions,
 )
+from typing import Any
 
 # for the algorithm
 import numpy as np
@@ -20,8 +21,6 @@ import numpy as np
 # for plotting
 from matplotlib import pyplot as plt
 from qdarts.plotting import get_CSD_data, get_polytopes
-
-# for measuring runtime
 
 plt.rcParams.update({"font.size": 18})
 
@@ -398,23 +397,41 @@ class Experiment:  # TODO: change name to the simulator name
             sensor_detunings=self.sensor_config["sensor_detunings"],
         )[0]
 
-    def get_plot_args(self, x_voltages, y_voltages, plane_axes, v_offset=None):
+    def get_plot_args(
+        self,
+        x_voltages: np.ndarray,
+        y_voltages: np.ndarray,
+        plane_axes: np.ndarray,
+        v_offset: list | np.ndarray | None = None,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, list[int], np.ndarray, np.ndarray]:
         """
         Function that returns the arguments for plotting the CSD.
 
         Arguments
         ---------
-        x_voltages: list of floats, the x-axis voltages
-        y_voltages: list of floats, the y-axis voltages
-        plane_axes: 2xN array, the axes of the plane in which the CSD is to be rendered
-        v_offset: Nx1 array, the offset voltage of all of the gates, which defines the origin of the plot
+        x_voltages : list | np.ndarray
+            the x-axis voltages
+        y_voltages : list | np.ndarray
+            the y-axis voltages
+        plane_axes : np.ndarray
+            2xN array, the axes of the plane in which the CSD is to be rendered
+        v_offset : list | np.ndarray | None
+            Nx1 array, the offset voltage of all of the gates, which defines the origin of the plot
 
         Returns
         -------
-        v_offset: Nx1 array, the offset voltage of all of the gates
-        minV: 2x1 array, the minimum voltage of selected axes
-        maxV: 2x1 array, the maximum voltage of selected axes
-        resolution: list of integers, the resolution of the plot
+        v_offset : np.ndarray
+            Nx1 array, the offset voltage of all of the gates
+        minV : np.ndarray
+            2x1 array, the minimum voltage of selected axes
+        maxV : np.ndarray
+            2x1 array, the maximum voltage of selected axes
+        resolution : list[int]
+            the resolution of the plot
+        xout : np.ndarray
+            the x voltages
+        yout : np.ndarray
+            the y voltages
         """
 
         if v_offset is None:
@@ -432,39 +449,54 @@ class Experiment:  # TODO: change name to the simulator name
 
         return v_offset, minV, maxV, resolution, xout, yout
 
-    # RENDER FUNCTIONS
-    # --------------------------
-
     def generate_CSD(
         self,
-        x_voltages,
-        y_voltages,
-        plane_axes,
-        target_state=None,
-        target_transition=None,
-        use_virtual_gates=False,
-        compensate_sensors=False,
-        compute_polytopes=False,
-        use_sensor_signal=False,
-        v_offset=None,
-        insitu_axis=None,
-    ):
+        x_voltages: np.ndarray,
+        y_voltages: np.ndarray,
+        plane_axes: list | np.ndarray,
+        target_state: list[int] | np.ndarray | None = None,
+        target_transition: list[int] | np.ndarray | None = None,
+        use_virtual_gates: bool = False,
+        compensate_sensors: bool = False,
+        compute_polytopes: bool = False,
+        use_sensor_signal: bool = False,
+        v_offset: list | np.ndarray | None = None,
+        insitu_axis: list | np.ndarray | None = None,
+    ) -> tuple[
+        np.ndarray,
+        np.ndarray,
+        np.ndarray | Any | None,
+        dict | None,
+        np.ndarray | None,
+        np.ndarray,
+    ]:
         """
         Function that renders the capacitance CSD for a given set of voltages and axes.
 
         Arguments
         ---------
-        x_voltages: list of floats, the x-axis voltages
-        y_voltages: list of floats, the y-axis voltages
-        plane_axes: 2xN array, the axes of the plane in which the CSD is to be rendered
-        target_state: int, the guess state or the state at which the transition happens
-        target_transition: list of integers, the transition point e.g. [1,-1] would be the transition from [2,2] to [1,1]
-        use_virtual_gates: bool, whether to use virtual gates
-        compensate_sensors: bool, whether to compensate the sensors
-        compute_polytopes: bool, whether to compute the polytopes
-        use_sensor_signal: bool, whether to use the sensor signal
-        v_offset: Nx1 array, the offset voltage of all of the gates, which defines the origin of the plot
-
+        x_voltages: list | np.ndarray
+            the x-axis voltages
+        y_voltages: list | np.ndarray
+            the y-axis voltages
+        plane_axes: list[int] | np.ndarray
+            2xN array, the axes of the plane in which the CSD is to be rendered
+        target_state: list[int] | np.ndarray
+            int, the guess state or the state at which the transition happens
+        target_transition: list[int] | np.ndarray
+            the transition point e.g. [1,-1] would be the transition from [2,2] to [1,1]
+        use_virtual_gates: bool
+            whether to use virtual gates
+        compensate_sensors: bool
+            whether to compensate the sensors
+        compute_polytopes: bool
+            whether to compute the polytopes
+        use_sensor_signal: bool
+            whether to use the sensor signal
+        v_offset:list | np.ndarray | None
+            the offset voltage of all of the gates, which defines the origin of the plot
+        insitu_axis: list | np.ndarray | None
+            Something for insitu reflectometry ? #TODO: Document this
         Returns
         -------
         xout, yout: list of floats, the x and y voltages
