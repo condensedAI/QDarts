@@ -101,10 +101,10 @@ def get_CSD_data(
     simulation: AbstractCapacitiveDeviceSimulator,
     P: np.ndarray,
     v_0: np.ndarray,
-    lower_left: list[float],
-    upper_right: list[float],
-    resolution: list[float],
-    state_hint_lower_left: list[int],
+    lower_left: list[float] | np.ndarray,
+    upper_right: list[float] | np.ndarray,
+    resolution: list[int] | np.ndarray,
+    state_hint_lower_left: list[int] | np.ndarray,
 ):
     """
     Function that computes a Charge Stability Diagram from a simulation of a device.

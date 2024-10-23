@@ -14,15 +14,8 @@ from qdarts.util_functions import (
     axis_align_transitions,
 )
 from typing import Any
-
-# for the algorithm
 import numpy as np
-
-# for plotting
-from matplotlib import pyplot as plt
 from qdarts.plotting import get_CSD_data, get_polytopes
-
-plt.rcParams.update({"font.size": 18})
 
 # SIMULATION CONSTANTS
 SLOW_NOISE = {"tc": 50}
