@@ -249,7 +249,6 @@ class NoisySensorDot(AbstractSensorSim):
         results += scale * np.random.randn(len(results))
         return results
 
-    # TODO: This function is identical to the previous one ?
     def sample_sensor_configuration(
         self, sampled_configuration, v, H, mixed_state, sensor_state, beta
     ):
