@@ -162,7 +162,7 @@ class AbstractCapacitanceModel(metaclass=ABCMeta):
         return [state_list + state]
 
     def compute_polytope_for_state(self, state, maximum_slack):
-        """For a given state, computes P(N)
+        r"""For a given state, computes P(N)
 
         Calls enumerate_neighbours and compute_transition_equations to obtain a list of
         possible transitions and then removes from this list iteratively

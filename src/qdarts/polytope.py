@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Polytope:
-    """Represents the polytope P(n) defined by all gate voltages v in a device that have
+    r"""Represents the polytope P(n) defined by all gate voltages v in a device that have
     capacitive ground state n. They are stored as a set of linear inequalities (A,b), and
     A point v in P(n) fulfills
 
