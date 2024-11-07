@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 
 
 class AbstractNoiseProcess(metaclass=ABCMeta):
-    """
+    r"""
     Models a noise process that produces possibly dependent samples :math:`\epsilon(v)_t`. The noise process
     can depend on the device voltages v and the noise can depend on all previous samples in the sequence. We assume
     that :math:`\epsilon(v)_t` is vector valued and the number of elements is stored in the ``num_elements`` attribute
@@ -48,7 +48,7 @@ class AbstractNoiseProcess(metaclass=ABCMeta):
 
     @abstractmethod
     def __call__(self, v):
-        """Returns the next element of the noise process.
+        r"""Returns the next element of the noise process.
 
         Parameters
         ----------
@@ -63,7 +63,7 @@ class AbstractNoiseProcess(metaclass=ABCMeta):
 
 
 class OU_process(AbstractNoiseProcess):
-    """Implements the Ornstein-Uhlenbeck noise process
+    r"""Implements the Ornstein-Uhlenbeck noise process
 
     This noise is independent of v. We have that
 
@@ -115,7 +115,7 @@ class OU_process(AbstractNoiseProcess):
 
 
 class Cosine_Mean_Function(AbstractNoiseProcess):
-    """Decorator of an random process that models an additive mean term that depends on the gate voltages.
+    r"""Decorator of an random process that models an additive mean term that depends on the gate voltages.
     This term is added to noise values sampled from the decorated noise model
 
     The mean term of the ith noise element is given as a set of cosine functions:
