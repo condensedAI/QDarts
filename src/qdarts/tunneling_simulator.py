@@ -925,7 +925,7 @@ class ApproximateTunnelingSimulator(AbstractPolytopeSimulator):
             line_start = sim_slice.poly_sim.find_state_of_voltage(
                 v_start, state_hint=line_start
             )
-            values[i] = sim_slice.sensor_scan(
+            values[:,i] = sim_slice.sensor_scan(
                 v_start,
                 v_end,
                 resolution[0],
