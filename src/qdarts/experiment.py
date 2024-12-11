@@ -542,5 +542,6 @@ class Experiment:  # TODO: change name to the simulator name
                 target_state,
                 insitu_axis=insitu_axis,
             )
+            sensor_values = sensor_values.swapaxes(0, 1)
 
         return xout, yout, CSD_data, polytopes, sensor_values, v_offset
