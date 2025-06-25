@@ -229,7 +229,7 @@ def plot_polytopes(
                 ax.text(
                     box_mid[0],
                     box_mid[1],
-                    str(list(res[inds])),
+                    str(res[inds].tolist()),
                     c=color,
                     ha="center",
                     va="center",

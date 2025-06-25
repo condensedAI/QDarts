@@ -117,7 +117,7 @@ class Experiment:  # TODO: change name to the simulator name
                     np.round(
                         (1 - 0.137 * 3.6 / (config["ks"] + 2.6) * config["ks"]), 3
                     ),
-                    2 + config["ks"],
+                    2 + config["ks"]
                 )
                 print(log)
             else:
@@ -523,7 +523,6 @@ class Experiment:  # TODO: change name to the simulator name
                 resolution,
                 target_state,
             )
-            CSD_data = CSD_data.T
         if compute_polytopes:
             polytopes = get_polytopes(states, backend, minV, maxV)
 
