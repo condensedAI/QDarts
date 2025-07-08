@@ -2,7 +2,6 @@ import cvxpy as cp
 import numpy as np
 from scipy.spatial import HalfspaceIntersection
 
-
 def is_sequence(seq):
     if isinstance(seq, str):
         return False
@@ -34,6 +33,45 @@ def solve_linear_problem(prob):
         prob.solve(verbose=False, solver=cp.CLARABEL, max_iter=100000)
     except cp.SolverError:
         prob.solve(solver=cp.GLPK)
+        
+def solve_polytope_slack_problem(A_eq,b_eq, A_poly, b_poly):
+    """For a given polytope given by A_poly, b_poly checks whether the equality constraint a_eq@x+b_eq=0 touches the polytope and computes
+    a minimum distance. Returns None if the problem is infeasible, in which case the polytope includes conflicting constraints"""
+    # setup optimisation problem
+    x = cp.Variable(A_eq.shape[0])
+    eps = cp.Variable()
+    prob = cp.Problem(
+        cp.Minimize(eps), [A_eq @ x + b_eq + eps == 0, A_poly @ x + b_poly <= 0, eps >= 0]
+    )
+    solve_linear_problem(prob)
+    if prob.status not in ["infeasible", "infeasible_inaccurate"]:
+        return eps.value
+    else:
+        return None
+
+def _compute_polytope_slacks_block(A, b, threshold = 1.e-6,touching=None):
+    N = len(A)
+    if touching is None:
+        touching = np.ones(N, dtype=bool)  # equations with eps~=0. At the beginning we assume all are touching
+    slacks = 1e100 * np.ones(N)
+    
+    for k in range(N):
+        # take all previous tested and verified touching eqs and all untested eqs, except the current
+        touching[k] = False
+        Ak = A[touching, :]
+        bk = b[touching]
+
+        # the current equation to test
+        A_eq = A[k]
+        b_eq = b[k]
+        
+        slack = solve_polytope_slack_problem(A_eq,b_eq, Ak, bk)
+
+        if slack is not None:
+            slacks[k] = slack
+            if slacks[k] < threshold:
+                touching[k] = True
+    return slacks
 
 
 def _compute_polytope_slacks_1D(A, b):
@@ -97,7 +135,7 @@ def _compute_polytope_slacks_2D(A, b, bounds_A, bounds_b):
     return slacks
 
 
-def compute_polytope_slacks(A, b, bounds_A, bounds_b, maximum_slack):
+def compute_polytope_slacks(A, b, bounds_A, bounds_b):
     """Computes the slacks of each candidate transition of a ground state polytope.
 
     The polytope is given by all points x, such that :math:`Ax+b<0`. There might be boundaries
@@ -129,9 +167,6 @@ def compute_polytope_slacks(A, b, bounds_A, bounds_b, maximum_slack):
         The linear coefficients of N' additional constraint that ensure that polytopes are bounded.
     bounds_b: N' np.array of floats
         The constant offsets of the N' bounds
-    maximum_slack: float
-        Value for the maximum acceptable slack for transitions to be considered near the polytope.
-        TODO: review whether this parameter is needed.
     """
 
     # to find whether an equation a^Tx+b<= 0 touches the polytope, we need to find
@@ -162,38 +197,10 @@ def compute_polytope_slacks(A, b, bounds_A, bounds_b, maximum_slack):
     # 1D and 2D problems can be solved efficiently
     if A.shape[1] == 1:
         return _compute_polytope_slacks_1D(A, b)
-    if A.shape[1] == 0:
+    if A.shape[1] == 2:
         return _compute_polytope_slacks_2D(A, b, bounds_A, bounds_b)
-
-    # now we know there is a polyope and we can compute its sides
-    N = len(A)
-    touching = np.ones(
-        N, dtype=bool
-    )  # equations with eps~=0. At the beginning we assume all are touching
-    slacks = (maximum_slack + 1) * np.ones(
-        N
-    )  # slack value (updated when equation is computed)
-    for k in range(N):
-        # take all previous tested and verified touching eqs and all untested eqs, except the current
-        touching[k] = False
-        Ak = A[touching, :]
-        bk = b[touching]
-
-        # the current equation to test
-        A_eq = A[k]
-        b_eq = b[k]
-
-        # setup optimisation problem
-        x = cp.Variable(A.shape[1])
-        eps = cp.Variable()
-        prob = cp.Problem(
-            cp.Minimize(eps), [A_eq @ x + b_eq + eps == 0, Ak @ x + bk <= 0, eps >= 0]
-        )
-        solve_linear_problem(prob)
-        if prob.status not in ["infeasible", "infeasible_inaccurate"]:
-            slacks[k] = eps.value
-            if eps.value < 1.0e-6:
-                touching[k] = True
+    
+    slacks = _compute_polytope_slacks_block(A, b, threshold = 1.e-6)
     return slacks
 
 

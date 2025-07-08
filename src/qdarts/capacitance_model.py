@@ -21,7 +21,6 @@ def is_sequence(seq):
 eV = 1.602e-19
 to_Farrad_per_eV = 1e-18 / eV
 
-
 class AbstractCapacitanceModel(metaclass=ABCMeta):
     """Base Class for all capacitance models.
 
@@ -174,7 +173,7 @@ class AbstractCapacitanceModel(metaclass=ABCMeta):
         :math:`s_i = min_v A_i^Tv +b_i, v \in P(n)`
 
         This function retains all facets that have slack smaller than maximum_slack.
-        Since enregy differences are measure din eV, the slack represents the minimum
+        Since enregy differences are measured in eV, the slack represents the minimum
         energy difference between the ground state and the state represented by the transition
         for any point inside the polytope.
 
@@ -191,80 +190,48 @@ class AbstractCapacitanceModel(metaclass=ABCMeta):
         """
         # get the potentially bacthed list of states
         state_lists = self.enumerate_neighbours(state)
-        As = []
-        bs = []
-        transition_slacks = []
-        states = []
-        # Now for each of those, get the list of transitions...
-        for idx, state_list in enumerate(state_lists):
-            A, b = self.compute_transition_equations(state_list, state)
+        if len(state_lists) > 1:
+            raise NotImplementedError("Batched state generation not implemented, yet")
+        state_list = state_lists[0]
+        A, b = self.compute_transition_equations(state_list, state)
 
-            # check, whether there are superfluous transitions
-            # TODO: Oswin: i don't remember what the significance of this was.
-            zero_const = np.all(np.abs(A) < 1.0e-8, axis=1)
-            if np.any(zero_const):
-                A = A[~zero_const]
-                b = b[~zero_const]
-                state_list = state_list[~zero_const]
-            # ... and check for this batch whether we can filter out non-touching ones
-            slacks = compute_polytope_slacks(
-                A, b, self.bounds_normals, self.bounds_limits, maximum_slack
-            )
-            keep = slacks <= maximum_slack + 1.0e-8
+        # check, whether there are superfluous transitions to prevent numerical difficulties
+        zero_const = np.all(np.abs(A) < 1.0e-8, axis=1)
+        if np.any(zero_const):
+            A = A[~zero_const]
+            b = b[~zero_const]
+            state_list = state_list[~zero_const]
+        
+        #if everything got discarded, we are done
+        if b.shape[0] == 0:
+            return Polytope(state)
+            
+        # Main piece of work: compute the slack of each transition, i.e.,
+        # the maximum distance it has from the polytope. slack=0 means they are touching.
+        
+        slacks = compute_polytope_slacks(
+            A, b, self.bounds_normals, self.bounds_limits
+        )
+        #filter out transitions that are too far away
+        keep = slacks <= maximum_slack
+        # if we have kept nothing, this means there is a set of equations that is not fullfillable
+        # this happens often when slicing, e.g, a polytope is not within the sliced subspace.
+        if not np.any(keep):
+            return Polytope(state)
 
-            # if we have kept nothing, this means there is a set of equations that is not fullfillable
-            # this happens often when slicing, e.g, a polytope is not within the sliced subspace.
-            if not np.any(keep):
-                return Polytope(state)
-
-            As.append(A[keep])
-            bs.append(b[keep])
-            transition_slacks.append(slacks[keep])
-            states.append(state_list[keep])
-
-        # TODO: this doesn't work ... max_slacks is not initiated
-        while len(As) > 1:
-            # Take the next set of As, bs and states, and merge them into a new set
-            A = np.vstack(As[:2])
-            b = np.concatenate(bs[:2])
-            max_slack = np.concatenate(max_slacks[:2])
-            state = np.vstack(states[:2])
-            # Update the lists; we've now taken care of another set of two
-            As = As[2:]
-            bs = bs[2:]
-            states = states[2:]
-            max_slacks = max_slacks[2:]
-            transition_slacks = transition_slacks[2:]
-
-            # Handle possible duplicate transitions
-            state, indxs = np.unique(state, axis=0, return_index=True)
-            A = A[indxs]
-            b = b[indxs]
-
-            # Find transitions in the merged sets
-            slacks = self._check_transition_existence(A, b, max_slack)
-            keep = slacks <= maximum_slack + 1.0e-8
-
-            # if we have kept nothing, this means there is a set of equations that is not fullfillable
-            # this happens often when slicing, e.g, a polytope is not within the sliced subspace.
-            if not np.any(keep):
-                return Polytope(state)
-
-            # Add the merged ones back to the list
-            As.append(A[keep])
-            bs.append(b[keep])
-            max_slacks.append(max_slack[keep])
-            transition_slacks.append(slacks[keep])
-            states.append(state[keep])
+        A = A[keep]
+        b = b[keep]
+        slacks = slacks[keep]
+        states = state_list[keep]
 
         # create final polytope
         poly = Polytope(state)
-        touching = transition_slacks[0] < 1.0e-8
+        touching = slacks < 1.0e-8
         point_inside, _ = compute_maximum_inscribed_circle(
-            As[0][touching], bs[0][touching], self.bounds_normals, self.bounds_limits
+            A[touching], b[touching], self.bounds_normals, self.bounds_limits
         )
         poly.set_polytope(
-            states[0] - state, As[0], bs[0], transition_slacks[0], point_inside
+            states - state[None,:], A, b, slacks, point_inside
         )
         return poly
 
@@ -298,8 +265,7 @@ class AbstractCapacitanceModel(metaclass=ABCMeta):
             polytope.A,
             polytope.b,
             self.bounds_normals,
-            self.bounds_limits,
-            maximum_slack,
+            self.bounds_limits
         )
         keep = slacks <= maximum_slack + 1.0e-8
         touching = slacks <= 1.0e-6
