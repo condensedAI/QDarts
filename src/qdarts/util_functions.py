@@ -162,7 +162,7 @@ def compute_polytope_slacks(A, b, bounds_A, bounds_b, maximum_slack):
     # 1D and 2D problems can be solved efficiently
     if A.shape[1] == 1:
         return _compute_polytope_slacks_1D(A, b)
-    if A.shape[1] == 0:
+    if A.shape[1] == 2:
         return _compute_polytope_slacks_2D(A, b, bounds_A, bounds_b)
 
     # now we know there is a polyope and we can compute its sides

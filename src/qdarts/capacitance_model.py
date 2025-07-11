@@ -191,80 +191,44 @@ class AbstractCapacitanceModel(metaclass=ABCMeta):
         """
         # get the potentially bacthed list of states
         state_lists = self.enumerate_neighbours(state)
-        As = []
-        bs = []
-        transition_slacks = []
-        states = []
-        # Now for each of those, get the list of transitions...
-        for idx, state_list in enumerate(state_lists):
-            A, b = self.compute_transition_equations(state_list, state)
+        if len(state_lists)>1:
+            raise NotImplementedError("batching of States not implemented, yet.")
+        state_list = state_lists[0]
+        A, b = self.compute_transition_equations(state_list, state)
 
-            # check, whether there are superfluous transitions
-            # TODO: Oswin: i don't remember what the significance of this was.
-            zero_const = np.all(np.abs(A) < 1.0e-8, axis=1)
-            if np.any(zero_const):
-                A = A[~zero_const]
-                b = b[~zero_const]
-                state_list = state_list[~zero_const]
-            # ... and check for this batch whether we can filter out non-touching ones
-            slacks = compute_polytope_slacks(
-                A, b, self.bounds_normals, self.bounds_limits, maximum_slack
-            )
-            keep = slacks <= maximum_slack + 1.0e-8
+        # check, whether there are superfluous transitions
+        # TODO: Oswin: i don't remember what the significance of this was.
+        zero_const = np.all(np.abs(A) < 1.0e-8, axis=1)
+        if np.any(zero_const):
+            A = A[~zero_const]
+            b = b[~zero_const]
+            state_list = state_list[~zero_const]
+        # ... and check for this batch whether we can filter out non-touching ones
+        slacks = compute_polytope_slacks(
+            A, b, self.bounds_normals, self.bounds_limits, maximum_slack
+        )
+        keep = slacks <= maximum_slack + 1.0e-8
 
-            # if we have kept nothing, this means there is a set of equations that is not fullfillable
-            # this happens often when slicing, e.g, a polytope is not within the sliced subspace.
-            if not np.any(keep):
-                return Polytope(state)
+        # if we have kept nothing, this means there is a set of equations that is not fullfillable
+        # this happens often when slicing, e.g, a polytope is not within the sliced subspace.
+        if not np.any(keep):
+            return Polytope(state)
 
-            As.append(A[keep])
-            bs.append(b[keep])
-            transition_slacks.append(slacks[keep])
-            states.append(state_list[keep])
+        A = A[keep]
+        b = b[keep]
+        slacks = slacks[keep]
+        state_list = state_list[keep]
 
-        # TODO: this doesn't work ... max_slacks is not initiated
-        while len(As) > 1:
-            # Take the next set of As, bs and states, and merge them into a new set
-            A = np.vstack(As[:2])
-            b = np.concatenate(bs[:2])
-            max_slack = np.concatenate(max_slacks[:2])
-            state = np.vstack(states[:2])
-            # Update the lists; we've now taken care of another set of two
-            As = As[2:]
-            bs = bs[2:]
-            states = states[2:]
-            max_slacks = max_slacks[2:]
-            transition_slacks = transition_slacks[2:]
-
-            # Handle possible duplicate transitions
-            state, indxs = np.unique(state, axis=0, return_index=True)
-            A = A[indxs]
-            b = b[indxs]
-
-            # Find transitions in the merged sets
-            slacks = self._check_transition_existence(A, b, max_slack)
-            keep = slacks <= maximum_slack + 1.0e-8
-
-            # if we have kept nothing, this means there is a set of equations that is not fullfillable
-            # this happens often when slicing, e.g, a polytope is not within the sliced subspace.
-            if not np.any(keep):
-                return Polytope(state)
-
-            # Add the merged ones back to the list
-            As.append(A[keep])
-            bs.append(b[keep])
-            max_slacks.append(max_slack[keep])
-            transition_slacks.append(slacks[keep])
-            states.append(state[keep])
+        
 
         # create final polytope
         poly = Polytope(state)
-        touching = transition_slacks[0] < 1.0e-8
+        touching = slacks < 1.0e-8
         point_inside, _ = compute_maximum_inscribed_circle(
-            As[0][touching], bs[0][touching], self.bounds_normals, self.bounds_limits
+            A[touching], b[touching], self.bounds_normals, self.bounds_limits
         )
         poly.set_polytope(
-            states[0] - state, As[0], bs[0], transition_slacks[0], point_inside
+            state_list - state, A, b, slacks, point_inside
         )
         return poly
 

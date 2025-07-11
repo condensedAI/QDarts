@@ -97,7 +97,7 @@ def raster_CSD_states(
 
 
 def get_CSD_data(
-    simulation, P, v_0, lower_left, upper_right, resolution, state_hint_lower_left
+    simulation, P, v_0, lower_left, upper_right, resolution, state_hint_lower_left,proxy=False
 ):
     """
     Function that computes a Charge Stability Diagram from a simulation of a device.
@@ -128,10 +128,8 @@ def get_CSD_data(
             number of sampled points in each direction of x. either single number or one per axis.
         state_hint_lower_left:
             starting point to guess the initial state of the lower left corner. must not be empty within sim.
-        draw_labels:
-            whether to draw the label of the state in a region
-        draw_background:
-            whether to draw a color map of the states of the CSD.
+        proxy:
+            Whether to cache the computations of the full polytopes. False is faster in most cases.
     """
     minV = np.array(lower_left)
     maxV = np.array(upper_right)
@@ -143,7 +141,7 @@ def get_CSD_data(
     corner_state = simulation.find_state_of_voltage(
         lower_left_corner, state_hint_lower_left
     )
-    simulation_slice = simulation.slice(P, v_0, proxy=True)
+    simulation_slice = simulation.slice(P, v_0, proxy=proxy)
 
     # compute CSD
     states = raster_CSD_states(
