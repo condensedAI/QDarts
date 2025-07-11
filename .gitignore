@@ -7,3 +7,4 @@ sphinx/interfaces/
 dist/
 QDarts.egg-info/
 examples/.ipynb_checkpoints/
+.venv
