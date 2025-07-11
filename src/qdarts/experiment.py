@@ -292,10 +292,9 @@ class Experiment:  # TODO: change name to the simulator name
 
         Returns
         -------
-        plane_axes: 2xN array, the axes spanning the cut through volage plane
+        plane_axes: 2xN array, the axes spanning the cut through voltage plane
         transition_sim: CapacitanceSimulator object, the transition simulator
         """
-
         if compensate_sensors:
             # fix the sensor gate if we compensate
             simulator = fix_gates(
@@ -303,7 +302,7 @@ class Experiment:  # TODO: change name to the simulator name
                 self.sensor_config["sensor_dot_indices"],
                 np.zeros(len(self.sensor_config["sensor_dot_indices"])),
             )
-            # reduce dimension of the voltag space
+            # reduce dimension of the voltage space
             complement_gates = [
                 i
                 for i in range(plane_axes.shape[1])
@@ -331,7 +330,6 @@ class Experiment:  # TODO: change name to the simulator name
             pair_transitions = np.array(
                 [np.array(transition).T for transition in plane_axes], dtype=int
             )
-
             idxs = [
                 find_label(inner_labels, t[self.inner_dots])[0]
                 for t in pair_transitions
@@ -390,13 +388,19 @@ class Experiment:  # TODO: change name to the simulator name
         if not self.has_sensors:
             raise ValueError("Compensating sensors requires a sensor model.")
 
-        return compensate_simulator_sensors(
+        sim,v = compensate_simulator_sensors(
             simulator,
             target_state=target_state,
             compensation_gates=self.sensor_config["sensor_dot_indices"],
             sensor_ids=self.sensor_config["sensor_dot_indices"],
-            sensor_detunings=self.sensor_config["sensor_detunings"],
-        )[0]
+            sensor_detunings=self.sensor_config["sensor_detunings"]
+        )
+        
+        #translate sensor gates to 0.
+        offset = np.zeros(len(v))
+        offset[self.sensor_config["sensor_dot_indices"]] = v[self.sensor_config["sensor_dot_indices"]]
+        return sim.slice(np.eye(len(v)),offset)
+        
 
     def get_plot_args(self, x_voltages, y_voltages, plane_axes, v_offset=None):
         """

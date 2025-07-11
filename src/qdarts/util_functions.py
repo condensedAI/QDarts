@@ -76,7 +76,7 @@ def _compute_polytope_slacks_1D(A, b):
 
 def _compute_polytope_slacks_2D(A, b, bounds_A, bounds_b):
     """Special case in 2D solved via halfspace intersection"""
-
+    
     # first we use halfspace intersection to compute all corners of the final polytope
     # find a point fulfilling all constraints
     feasible_point, _ = compute_maximum_inscribed_circle(A, b, bounds_A, bounds_b)
@@ -380,7 +380,8 @@ def axis_align_transitions(
     return simulator.slice(P, np.zeros(simulator.num_inputs), proxy=proxy)
 
 
-def compensate_simulator_sensors(
+
+def compute_sensor_compensation_matrix(
     simulator,
     target_state,
     compensation_gates,
@@ -496,7 +497,7 @@ def compensate_simulator_sensors(
     np.put(P, P_sub_ids, compensation.flatten())
 
     # add errors to P-matrix
-    P = (1 - sensor_slope_detuning) * P + sensor_slope_detuning * np.eye(
+    P_error = (1 - sensor_slope_detuning) * P + sensor_slope_detuning * np.eye(
         simulator.num_inputs
     )
 
@@ -517,3 +518,183 @@ def compensate_simulator_sensors(
         compensation_transform,
         compensation_transform(v),
     )
+
+def compute_sensor_compensation_transform(
+    simulator,
+    target_state,
+    compensation_gates,
+    sensor_ids,
+    sensor_detunings,
+    sensor_slope_detuning=0.0,
+):
+    """Transforms the simulation to compensate the sensors against all other gates.
+
+    This function allows for perfect or imperfect sensor compensation as well as the exact position on the sensor peak.
+    This is done by finding the compensation values of the sensor plunger gates to compensate for the linear cross-talk of all other
+    plungers. This compensation is computed for a given target state as the compensation parameters might depend on the capacitances
+    in the state if they are variable.
+
+    The position on the sensor peak is given by sensor_detunings which move the position as a direct modification of the sensor potential.
+
+    Parameters
+    ----------
+    simulator: AbstractPolytopeSimulator
+        The simulator object which is to be transformed
+    target_state: list of int
+        The state from which the transitions are extracted
+    compensation_gates: list of int
+        The gates to be used for compensation of the sensor. Typically the sensor plunger gates in the device
+    sensor_ids: list of int
+        The indices of the sensor ids.
+    sensor_detunings: np.array of float
+        detuning parameter for each sensor which allows to move the sensor on a pre-specified point of the peak.
+    sensor_slope_detuning: float
+        (Experimental) scaling factor that moves the compensation linearly from perfect compensation (0) to no compensation (1).
+
+    Returns
+    -------
+    P: the compensation matrix
+    compute_bias(v): computes the offset b so that P@v+b is a point with the given detuning
+    v: a point with detuning = 0, the point the compensation is computed about
+    """
+    if len(sensor_ids) != len(compensation_gates):
+        raise ValueError(
+            "Number of gates for compensation must equal number of sensors"
+        )
+
+    if len(sensor_ids) != len(sensor_detunings):
+        raise ValueError(
+            "Number of gates for compensation must equal number of sensors"
+        )
+
+    for sensor in sensor_ids:
+        if target_state[sensor] <= 0:
+            raise ValueError(
+                "Target state must have at least one electron on each sensor dot"
+            )
+
+    compensation_gates = np.array(compensation_gates, dtype=int)
+    other_gates = np.delete(np.arange(simulator.num_inputs), compensation_gates)
+    sensor_detunings = np.array(sensor_detunings)
+
+    # by default we assume that for the sensor dots,
+    # we compute the transition between dots K and K+1
+    # where K is the electron occupation on the target state,
+    # which means that we take the polytope at the target state
+    # and compute the transition for the electron K->K+1 on the sensor dot.
+    # However, we will change the computed polytope based
+    # on the sensor detuning. if it is positive, we will instead compute
+    # the polytope for the K+1 electron and then search for the transition K+1->K
+
+    target_state = target_state.copy()
+    transitions = []
+    detunings = []
+    for detuning, sens_id in zip(sensor_detunings, sensor_ids):
+        if detuning > 0:
+            transitions.append(-np.eye(1, simulator.num_dots, sens_id))
+            detunings.append(-detuning)
+        else:
+            target_state[sens_id] -= 1
+            transitions.append(np.eye(1, simulator.num_dots, sens_id))
+            detunings.append(detuning)
+
+    # get geometry of the target state to compensate for
+    polytope = simulator.boundaries(target_state)
+
+    # find the sensor transitions inside the polytope
+    transition_idxs = []
+    for transition in transitions:
+        idx = find_label(polytope.labels, transition)[0]
+        transition_idxs.append(idx)
+
+    # get normals of sensor transitions
+    normals = polytope.A[transition_idxs, :]
+    # compute point on the intersection of the transition
+    v = find_point_on_transitions(polytope, transition_idxs)
+    
+
+    # compute compensation matrix
+    #normals /= np.linalg.norm(normals, axis=1)[:, None]
+    A1 = normals[:, compensation_gates]
+    A2 = normals[:, other_gates]
+    compensation = -np.linalg.inv(A1) @ A2
+    # now create the P-matrix
+    P = np.eye(simulator.num_inputs)
+    # get the indizes of the elements in the submatrix of the compensation parameters
+    P_sub_ids = (
+        simulator.num_inputs * compensation_gates[:, None] + other_gates[None, :]
+    )
+    np.put(P, P_sub_ids, compensation.flatten())
+
+    # add errors to P-matrix
+    P_error = (1 - sensor_slope_detuning) * P + sensor_slope_detuning * np.eye(
+        simulator.num_inputs
+    )
+    
+    #offset function. 
+    
+    # apply sensor detunings. First compute virtual gate matrix P_S for the sensor voltages
+    P_S = A1.T @ np.linalg.inv(A1 @ A1.T)
+    v_detuned = v.copy()
+    v_detuned[compensation_gates] += P_S@detunings
+    offset_v = v_detuned - P[:, other_gates] @ v[other_gates]
+    
+    
+    def compute_offset(v):
+        #using only the non-sensor gates, compute the sensor point with given detuning
+        v_comp = P[:, other_gates] @ v[other_gates] + offset_v
+        #b is the offset so that P_error@v+b=v_comp
+        b = v_comp-P_error@v
+        return b
+    
+    return P_error,  compute_offset, v_detuned
+
+def compensate_simulator_sensors(
+    simulator,
+    target_state,
+    compensation_gates,
+    sensor_ids,
+    sensor_detunings,
+    sensor_slope_detuning=0.0,
+):
+    """Transforms the simulation to compensate the sensors against all other gates.
+
+    This function allows for perfect or imperfect sensor compensation as well as the exact position on the sensor peak.
+    This is done by finding the compensation values of the sensor plunger gates to compensate for the linear cross-talk of all other
+    plungers. This compensation is computed for a given target state as the compensation parameters might depend on the capacitances
+    in the state if they are variable.
+
+    The position on the sensor peak is given by sensor_detunings which move the position as a direct modification of the sensor potential.
+
+    Parameters
+    ----------
+    simulator: AbstractPolytopeSimulator
+        The simulator object which is to be transformed
+    target_state: list of int
+        The state from which the transitions are extracted
+    compensation_gates: list of int
+        The gates to be used for compensation of the sensor. Typically the sensor plunger gates in the device
+    sensor_ids: list of int
+        The indices of the sensor ids.
+    sensor_detunings: np.array of float
+        detuning parameter for each sensor which allows to move the sensor on a pre-specified point of the peak.
+    sensor_slope_detuning: float
+        (Experimental) scaling factor that moves the compensation linearly from perfect compensation (0) to no compensation (1).
+
+    Returns
+    -------
+    sliced_sim: the sliced simulation that is created from the computed compensation parameters
+    tuning_point: a vector of gate voltages that indicates the exact compensation point of the simulation
+    """
+    
+    P_error, compute_bias, v = compute_sensor_compensation_transform(
+        simulator,
+        target_state,
+        compensation_gates,
+        sensor_ids,
+        sensor_detunings,
+        sensor_slope_detuning
+    )
+    offset = compute_bias(v)
+    
+    return simulator.slice(P_error, offset, True), v
