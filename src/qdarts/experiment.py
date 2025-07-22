@@ -52,9 +52,10 @@ class Experiment:  # TODO: change name to the simulator name
         self.tunneling_config = tunneling_config
         self.sensor_config = sensor_config
         self.print_logs = print_logs
-
-        print("EXPERIMENT INITIALIZED")
-        print("-----------------------")
+        
+        if print_logs:
+            print("EXPERIMENT INITIALIZED")
+            print("-----------------------")
 
         # Deploy simulators
         self.capacitance_sim = self.deploy_capacitance_sim(capacitance_config)
