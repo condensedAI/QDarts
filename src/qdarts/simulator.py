@@ -277,15 +277,18 @@ class AbstractCapacitiveDeviceSimulator(AbstractPolytopeSimulator):
 
         direction = new_v - old_v
         direction /= np.linalg.norm(direction)
+        selection = np.where(polytope.slacks<1.e-8)[0]
+        
 
-        A_line = polytope.A @ direction
-        b_line = polytope.b + polytope.A @ old_v
+        A_line = polytope.A[selection] @ direction
+        b_line = polytope.b[selection] + polytope.A[selection] @ old_v
         positive = np.where(A_line > 0)[0]
         ts = -b_line[positive] / A_line[positive]
         transition_idx = np.argmin(ts)
+        selection = selection[positive]
 
         # construct point of closest hit
-        transition_state = state + polytope.labels[positive[transition_idx]]
+        transition_state = state + polytope.labels[selection[transition_idx]]
         v_intersect = old_v + (1 + epsilon) * ts[transition_idx] * direction
         if self.inside_state(v_intersect, transition_state):
             return transition_state, v_intersect
