@@ -1,4 +1,6 @@
 import cvxpy as cp
+import scipy
+import clarabel
 import numpy as np
 from scipy.spatial import HalfspaceIntersection
 
@@ -31,11 +33,41 @@ def is_invertible_matrix(A, max_cond=1.0e8):
 def solve_linear_problem(prob):
     """Internal helper function to solve supplied linear cvxpy problems"""
     try:
-        prob.solve(verbose=False, solver=cp.CLARABEL, max_iter=100000)
+        prob.solve(verbose=False, solver=cp.CLARABEL, max_iter=1000000)
     except cp.SolverError:
         prob.solve(solver=cp.GLPK)
 
+def solve_linear_ineq_problem(cx,bx, A_ineq,b_ineq):
+    """Internal helper function to solve LP with no equality constraints"""
 
+    # convert to SCS format
+    N = len(cx)
+    M = A_ineq.shape[0]
+    P = scipy.sparse.csc_matrix((N,N))
+    q = -cx
+    A = scipy.sparse.csc_matrix(A_ineq)
+    b = -b_ineq
+    
+    cone = [clarabel.NonnegativeConeT(M)]
+
+    # Set solver parameters
+    settings = clarabel.DefaultSettings()
+    settings.verbose = False
+    
+    #initializeand solve
+    solver = clarabel.DefaultSolver(P,q,A,b,cone,settings)
+    solution = solver.solve()
+    
+    status = str(solution.status)
+    success = False
+    if status == "Solved" or status == "AlmostSolved":
+        success = True
+    
+    if success :
+        return True, -solution.obj_val+bx, solution.x
+    else:
+        return False, None, None
+    
 def _compute_polytope_slacks_1D(A, b):
     """Special case called by compute_polytope_slacks when A has a single column"""
     w = A.reshape(-1)
@@ -173,27 +205,18 @@ def compute_polytope_slacks(A, b, bounds_A, bounds_b, maximum_slack):
     slacks = (maximum_slack + 1) * np.ones(
         N
     )  # slack value (updated when equation is computed)
+    A_touch = A
+    b_touch = b
     for k in range(N):
-        # take all previous tested and verified touching eqs and all untested eqs, except the current
-        touching[k] = False
-        Ak = A[touching, :]
-        bk = b[touching]
-
-        # the current equation to test
-        A_eq = A[k]
-        b_eq = b[k]
-
-        # setup optimisation problem
-        x = cp.Variable(A.shape[1])
-        eps = cp.Variable()
-        prob = cp.Problem(
-            cp.Minimize(eps), [A_eq @ x + b_eq + eps == 0, Ak @ x + bk <= 0, eps >= 0]
-        )
-        solve_linear_problem(prob)
-        if prob.status not in ["infeasible", "infeasible_inaccurate"]:
-            slacks[k] = eps.value
-            if eps.value < 1.0e-6:
+        success, value, x = solve_linear_ineq_problem(A[k],b[k], A_touch,b_touch)
+        touching[k]=False
+        if success:
+            slacks[k] = np.maximum(-value,0.0)
+            if slacks[k] < 1.0e-6:
                 touching[k] = True
+        if not touching[k]:
+            A_touch = A[touching, :]
+            b_touch = b[touching]
     return slacks
 
 
@@ -378,146 +401,6 @@ def axis_align_transitions(
     np.put(P, P_sub_ids, compensation.flatten())
 
     return simulator.slice(P, np.zeros(simulator.num_inputs), proxy=proxy)
-
-
-
-def compute_sensor_compensation_matrix(
-    simulator,
-    target_state,
-    compensation_gates,
-    sensor_ids,
-    sensor_detunings,
-    sensor_slope_detuning=0.0,
-):
-    """Transforms the simulation to compensate the sensors against all other gates.
-
-    This function allows for perfect or imperfect sensor compensation as well as the exact position on the sensor peak.
-    This is done by finding the compensation values of the sensor plunger gates to compensate for the linear cross-talk of all other
-    plungers. This compensation is computed for a given target state as the compensation parameters might depend on the capacitances
-    in the state if they are variable.
-
-    The position on the sensor peak is given by sensor_detunings which move the position as a direct modification of the sensor potential.
-
-    Parameters
-    ----------
-    simulator: AbstractPolytopeSimulator
-        The simulator object which is to be transformed
-    target_state: list of int
-        The state from which the transitions are extracted
-    compensation_gates: list of int
-        The gates to be used for compensation of the sensor. Typically the sensor plunger gates in the device
-    sensor_ids: list of int
-        The indices of the sensor ids.
-    sensor_detunings: np.array of float
-        detuning parameter for each sensor which allows to move the sensor on a pre-specified point of the peak.
-    sensor_slope_detuning: float
-        (Experimental) scaling factor that moves the compensation linearly from perfect compensation (0) to no compensation (1).
-
-    Returns
-    -------
-    sliced_sim: the sliced simulation that is created from the computed compensation parameters
-    compensation_transform: a linear function that for any point v in the original coordinate system finds the point with the compensation applied in the new coordinate system
-    tuning_point: a vector of gate voltages that indicates the exact compensation point of the simulation
-    """
-    if len(sensor_ids) != len(compensation_gates):
-        raise ValueError(
-            "Number of gates for compensation must equal number of sensors"
-        )
-
-    if len(sensor_ids) != len(sensor_detunings):
-        raise ValueError(
-            "Number of gates for compensation must equal number of sensors"
-        )
-
-    for sensor in sensor_ids:
-        if target_state[sensor] <= 0:
-            raise ValueError(
-                "Target state must have at least one electron on each sensor dot"
-            )
-
-    compensation_gates = np.array(compensation_gates, dtype=int)
-    other_gates = np.delete(np.arange(simulator.num_inputs), compensation_gates)
-    sensor_detunings = np.array(sensor_detunings)
-
-    # by default we assume that for the sensor dots,
-    # we compute the transition between dots K and K+1
-    # where K is the electron occupation on the target state,
-    # which means that we take the polytope at the target state
-    # and compute the transition for the electron K->K+1 on the sensor dot.
-    # However, we will change the computed polytope based
-    # on the sensor detuning. if it is positive, we will instead compute
-    # the polytope for the K+1 electron and then search for the transition K+1->K
-
-    target_state = target_state.copy()
-    transitions = []
-    detunings = []
-    for detuning, sens_id in zip(sensor_detunings, sensor_ids):
-        if detuning > 0:
-            transitions.append(-np.eye(1, simulator.num_dots, sens_id))
-            detunings.append(-detuning)
-        else:
-            target_state[sens_id] -= 1
-            transitions.append(np.eye(1, simulator.num_dots, sens_id))
-            detunings.append(detuning)
-
-    # get geometry of the target state to compensate for
-    polytope = simulator.boundaries(target_state)
-
-    # find the sensor transitions inside the polytope
-    transition_idxs = []
-    for transition in transitions:
-        idx = find_label(polytope.labels, transition)[0]
-        transition_idxs.append(idx)
-
-    # get normals of sensor transitions
-    normals = polytope.A[transition_idxs, :]
-    # compute point on the intersection of the transition
-    v = find_point_on_transitions(polytope, transition_idxs)
-    # apply sensor detunings. First compute virtual gates for the
-    # two sensor voltages
-    comp_det = normals.T @ np.linalg.inv(normals @ normals.T)
-    # now use the compensation to define sensor detunings
-    v_detuning = comp_det @ sensor_detunings
-    v_detuned = (
-        v - v_detuning
-    )  # use detuning to move the point away from the transition
-
-    # compute compensation matrix
-    normals /= np.linalg.norm(normals, axis=1)[:, None]
-    A1 = normals[:, compensation_gates]
-    A2 = normals[:, other_gates]
-    compensation = -np.linalg.inv(A1) @ A2
-
-    # now create the P-matrix
-    P = np.eye(simulator.num_inputs)
-    # get the indizes of the elements in the submatrix of the compensation parameters
-    P_sub_ids = (
-        simulator.num_inputs * compensation_gates[:, None] + other_gates[None, :]
-    )
-    np.put(P, P_sub_ids, compensation.flatten())
-
-    # add errors to P-matrix
-    P_error = (1 - sensor_slope_detuning) * P + sensor_slope_detuning * np.eye(
-        simulator.num_inputs
-    )
-
-    # If we compensate now with v as central point, our gates would compute
-    # relative voltages to this (arbitrary) point. Tis would make it impossible
-    # to plot the same region with different compensation points
-    # instead, we will now take v and move it such, that the other gates are 0.
-    v_zero = v_detuned - P[:, other_gates] @ v_detuned[other_gates]
-
-    P_inv = np.linalg.inv(P)
-
-    def compensation_transform(v):
-        # find the linear transformation such, that v is mapped on v_detuned
-        return P_inv @ (v - v_zero - v_detuning)
-
-    return (
-        simulator.slice(P, v_zero, True),
-        compensation_transform,
-        compensation_transform(v),
-    )
 
 def compute_sensor_compensation_transform(
     simulator,
